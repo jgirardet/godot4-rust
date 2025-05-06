@@ -1,0 +1,30 @@
+todo:
+
+features:
+- changer le nom du tscn
+- option pub crate or pub scene : à définir
+- explorer
+    - godot Tscn explorer
+    - godot res dir explorer 
+    - drag/click onready/preload from explorer
+    - explorer indicate some things (onready or others)
+    - icons + from godotClass
+
+test
+- configurer test :
+    - ui: ok
+    - vscode: à voir
+    - unit pur: 
+
+code refactor
+- parser TSCN:
+    - refactor one from grudot team/ use tree sitter ?
+    - projet indépendant ?
+    - parser node avec - _ et /
+    - echec avec scalzard à retester
+
+- parser Rust
+    - extract a godomodule/godotclass
+
+
+
