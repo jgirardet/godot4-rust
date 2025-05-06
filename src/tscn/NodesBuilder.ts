@@ -37,12 +37,15 @@ class Nodes {
 
   choices = (): NodeQuickItem[] => {
     let res: NodeQuickItem[] = [];
-    res.push(new NodeQuickItem(this.nodes[0]));
     for (let s of this.nodes.slice(1, this.nodes.length)) {
       res.push(new NodeQuickItem(s));
     }
     return res;
   };
+
+  get root(): Node {
+    return this.nodes[0];
+  }
 }
 
 class NodesBuilder {

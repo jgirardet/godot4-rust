@@ -5,6 +5,7 @@ import { NAME } from "./constantes";
 import { log_error, logger } from "./log";
 import { newGodotClass } from "./commands/newGodotClass";
 import { createGdextensionCommand } from "./commands/createGdextension";
+import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 
 export function activate(context: vscode.ExtensionContext) {
   logger.info("Extension activating");
@@ -28,10 +29,16 @@ export function activate(context: vscode.ExtensionContext) {
     () => log_error(createGdextensionCommand)
   );
 
+  const commandstartNewGDExtension = vscode.commands.registerCommand(
+    NAME + "." + "startNewGDExtensionProject",
+    () => log_error(startNewExtensionCommand)
+  );
+
   context.subscriptions.push(commandSetProject);
   context.subscriptions.push(commandInsertOnReady);
   context.subscriptions.push(command_newGodotClass);
   context.subscriptions.push(commandCreateGdextension);
+  context.subscriptions.push(commandstartNewGDExtension);
 }
 
 export function deactivate() {

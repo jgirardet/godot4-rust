@@ -103,19 +103,31 @@ export const multiSelect = async (
     }
   }
 };
-export const fileExistsAsync = async (fp: string, driver: WebDriver) => {
+export const fileExistsAsync = async (
+  fp: string,
+  driver: WebDriver,
+  timeout: number = 2000
+) => {
+  const waitTime = 100;
   let counter = 0;
+  console.log(`Waiting for ${fp}`);
   await driver.wait(async () => {
     if (existsSync(fp)) {
       return true;
     }
-    if (counter === 10) {
-      return;
+    if (counter >= timeout) {
+      throw new Error(`timeout waiting ${fp}`);
     }
-    await driver.sleep(100);
-    counter += 1;
+    await driver.sleep(waitTime);
+    counter += waitTime;
   });
   return true;
+};
+
+export const selectPath = async (fullpath: string) => {
+  const input = await InputBox.create();
+  await input.setText(fullpath);
+  await input.confirm();
 };
 
 const clearTmp = async () => {

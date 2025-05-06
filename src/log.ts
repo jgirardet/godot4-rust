@@ -21,5 +21,6 @@ const log_error = async (f: () => Promise<void>) => {
     await f();
   } catch (e) {
     logger.error(e);
+    vscode.window.showErrorMessage(`Godot 4 Rust Error: ${e}`);
   }
 };

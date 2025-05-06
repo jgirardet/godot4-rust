@@ -38,10 +38,11 @@ describe("addNewGodot class Command", () => {
     await inp.selectQuickPick(LEVEL_SCENE_PATH);
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();
-    await multiSelect(inp, [0, 1, 2]);
+    await multiSelect(inp, [0, 1]);
     await inp.confirm();
     let editor = new TextEditor();
     let content = await editor.getText();
+    await editor.save(); // to avoid "do you want to save ?"
     assert.equal(
       content,
       fs
@@ -50,7 +51,6 @@ describe("addNewGodot class Command", () => {
         )
         .toString()
     );
-    await editor.save(); // to avoid "do you want to save ?"
   });
 
   it("tests to add a new class from no file", async () => {
@@ -60,7 +60,7 @@ describe("addNewGodot class Command", () => {
     await inp.selectQuickPick(LEVEL_SCENE_PATH);
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();
-    await multiSelect(inp, [0, 1, 2]);
+    await multiSelect(inp, [0, 1]);
     await inp.confirm(); // confirm multiselect
     await driver.sleep(500);
     await inp.confirm(); // confirm file path

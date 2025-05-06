@@ -1,8 +1,10 @@
-import { existsSync, readFileSync, readSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import * as vscode from "vscode";
 import { logger } from "./log";
 const toml = require("smol-toml");
+import cp from "node:child_process";
+import { CargoComandResult } from "./types";
 
 // find Cargo.toml file => undefined if != 1
 export const getCargoToml = async (): Promise<string | undefined> => {
@@ -29,7 +31,6 @@ export const getRustDir = async (cargoToml?: string): Promise<string> => {
   }
 };
 
-/// Try to return rust/src/ folder and fallback workspace
 export const getRustSrcDir = async (cargoToml?: string): Promise<string> => {
   let rustDir = await getRustDir(cargoToml);
   if (existsSync(path.join(rustDir, "src/"))) {
@@ -51,4 +52,17 @@ export const getCrateName = (cargoPath: string): string => {
     );
   }
   return res;
+};
+
+// cargo command which avoid Error bubbling
+export const runCargoCommand = (command: string): CargoComandResult => {
+  try {
+    const res = cp.execSync(`cargo ${command}`, {
+      encoding: "utf-8",
+      timeout: 2000,
+    });
+    return { ok: res };
+  } catch (err: any) {
+    return { error: err.toString() };
+  }
 };

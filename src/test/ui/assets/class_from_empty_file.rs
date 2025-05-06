@@ -1,11 +1,9 @@
-use godot::{classes::{NinePatchRect,NinePatchRect,Label,TextureRect, INinePatchRect}, prelude::*,};
+use godot::{classes::{NinePatchRect,Label,TextureRect,INinePatchRect}, prelude::*,};
 
 #[derive(GodotClass)]
 #[class(base=NinePatchRect,init)]
 struct LevelButton {
 base: Base<NinePatchRect>,
-#[init(node = "LevelButton")]
-level_button: OnReady<Gd<NinePatchRect>>,
 #[init(node = "LevelLabel")]
 level_label: OnReady<Gd<Label>>,
 #[init(node = "CheckMark")]

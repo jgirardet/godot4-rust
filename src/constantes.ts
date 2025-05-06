@@ -5,3 +5,5 @@ export const GODOT_PROJECT_FILEPATH_KEY = "godotProjectFilePath";
 export interface GodotSettings {
   "godot4-rust.godotProjectFilePath": string;
 }
+
+export const LAST_GODOT_CRATE_VERSION_AS_TOML: string = 'godot = "0.2.4"';

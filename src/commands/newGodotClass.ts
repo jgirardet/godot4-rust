@@ -12,15 +12,11 @@ import {
 import { logger } from "../log";
 import { Node, Nodes, NodesBuilder } from "../tscn/NodesBuilder";
 import { GODOT_CLASSES } from "../godotClasses";
-import {
-  applyCodeActionNamed,
-  getGodotProjectPath,
-  selectTscn,
-} from "../utils";
+import { applyCodeActionNamed, selectTscn } from "../utils";
 import path from "path";
 import { toSnake } from "ts-case-convert";
-import { writeFile, writeFileSync } from "fs";
 import { getRustSrcDir } from "../cargo.js";
+import { getGodotProjectDir } from "../godotProject";
 
 export const newGodotClass = async () => {
   let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {
@@ -30,7 +26,7 @@ export const newGodotClass = async () => {
     return;
   }
 
-  const godotProjectPath = getGodotProjectPath();
+  const godotProjectPath = getGodotProjectDir();
   const selectedTscn = await selectTscn(godotProjectPath);
   if (selectedTscn === undefined) {
     return;

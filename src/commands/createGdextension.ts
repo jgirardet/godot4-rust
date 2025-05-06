@@ -1,12 +1,14 @@
-import { GODOT_PROJECT_FILEPATH_KEY } from "../constantes";
-import { getConfigValue, getGodotProjectPath } from "../utils";
 import path from "path";
 import { logger } from "../log";
-import { readFile } from "fs/promises";
-import * as ini from "ini";
 import { getRustDir, getCrateName, getCargoToml } from "../cargo.js";
 import { window } from "vscode";
 import { writeFileSync, existsSync } from "fs";
+import {
+  getGodotProjectDir,
+  getGodotProjectFile,
+  getParsedGodotProject,
+} from "../godotProject";
+import { FullPathDir, FullPathFile, Name } from "../types";
 
 export const createGdextensionCommand = async () => {
   logger.info("Starting command: create gdextension file");
@@ -18,11 +20,24 @@ export const createGdextensionCommand = async () => {
     return;
   }
   const rustDir = await getRustDir(cargoToml);
-  const godotDir = getGodotProjectPath();
-  logger.info(`Using ${godotDir}`);
-
-  // deal with the names
   let crateName = getCrateName(cargoToml);
+  const gfp = getGodotProjectFile();
+
+  let fileExtensionName = await processCreateGdextension(
+    crateName,
+    rustDir,
+    gfp
+  );
+  window.showInformationMessage(`${fileExtensionName} created`);
+};
+
+export const processCreateGdextension = async (
+  crateName: Name,
+  rustDir: FullPathDir,
+  gfp: FullPathFile
+): Promise<string | undefined> => {
+  let godotDir = getGodotProjectDir(gfp);
+  logger.info(`Using ${godotDir}`);
   let extFilename = `${crateName}.gdextension`;
   let secondExtFilename = `new_${extFilename}`;
   let newPath = path.join(godotDir, extFilename);
@@ -43,32 +58,24 @@ export const createGdextensionCommand = async () => {
   }
 
   // generate and write to disk
-  const gdContent = await gdText(rustDir, crateName);
+  const gdContent = await gdText(rustDir, crateName, gfp);
   writeFileSync(newPath, gdContent);
-  window.showInformationMessage(`${extFilename} created`);
+  return extFilename;
 };
 
-const gdText = async (rustDir: string, crateName: string, version?: string) => {
-  const godotDir = getGodotProjectPath();
-  const godotFile = getConfigValue(GODOT_PROJECT_FILEPATH_KEY);
-  let _version;
-  if (version === undefined) {
-    let text = await readFile(godotFile, {
-      encoding: "utf-8",
-    });
-    let project = ini.parse(text);
-    _version =
-      (project["application"]["config/features"] as string)
-        .match(/.*(\d\.\d).*/)
-        ?.at(1) ?? "4.2";
-  } else {
-    _version = version;
-  }
+const gdText = async (
+  rustDir: string,
+  crateName: string,
+  gfp: FullPathFile,
+  version?: string
+) => {
+  const godotDir = getGodotProjectDir(gfp);
+  let _version = version || getParsedGodotProject(gfp).version;
   logger.info(`Creating gdextension file with compatibility ${_version}`);
   const relativeRustDir = path
     .relative(godotDir, rustDir)
-    .replaceAll("\\", "/"); // win32 hack
-  crateName = crateName.replaceAll("-", "_"); // changed by rust when buildind
+    .replaceAll("\\", "/"); //win32 hack
+  crateName = crateName.replaceAll("-", "_"); // changed by rust when build
 
   return `[configuration]
 entry_symbol = "gdext_rust_init"

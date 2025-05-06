@@ -3,28 +3,9 @@ import { GODOT_PROJECT_FILEPATH_KEY, NAME } from "./constantes";
 import path from "path";
 import { glob } from "glob";
 import { logger } from "./log";
+import { FullPathDir } from "./types";
 
-export {
-  getGodotProjectPath,
-  getProjectConfig,
-  getConfigValue,
-  selectTscn,
-  applyCodeActionNamed,
-};
-
-const getGodotProjectPath = (): string => {
-  const godotfp = getConfigValue(GODOT_PROJECT_FILEPATH_KEY);
-  if (godotfp === undefined || godotfp.length === 0) {
-    vscode.window.showErrorMessage(
-      "Godot Project is not set. Use Ctrl+Maj+P => <Set Godot Project> to select .godot project file"
-    );
-    throw new Error("No Godot project Set");
-  }
-
-  const gdp = path.dirname(godotfp);
-  logger.info(`Godot Project path: ${gdp}`);
-  return gdp;
-};
+export { getProjectConfig, getConfigValue, selectTscn, applyCodeActionNamed };
 
 const getProjectConfig = (): vscode.WorkspaceConfiguration => {
   return vscode.workspace.getConfiguration(NAME);
@@ -42,7 +23,7 @@ const getConfigValue = (key: string): string => {
 };
 
 const selectTscn = async (
-  godot_project_path: string
+  godot_project_path: FullPathDir
 ): Promise<string | undefined> => {
   const tscn_files = await glob("**/*.tscn", { cwd: godot_project_path });
 

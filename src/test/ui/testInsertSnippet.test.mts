@@ -1,4 +1,4 @@
-import  assert  from "assert";
+import assert from "assert";
 import {
   BottomBarPanel,
   InputBox,
@@ -30,7 +30,7 @@ describe("InsertSnippet Command", () => {
     await wb.executeCommand("godot4-rust.insertOnReady");
     inp = await InputBox.create();
     await inp.selectQuickPick(0);
-    await inp.selectQuickPick(4);
+    await inp.selectQuickPick(3)
 
     let editor = new TextEditor();
     let ligne1 = await editor.getTextAtLine(1);
@@ -43,7 +43,7 @@ describe("InsertSnippet Command", () => {
     await wb.executeCommand("godot4-rust.insertOnReady");
     inp = await InputBox.create();
     await inp.selectQuickPick(0);
-    await inp.selectQuickPick(4);
+    await inp.selectQuickPick(3);
 
     ligne1 = await editor.getTextAtLine(1);
     ligne2 = await editor.getTextAtLine(2);

@@ -12,7 +12,9 @@ const insertOnready = async () => {
   }
 
   // Pick node
-  const pick = await vscode.window.showQuickPick(res.choices());
+  const pick = await vscode.window.showQuickPick(res.choices(), {
+    title: `Nodes of ${res.root.name}`
+  });
   if (pick === undefined) {
     return;
   }

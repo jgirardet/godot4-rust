@@ -43,8 +43,9 @@ const implVirtualMethodsEnd = (): string[] => {
 };
 
 const classImports = (node: Node, otherClassesImports: string[]): string[] => {
+  let imports = new Set([node.type, ...otherClassesImports]);
   return [
-    `use godot::{classes::{${[node.type, ...otherClassesImports].join(",")}, I${
+    `use godot::{classes::{${[...imports].join(",")},I${
       node.type
     }}, prelude::*,};\n`,
   ];

@@ -1,10 +1,20 @@
 import * as vscode from "vscode";
 import { DISPLAY_NAME, NAME } from "../constantes";
 import { logger } from "../log";
+import { FullPathFile } from "../types";
 
-export { setGodotProject };
+export const setGodotProject = async () => {
+  let path = await selectGodotProject();
+  if (path === undefined) {
+    return;
+  }
+  vscode.workspace.getConfiguration(NAME).update("godotProjectFilePath", path);
+  logger.info(`Set Godot Project to: ${path}`);
+};
 
-const setGodotProject = async () => {
+export const selectGodotProject = async (): Promise<
+  FullPathFile | undefined
+> => {
   const godotfilepath = await vscode.window.showOpenDialog({
     filters: { "Godot Project File": ["godot"] },
     openLabel: "Select .godot project file",
@@ -14,8 +24,5 @@ const setGodotProject = async () => {
     logger.info(": No project File selected");
     return;
   }
-  vscode.workspace
-    .getConfiguration(NAME)
-    .update("godotProjectFilePath", godotfilepath[0].fsPath);
-  logger.info(`Set Godot Project to: ${godotfilepath[0].fsPath}`);
+  return godotfilepath[0].path;
 };
