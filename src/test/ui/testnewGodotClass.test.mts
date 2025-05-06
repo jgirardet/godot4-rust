@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import  assert  from "assert";
 import path from "path";
 import * as fs from "fs";
 import * as os from "os";
@@ -46,7 +46,7 @@ describe("addNewGodot class Command", () => {
       content,
       fs
         .readFileSync(
-          path.resolve("src/test/ui-test/assets/class_from_empty_file.rs")
+          path.resolve("src/test/ui/assets/class_from_empty_file.rs")
         )
         .toString()
     );
@@ -72,7 +72,7 @@ describe("addNewGodot class Command", () => {
       content,
       fs
         .readFileSync(
-          path.resolve("src/test/ui-test/assets/class_from_empty_file.rs")
+          path.resolve("src/test/ui/assets/class_from_empty_file.rs")
         )
         .toString()
     );

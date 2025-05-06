@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import path from "path";
 import {
   BottomBarPanel,
@@ -16,6 +15,7 @@ import {
   initTest,
 } from "../testutils.js";
 import { existsSync, readFileSync, unlink, unlinkSync } from "fs";
+import assert from "assert";
 
 describe("create gdextension file", () => {
   let browser: VSBrowser;

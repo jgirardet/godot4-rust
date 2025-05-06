@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import  assert  from "assert";
 import path from "path";
 import * as fs from "fs";
 import {

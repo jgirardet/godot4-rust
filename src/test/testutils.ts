@@ -64,7 +64,7 @@ export const initTest = async (): Promise<
   let rootPath = cloneDirToTemp("assets/noConfigProject");
   addGodotProjectPathSetting(rootPath);
   let browser = VSBrowser.instance;
-  browser.openResources(rootPath);
+  await browser.openResources(rootPath);
   let driver = browser.driver;
   await browser.waitForWorkbench();
   let wb = new Workbench();

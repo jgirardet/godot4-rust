@@ -53,16 +53,15 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test",
     "clearTmp": "node ./out/test/testutils.js",
-    "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions && npm run clearTmp",
-    "ui-test": "extest setup-and-run './out/test/ui-test/*.test.mjs' --code_version max --code_settings src/test/ui-test/settings.json --extensions_dir .test-extensions && npm run clearTmp",
-    "ui-testone": "extest setup-and-run './out/test/ui-test/*sion.test.mjs' --code_version max --code_settings src/test/ui-test/settings.json --extensions_dir .test-extensions && npm run clearTmp"
+    "unit-test": "mocha out/test/unit",
+    "vscode-test": "node ./out/test/runVscodeTests.js",
+    "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
+    "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
+    "ui-testone": "extest run-tests --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
   },
   "devDependencies": {
-    "@types/chai": "^5.2.2",
     "@types/ini": "^4.1.1",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
@@ -72,7 +71,6 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
-    "chai": "^5.2.0",
     "eslint": "^9.25.1",
     "typescript": "^5.8.3",
     "vscode-extension-tester": "^8.14.1"

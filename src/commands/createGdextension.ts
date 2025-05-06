@@ -65,7 +65,9 @@ const gdText = async (rustDir: string, crateName: string, version?: string) => {
     _version = version;
   }
   logger.info(`Creating gdextension file with compatibility ${_version}`);
-  const relativeRustDir = path.relative(godotDir, rustDir);
+  const relativeRustDir = path
+    .relative(godotDir, rustDir)
+    .replaceAll("\\", "/"); // win32 hack
   crateName = crateName.replaceAll("-", "_"); // changed by rust when buildind
 
   return `[configuration]
