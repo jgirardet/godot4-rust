@@ -1,0 +1,66 @@
+[gd_scene load_steps=6 format=3 uid="uid://jt3wvha7tsv3"]
+
+[ext_resource type="Texture2D" uid="uid://cxuhnxm0efm63" path="res://assets/blue_panel.png" id="1_g2igf"]
+[ext_resource type="Script" uid="uid://def4qjdtop7jm" path="res://Scenes/Main/LevelButton/level_button.gd" id="2_2y826"]
+[ext_resource type="FontFile" uid="uid://d2u7v36lfb634" path="res://assets/LuckiestGuy-Regular.ttf" id="2_oyhed"]
+[ext_resource type="Texture2D" uid="uid://bhwulti02oucr" path="res://assets/green_checkmark.png" id="3_2qqcx"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_2qqcx"]
+font = ExtResource("2_oyhed")
+font_size = 32
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="LevelButton" type="NinePatchRect"]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("1_g2igf")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+script = ExtResource("2_2y826")
+
+[node name="LevelLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "10"
+label_settings = SubResource("LabelSettings_2qqcx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckMark" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -21.0
+offset_bottom = 20.0
+grow_horizontal = 0
+texture = ExtResource("3_2qqcx")
+stretch_mode = 2
+
+[node name="Button" type="Button" parent="."]
+modulate = Color(1, 1, 1, 0.258824)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
