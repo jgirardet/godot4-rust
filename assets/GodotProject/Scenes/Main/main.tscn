@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dycv01s4vud8g" path="res://assets/Gray.png" id="1_lixft"]
 [ext_resource type="LabelSettings" uid="uid://b0kponm3gbkqq" path="res://Resources/MainTitleFont.tres" id="2_qw60k"]
 [ext_resource type="PackedScene" uid="uid://jt3wvha7tsv3" path="res://Scenes/Main/LevelButton/level_button.tscn" id="3_qw60k"]
+[ext_resource type="Script" path="res://world.gd" id="1_kk187"]
 
 [node name="Main" type="MainScene"]
 anchors_preset = 15

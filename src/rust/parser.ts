@@ -1,17 +1,12 @@
-import Parser, { Tree, Query, SyntaxNode, QueryCapture } from "tree-sitter";
+import Parser, { Query, SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
 import { godotModuleQuery } from "./queries/loadQueries";
 import { ParsedGodotModule } from "./types";
+import { TreeSitterParser } from "../tree/treeSitterParser";
 
-export class RustParser {
-  source: string;
-  _parser: Parser = new Parser();
-  _tree: Tree;
-
-  constructor(source: string) {
-    this.source = source;
-    this._parser.setLanguage(Rust as Parser.Language);
-    this._tree = this._parser.parse(source);
+export class RustParser extends TreeSitterParser {
+  get lang(): Parser.Language {
+    return Rust as Parser.Language;
   }
 
   get rootNode(): SyntaxNode {

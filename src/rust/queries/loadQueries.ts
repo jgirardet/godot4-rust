@@ -1,9 +1,3 @@
-import { readFileSync } from "fs";
-import path from "path";
+import { loadFileQueries } from "../../util";
 
-const buildExports = (file: string) =>
-  readFileSync(path.resolve("src/rust/queries", file), {
-    encoding: "utf-8",
-  });
-
-export const godotModuleQuery = buildExports("./godotModule.scm");
+export const godotModuleQuery = loadFileQueries("rust", "godotModule.scm");

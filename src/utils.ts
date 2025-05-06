@@ -1,11 +1,15 @@
 import * as vscode from "vscode";
-import { GODOT_PROJECT_FILEPATH_KEY, NAME } from "./constantes";
-import path from "path";
+import { NAME } from "./constantes";
 import { glob } from "glob";
 import { logger } from "./log";
 import { FullPathDir } from "./types";
 
-export { getProjectConfig, getConfigValue, selectTscn, applyCodeActionNamed };
+export {
+  getProjectConfig,
+  getConfigValue,
+  selectTscn,
+  applyCodeActionNamed,
+};
 
 const getProjectConfig = (): vscode.WorkspaceConfiguration => {
   return vscode.workspace.getConfiguration(NAME);
@@ -63,3 +67,4 @@ const applyCodeActionNamed = async (
     }
   }
 };
+

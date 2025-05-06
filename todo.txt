@@ -17,7 +17,9 @@ code refactor
     - projet indépendant ?
     - parser node avec - _ et /
     - echec avec scalzard à retester
-
+    - un grand nombre de test de tscn différent pour tester plantage
+    
+- les utils
 
 - 2 case converts
 
