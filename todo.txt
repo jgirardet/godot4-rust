@@ -10,11 +10,6 @@ features:
     - explorer indicate some things (onready or others)
     - icons + from godotClass
 
-test
-- configurer test :
-    - ui: ok
-    - vscode: à voir
-    - unit pur: 
 
 code refactor
 - parser TSCN:
