@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { NodeMethodQuickItem } from "../tscn/quickPickItems";
 import {
   classImports,
   declGodotClassEnd,
@@ -10,13 +9,20 @@ import {
   onready_snippet,
 } from "../snippets";
 import { logger } from "../log";
-import { Node, Nodes, NodesBuilder } from "../tscn/NodesBuilder";
 import { GODOT_CLASSES } from "../godotClasses";
-import { applyCodeActionNamed, selectTscn } from "../utils";
+import { applyCodeActionNamed } from "../utils";
 import path from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
-import { getGodotProjectDir } from "../godotProject";
+import {
+  getGodotProjectDir,
+  getGodotProjectFile,
+  listTscnFiles,
+} from "../godotProject";
+import { selectNodes, selectTscn } from "../ui/select";
+import { TscnParser } from "../tscn/parser";
+import { QuickPickItem } from "vscode";
+import { Node } from "../tscn/types";
 
 export const newGodotClass = async () => {
   let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {
@@ -26,17 +32,15 @@ export const newGodotClass = async () => {
     return;
   }
 
-  const godotProjectPath = getGodotProjectDir();
-  const selectedTscn = await selectTscn(godotProjectPath);
-  if (selectedTscn === undefined) {
+  let gpf = getGodotProjectFile();
+  let gpd = getGodotProjectDir(gpf);
+  const tscnFiles = listTscnFiles(gpf);
+  const selectedTscn = await selectTscn(tscnFiles, gpd);
+  if (!selectedTscn) {
     return;
   }
 
-  const nodes = await NodesBuilder.build(godotProjectPath, selectedTscn);
-  if (nodes === undefined) {
-    logger.info("New Godot Class command: aborting");
-    return;
-  }
+  let nodes = new TscnParser(path.resolve(selectedTscn)).parse().nodes;
 
   const methods = buildMethodsList();
   const pickedMethod = await pickMethods(methods);
@@ -50,7 +54,7 @@ export const newGodotClass = async () => {
     return;
   }
 
-  const snippet = build_snippet(nodes.nodes[0], pickedMethod, pickedOnready);
+  const snippet = build_snippet(nodes[0], pickedMethod, pickedOnready);
 
   let editor: vscode.TextEditor | undefined;
   if (persistFile === "Yes") {
@@ -95,32 +99,29 @@ const pickMethods = async (
   return choices;
 };
 
-const pickOnReady = async (nodes: Nodes): Promise<Node[] | undefined> => {
-  let choices = await vscode.window.showQuickPick(nodes.choices(), {
+const pickOnReady = async (nodes: Node[]): Promise<Node[] | undefined> => {
+  let choices = (await selectNodes(nodes, {
     canPickMany: true,
     title: "Select OnReady field to add",
-  });
-  if (choices === undefined) {
-    return undefined;
-  }
-
-  return choices.map((p) => {
-    return p.node;
-  });
+  })) as Node[] | undefined; // pick many
+  logger.info(choices);
+  return choices;
 };
 
 const build_snippet = (
-  node: Node,
+  rootNode: Node,
   methods: NodeMethodQuickItem[],
   onReadys: Node[]
 ): string => {
   const onreadysImports = onReadys
-    .filter((p) => GODOT_CLASSES.includes(p.type))
-    .map((p) => p.type);
-  const cImports = classImports(node, onreadysImports);
-  const decl_start = declGodotClassStart(node);
+    .filter(
+      (p) => GODOT_CLASSES.includes(p.type?.value || "") // TODO:FIX p.instance?.value.type.value)
+    )
+    .map((p) => p.type?.value ?? ""); // FIX FIX
+  const cImports = classImports(rootNode, onreadysImports);
+  const decl_start = declGodotClassStart(rootNode);
   const decl_end = declGodotClassEnd();
-  const imp_start = implVirtualMethodsStart(node);
+  const imp_start = implVirtualMethodsStart(rootNode);
   const impl_end = implVirtualMethodsEnd();
 
   const virMethods = methods.map((x) => x.detail);
@@ -168,3 +169,16 @@ const insertRustMod = async (editor: vscode.TextEditor, filename: string) => {
   await applyCodeActionNamed(editor, `Insert \`mod ${filename};\``);
   logger.info("Insert mod complete");
 };
+
+class NodeMethodQuickItem implements QuickPickItem {
+  label: string;
+  detail: string;
+  picked: boolean;
+
+  constructor(label: string, detail: string, picked: boolean) {
+    console.log(picked);
+    this.label = label;
+    this.detail = detail.trimEnd();
+    this.picked = picked;
+  }
+}

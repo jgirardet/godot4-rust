@@ -27,10 +27,11 @@ describe("InsertSnippet Command", () => {
     await wb.executeCommand("workbench.action.files.newUntitledFile");
 
     // first part test simple add
+
     await wb.executeCommand("godot4-rust.insertOnReady");
     inp = await InputBox.create();
-    await inp.selectQuickPick(0);
-    await inp.selectQuickPick(3)
+    await inp.selectQuickPick("/Scenes/Main/main.tscn");
+    await inp.selectQuickPick(3);
 
     let editor = new TextEditor();
     let ligne1 = await editor.getTextAtLine(1);
@@ -42,7 +43,7 @@ describe("InsertSnippet Command", () => {
     // second part test "add it to then new line under if line is not empty"
     await wb.executeCommand("godot4-rust.insertOnReady");
     inp = await InputBox.create();
-    await inp.selectQuickPick(0);
+    await inp.selectQuickPick("/Scenes/Main/main.tscn");
     await inp.selectQuickPick(3);
 
     ligne1 = await editor.getTextAtLine(1);

@@ -1,4 +1,4 @@
-import  assert  from "assert";
+import assert from "assert";
 import path from "path";
 import * as fs from "fs";
 import * as os from "os";
@@ -13,7 +13,7 @@ import {
 } from "vscode-extension-tester";
 import { initTest, multiSelect } from "../testutils.js";
 
-let LEVEL_SCENE_PATH = "Scenes/Main/LevelButton/level_button.tscn";
+let LEVEL_SCENE_PATH = "/Scenes/Main/LevelButton/level_button.tscn";
 if (os.platform() === "win32") {
   LEVEL_SCENE_PATH = LEVEL_SCENE_PATH.replaceAll("/", "\\");
 }
@@ -36,6 +36,7 @@ describe("addNewGodot class Command", () => {
     inp = await InputBox.create();
     await inp.selectQuickPick("No");
     await inp.selectQuickPick(LEVEL_SCENE_PATH);
+    inp = await InputBox.create();
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();
     await multiSelect(inp, [0, 1]);
@@ -58,6 +59,7 @@ describe("addNewGodot class Command", () => {
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
     await inp.selectQuickPick(LEVEL_SCENE_PATH);
+    inp = await InputBox.create();
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();
     await multiSelect(inp, [0, 1]);

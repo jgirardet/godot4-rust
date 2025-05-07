@@ -7,7 +7,6 @@ import { FullPathDir } from "./types";
 export {
   getProjectConfig,
   getConfigValue,
-  selectTscn,
   applyCodeActionNamed,
 };
 
@@ -26,19 +25,6 @@ const getConfigValue = (key: string): string => {
   }
 };
 
-const selectTscn = async (
-  godot_project_path: FullPathDir
-): Promise<string | undefined> => {
-  const tscn_files = await glob("**/*.tscn", { cwd: godot_project_path });
-
-  const selected = await vscode.window.showQuickPick(tscn_files);
-  if (selected === undefined) {
-    logger.info("No file selected, aborting");
-    return;
-  }
-  logger.info(`${selected} selected`);
-  return selected;
-};
 
 /// Apply the code titled at current cursor position
 const applyCodeActionNamed = async (

@@ -6,6 +6,7 @@ import { GODOT_PROJECT_FILEPATH_KEY } from "./constantes";
 import path from "path";
 import { existsSync, readFileSync } from "fs";
 import { FullPathDir, FullPathFile, Name } from "./types";
+import { globSync } from "glob";
 
 export const getGodotProjectFile = (): FullPathFile => {
   const godotfp = getConfigValue(GODOT_PROJECT_FILEPATH_KEY);
@@ -32,6 +33,11 @@ export const getParsedGodotProject = (
   });
   const content = ini.parse(text) as IGodotProject;
   return new GodotProject(content);
+};
+
+export const listTscnFiles = (projectFile?: FullPathFile): FullPathFile[] => {
+  let gpd = getGodotProjectDir(projectFile);
+  return globSync("**/*.tscn", { cwd: gpd, absolute: true });
 };
 
 interface IGodotProject {

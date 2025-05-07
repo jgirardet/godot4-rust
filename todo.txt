@@ -13,12 +13,14 @@ features:
 
 code refactor
 - parser TSCN:
-    - refactor one from grudot team/ use tree sitter ?
-    - projet indépendant ?
+    - load query ne marche pas dans les tests
+    - voir pour ne parser 2 fois la mme scene
+    - FIXER le type ?
     - parser node avec - _ et /
     - echec avec scalzard à retester
     - un grand nombre de test de tscn différent pour tester plantage
     
-- les utils
+- les utils:
+    coadeaction provider n'arien à faire là: rust ? ui ?
 - 2 case converts
 
