@@ -4,7 +4,7 @@
     (attribute 
         (identifier) @keyType (#eq? @keyType "type") 
         (string) @type 
-)
+    )
     (attribute 
         (identifier) @keyUid (#eq? @keyUid "uid")
         (string) @uid

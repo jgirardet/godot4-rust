@@ -1,3 +1,5 @@
+import { Point } from "tree-sitter";
+
 export interface GDScene {
   uid: string;
   ext_resources: ExtResource[];
@@ -5,15 +7,24 @@ export interface GDScene {
 }
 
 export interface ExtResource {
-  type: string;
-  uid: string;
-  path: string;
-  id: string;
+  type: StringAttribute;
+  uid: StringAttribute;
+  path: StringAttribute;
+  id: StringAttribute;
 }
 
 export interface Node {
-  name: string;
-  type: string;
-  parent?: string;
-  instance?: ExtResource;
+  name: StringAttribute;
+  type?: StringAttribute;
+  parent?: StringAttribute;
+  instance?: ExtResourceAttribute;
 }
+
+export interface Attribute<T> {
+  value: T;
+  startPosition: Point;
+  endPosition: Point;
+}
+
+export type StringAttribute = Attribute<string>;
+export type ExtResourceAttribute = Attribute<ExtResource>;
