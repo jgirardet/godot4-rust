@@ -2,7 +2,7 @@ import { Point } from "tree-sitter";
 
 export interface GDScene {
   uid: string;
-  ext_resources: ExtResource[];
+  extResources: ExtResource[];
   nodes: Node[];
 }
 
