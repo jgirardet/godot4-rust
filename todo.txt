@@ -20,6 +20,5 @@ code refactor
     - un grand nombre de test de tscn différent pour tester plantage
     
 - les utils
-
 - 2 case converts
 
