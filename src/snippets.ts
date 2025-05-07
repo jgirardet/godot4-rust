@@ -1,5 +1,5 @@
 import { toSnake } from "ts-case-convert";
-import { Node } from "./tscn/NodesBuilder";
+import { Node } from "./tscn/types";
 
 export {
   onready_snippet,
@@ -13,8 +13,8 @@ export {
 
 const onready_snippet = (node: Node): string[] => {
   return [
-    `#[init(node = "${node.path}")]`,
-    `${toSnake(node.name)}: OnReady<Gd<${node.type}>>,`,
+    `#[init(node = "${formatParentString(node)}")]`,
+    `${toSnake(node.name.value)}: OnReady<Gd<${node.type?.value}>>,`,
   ];
 };
 
@@ -24,9 +24,9 @@ const declGodotClassStart = (
 ): string[] => {
   return [
     "#[derive(GodotClass)]",
-    `#[class(base=${node.type}${withInit ? ",init" : ""})]`,
-    `struct ${node.name} {`,
-    `base: Base<${node.type}>,`,
+    `#[class(base=${node.type?.value}${withInit ? ",init" : ""})]`,
+    `struct ${node.name.value} {`,
+    `base: Base<${node.type?.value}>,`,
   ];
 };
 
@@ -35,7 +35,7 @@ const declGodotClassEnd = (): string[] => {
 };
 
 const implVirtualMethodsStart = (node: Node): string[] => {
-  return [`#[godot_api]`, `impl I${node.type} for ${node.name} {`];
+  return [`#[godot_api]`, `impl I${node.type?.value} for ${node.name.value} {`];
 };
 
 const implVirtualMethodsEnd = (): string[] => {
@@ -43,10 +43,10 @@ const implVirtualMethodsEnd = (): string[] => {
 };
 
 const classImports = (node: Node, otherClassesImports: string[]): string[] => {
-  let imports = new Set([node.type, ...otherClassesImports]);
+  let imports = new Set([node.type?.value, ...otherClassesImports]);
   return [
     `use godot::{classes::{${[...imports].join(",")},I${
-      node.type
+      node.type?.value
     }}, prelude::*,};\n`,
   ];
 };
@@ -77,3 +77,10 @@ const node_methods = {
   // get_configuration_warnings:
   //   "fn get_configuration_warnings(&self) -> PackedStringArray {}",
 };
+
+function formatParentString(node: Node) {
+  return (
+    (node.parent?.value === "." ? "" : node.parent?.value + "/") +
+    node.name.value
+  );
+}

@@ -1,6 +1,6 @@
 import Parser, { Query, SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
-import { godotModuleQuery } from "./queries/loadQueries";
+import { godotModuleQuery } from "../queries/loadQueries";
 import { ParsedGodotModule } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
 

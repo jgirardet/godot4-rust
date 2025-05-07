@@ -12,7 +12,7 @@ import {
   ExtResourcesQuery,
   NodesQuery,
   TitleQuery,
-} from "./queries/loadQueries";
+} from "../queries/loadQueries";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
@@ -23,16 +23,17 @@ export class TscnParser extends TreeSitterParser {
   }
 
   parse(): GDScene {
-    let q = new Query(GODOT as Parser.Language, TitleQuery);
-    let uid = this._getStringAttributeUnsafe(
-      "uid",
-      q.captures(this.rootNode)
-    ).value; // ! ok
     return {
-      uid,
+      uid: this.getUid(),
       extResources: this.getExtResources(),
       nodes: this.getNodes(),
     };
+  }
+
+  getUid(): string {
+    let q = new Query(GODOT as Parser.Language, TitleQuery);
+    return this._getStringAttributeUnsafe("uid", q.captures(this.rootNode))
+      .value; // ! ok
   }
 
   getExtResources(): ExtResource[] {
