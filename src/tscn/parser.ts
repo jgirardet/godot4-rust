@@ -6,8 +6,13 @@ import {
   Node,
   StringAttribute,
   ExtResourceAttribute,
+  GDScene,
 } from "./types";
-import { ExtResourcesQuery, NodesQuery } from "./queries/loadQueries";
+import {
+  ExtResourcesQuery,
+  NodesQuery,
+  TitleQuery,
+} from "./queries/loadQueries";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
@@ -15,6 +20,19 @@ export class TscnParser extends TreeSitterParser {
 
   get lang(): Parser.Language {
     return GODOT as Parser.Language;
+  }
+
+  parse(): GDScene {
+    let q = new Query(GODOT as Parser.Language, TitleQuery);
+    let uid = this._getStringAttributeUnsafe(
+      "uid",
+      q.captures(this.rootNode)
+    ).value; // ! ok
+    return {
+      uid,
+      extResources: this.getExtResources(),
+      nodes: this.getNodes(),
+    };
   }
 
   getExtResources(): ExtResource[] {
@@ -29,6 +47,7 @@ export class TscnParser extends TreeSitterParser {
         path: this._getStringAttributeUnsafe("path", z.captures),
       });
     }
+
     return this.extResources;
   }
 
