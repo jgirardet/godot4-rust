@@ -2,6 +2,7 @@ import Parser, { Tree, SyntaxNode } from "tree-sitter";
 import { FullPathFile } from "../types";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
+import { readFile } from "fs/promises";
 
 /// Base class to derive Parser From
 /// Must reimplment lang()
@@ -19,6 +20,7 @@ export class TreeSitterParser {
     this._parser.setLanguage(this.lang);
     this._tree = this._parser.parse(this.source);
   }
+
 
   get lang(): Parser.Language {
     throw new Error(

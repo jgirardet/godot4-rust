@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://budmhkgm4nb6f"]
+
+[ext_resource type="PackedScene" uid="uid://d2mdflvalg8e5" path="res://child1.tscn" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://dtij3paetga7n" path="res://child2.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://6bmi4pv152ba" path="res://child22.tscn" id="3_h2yge"]
+
+[node name="main" type="Node2D"]
+
+[node name="child1" parent="." instance=ExtResource("1_0xm2m")]
+
+[node name="child2" parent="." instance=ExtResource("2_h2yge")]
+
+[node name="child22" parent="child2" instance=ExtResource("3_h2yge")]

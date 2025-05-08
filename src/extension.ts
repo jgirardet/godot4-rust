@@ -9,6 +9,7 @@ import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 
 export function activate(context: vscode.ExtensionContext) {
   logger.info("Extension activating");
+
   const commandSetProject = vscode.commands.registerCommand(
     NAME + "." + "setGodotProject",
     () => log_error(setGodotProject)

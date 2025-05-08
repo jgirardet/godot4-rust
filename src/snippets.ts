@@ -1,5 +1,5 @@
 import { toSnake } from "ts-case-convert";
-import { Node } from "./tscn/types";
+import { Node } from "./godot/types";
 
 export {
   onready_snippet,
