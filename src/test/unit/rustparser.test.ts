@@ -1,5 +1,5 @@
-import { RustParser } from "../../rust/parser";
 import { expect } from "earl";
+import { RustParser } from "../../rust/parser";
 
 describe("rust parser", function () {
   describe("ParsedGodotModule", function () {

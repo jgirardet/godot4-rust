@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import path from "path";
-import { TscnParser } from "../../tscn/parser";
+import { TscnParser } from "../../godot/parser";
 import { expect } from "earl";
 
 describe("TSCN Parser", () => {

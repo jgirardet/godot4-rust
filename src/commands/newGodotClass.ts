@@ -9,7 +9,7 @@ import {
   onready_snippet,
 } from "../snippets";
 import { logger } from "../log";
-import { GODOT_CLASSES } from "../godotClasses";
+import { GODOT_CLASSES } from "../godot/godotClasses";
 import { applyCodeActionNamed } from "../utils";
 import path from "path";
 import { toSnake } from "ts-case-convert";
@@ -20,9 +20,9 @@ import {
   listTscnFiles,
 } from "../godotProject";
 import { selectNodes, selectTscn } from "../ui/select";
-import { TscnParser } from "../tscn/parser";
+import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
-import { Node } from "../tscn/types";
+import { Node } from "../godot/types";
 
 export const newGodotClass = async () => {
   let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {

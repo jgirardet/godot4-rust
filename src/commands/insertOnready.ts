@@ -7,12 +7,12 @@ import {
   getGodotProjectFile,
   listTscnFiles,
 } from "../godotProject";
-import { TscnParser } from "../tscn/parser";
+import { TscnParser } from "../godot/parser";
 import path from "path";
-import { Node } from "../tscn/types";
+import { Node } from "../godot/types";
 
 export const insertOnready = async () => {
-  let gpf = getGodotProjectFile()
+  let gpf = getGodotProjectFile();
   let gpd = getGodotProjectDir(gpf);
   const tscnFiles = listTscnFiles(gpf);
   const tscn = await selectTscn(tscnFiles, gpd);

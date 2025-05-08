@@ -13,10 +13,17 @@ import {
   NodesQuery,
   TitleQuery,
 } from "../queries/loadQueries";
+import { FullPathFile } from "../types";
+import { readFile } from "fs/promises";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
   nodes: Node[] = [];
+
+  static async new(source: FullPathFile): Promise<TscnParser> {
+    source = await readFile(source, { encoding: "utf-8" });
+    return new TscnParser(source);
+  }
 
   get lang(): Parser.Language {
     return GODOT as Parser.Language;

@@ -1,7 +1,10 @@
 import { Point } from "tree-sitter";
 
+export type Uid = string;
+export type ResPath = string;
+
 export interface GDScene {
-  uid: string;
+  uid: Uid;
   extResources: ExtResource[];
   nodes: Node[];
 }

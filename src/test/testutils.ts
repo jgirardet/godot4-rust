@@ -28,7 +28,7 @@ export const cloneGrudotDirTemp = (dirpath?: string): string => {
 
 export const addGodotProjectPathSetting = (
   projectPath: string,
-  godotProjectDir?: string
+  godotProjectDir: string
 ) => {
   let dotvscode = path.resolve(projectPath, ".vscode");
   godotProjectDir = godotProjectDir ?? path.resolve("assets/GodotProject");
@@ -40,10 +40,21 @@ export const addGodotProjectPathSetting = (
   let setting = {
     "godot4-rust.godotProjectFilePath": godotProject,
   };
-  fs.writeFileSync(
-    path.resolve(projectPath, ".vscode/settings.json"),
-    JSON.stringify(setting)
-  );
+  // console.log(godotProject);
+  // fs.writeFileSync(
+  //   path.resolve(projectPath, ".vscode/settings.json"),
+  //   JSON.stringify(setting)
+  // );
+  // console.log(
+  //   fs.readFileSync(path.resolve(projectPath, ".vscode/settings.json"), {
+  //     encoding: "utf-8",
+  //   })
+  // );
+  // console.log(
+  //   fs.readFileSync(godotProject, {
+  //     encoding: "utf-8",
+  //   })
+  // );
 };
 
 export const getSettings = (filepath: string): GodotSettings | undefined => {
@@ -62,7 +73,7 @@ export const initTest = async (): Promise<
   [string, VSBrowser, WebDriver, Workbench, BottomBarPanel, OutputView]
 > => {
   let rootPath = cloneDirToTemp("assets/noConfigProject");
-  addGodotProjectPathSetting(rootPath);
+  addGodotProjectPathSetting(rootPath, cloneGrudotDirTemp());
   let browser = VSBrowser.instance;
   await browser.openResources(rootPath);
   let driver = browser.driver;
