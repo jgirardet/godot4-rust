@@ -1,5 +1,9 @@
 todo:
 
+
+Bug:
+    - loadFileQueries path
+
 features:
 - changer le nom du tscn
 - option pub crate or pub scene : à définir
