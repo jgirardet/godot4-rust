@@ -4,41 +4,38 @@ import { TscnParser } from "../../godot/parser";
 import { expect } from "earl";
 
 describe("TSCN Parser", () => {
-  describe("Full parse", () => {
-    it("tscn ext resource", () => {
-      let p = new TscnParser(
-        readFileSync(
-          path.resolve("assets/GodotProject/Scenes/Main/main.tscn"),
-          { encoding: "utf-8" }
-        )
-      );
-      let res = p.getExtResources();
+  it("tscn ext resource", async () => {
+    let p = await TscnParser.file(
+      path.resolve("assets/GodotProject/Scenes/Main/main.tscn")
+    );
+    let res = p.getExtResources();
+    expect(res).toEqual(extRes);
+  });
 
-      expect(res).toEqual(extRes);
-    });
-
-    it("tscn node", () => {
-      let p = new TscnParser(
-        readFileSync(
-          path.resolve("assets/GodotProject/Scenes/Main/main.tscn"),
-          { encoding: "utf-8" }
-        )
-      );
-      p.getExtResources();
-      expect(p.getNodes()).toEqual(nodes);
-    });
-    it("tscn gscene", () => {
-      let p = new TscnParser(
-        readFileSync(
-          path.resolve("assets/GodotProject/Scenes/Main/main.tscn"),
-          { encoding: "utf-8" }
-        )
-      );
-      let scene = p.parse();
-      expect(scene.uid).toEqual("uid://dtkeetr8r8u3l");
-      expect(scene.extResources).toEqual(extRes);
-      expect(scene.nodes).toEqual(nodes);
-    });
+  it("tscn node", async () => {
+    let p = await TscnParser.file(
+      path.resolve("assets/GodotProject/Scenes/Main/main.tscn")
+    );
+    p.getExtResources();
+    expect(p.getNodes()).toEqual(nodes);
+  });
+  it("tscn gscene", async () => {
+    let p = await TscnParser.file(
+      path.resolve("assets/GodotProject/Scenes/Main/main.tscn")
+    );
+    let scene = p.parse();
+    expect(scene.uid).toEqual("uid://dtkeetr8r8u3l");
+    expect(scene.extResources).toEqual(extRes);
+    expect(scene.nodes).toEqual(nodes);
+  });
+  it("tscn en vrac à tester", async () => {
+    for (const c of [
+      "assets/GodotProject/Scenes/Main/main2.tscn",
+      "assets/bigtscn.tscn",
+    ]) {
+      let p = await TscnParser.file(path.resolve(c));
+      p.parse();
+    }
   });
 });
 
@@ -113,154 +110,281 @@ const extRes = [
 
 const nodes = [
   {
-    type: {
-      startPosition: { row: 7, column: 23 },
-      endPosition: { row: 7, column: 34 },
-      value: "MainScene",
-    },
     name: {
-      startPosition: { row: 7, column: 11 },
-      endPosition: { row: 7, column: 17 },
+      startPosition: {
+        row: 7,
+        column: 11,
+      },
+      endPosition: {
+        row: 7,
+        column: 17,
+      },
       value: "Main",
     },
+    type: {
+      startPosition: {
+        row: 7,
+        column: 23,
+      },
+      endPosition: {
+        row: 7,
+        column: 34,
+      },
+      value: "MainScene",
+    },
   },
   {
-    type: {
-      startPosition: { row: 14, column: 30 },
-      endPosition: { row: 14, column: 43 },
+    name: {
+      startPosition: {
+        row: 14,
+        column: 11,
+      },
+      endPosition: {
+        row: 14,
+        column: 24,
+      },
       value: "TextureRect",
     },
-    name: {
-      startPosition: { row: 14, column: 11 },
-      endPosition: { row: 14, column: 24 },
+    type: {
+      startPosition: {
+        row: 14,
+        column: 30,
+      },
+      endPosition: {
+        row: 14,
+        column: 43,
+      },
       value: "TextureRect",
     },
     parent: {
-      startPosition: { row: 14, column: 51 },
-      endPosition: { row: 14, column: 54 },
+      startPosition: {
+        row: 14,
+        column: 51,
+      },
+      endPosition: {
+        row: 14,
+        column: 54,
+      },
       value: ".",
     },
   },
   {
+    name: {
+      startPosition: {
+        row: 24,
+        column: 11,
+      },
+      endPosition: {
+        row: 24,
+        column: 15,
+      },
+      value: "MC",
+    },
     type: {
-      startPosition: { row: 24, column: 21 },
-      endPosition: { row: 24, column: 38 },
+      startPosition: {
+        row: 24,
+        column: 21,
+      },
+      endPosition: {
+        row: 24,
+        column: 38,
+      },
       value: "MarginContainer",
     },
-    name: {
-      startPosition: { row: 24, column: 11 },
-      endPosition: { row: 24, column: 15 },
-      value: "MC",
-    },
     parent: {
-      startPosition: { row: 24, column: 46 },
-      endPosition: { row: 24, column: 49 },
+      startPosition: {
+        row: 24,
+        column: 46,
+      },
+      endPosition: {
+        row: 24,
+        column: 49,
+      },
       value: ".",
     },
   },
   {
-    type: {
-      startPosition: { row: 36, column: 21 },
-      endPosition: { row: 36, column: 36 },
-      value: "VBoxContainer",
-    },
     name: {
-      startPosition: { row: 36, column: 11 },
-      endPosition: { row: 36, column: 15 },
+      startPosition: {
+        row: 36,
+        column: 11,
+      },
+      endPosition: {
+        row: 36,
+        column: 15,
+      },
       value: "VB",
     },
+    type: {
+      startPosition: {
+        row: 36,
+        column: 21,
+      },
+      endPosition: {
+        row: 36,
+        column: 36,
+      },
+      value: "VBoxContainer",
+    },
     parent: {
-      startPosition: { row: 36, column: 44 },
-      endPosition: { row: 36, column: 48 },
+      startPosition: {
+        row: 36,
+        column: 44,
+      },
+      endPosition: {
+        row: 36,
+        column: 48,
+      },
       value: "MC",
     },
   },
   {
-    type: {
-      startPosition: { row: 39, column: 11 },
-      endPosition: { row: 39, column: 18 },
-      value: "Label",
-    },
     name: {
-      startPosition: { row: 39, column: 24 },
-      endPosition: { row: 39, column: 31 },
-      value: "Label",
-    },
-    parent: {
-      startPosition: { row: 39, column: 39 },
-      endPosition: { row: 39, column: 46 },
-      value: "MC/VB",
-    },
-  },
-  {
-    type: {
-      startPosition: { row: 46, column: 23 },
-      endPosition: { row: 46, column: 38 },
-      value: "GridContainer",
-    },
-    name: {
-      startPosition: { row: 46, column: 11 },
-      endPosition: { row: 46, column: 17 },
+      startPosition: {
+        row: 46,
+        column: 11,
+      },
+      endPosition: {
+        row: 46,
+        column: 17,
+      },
       value: "Grid",
     },
+    type: {
+      startPosition: {
+        row: 46,
+        column: 23,
+      },
+      endPosition: {
+        row: 46,
+        column: 38,
+      },
+      value: "GridContainer",
+    },
     parent: {
-      startPosition: { row: 46, column: 46 },
-      endPosition: { row: 46, column: 53 },
+      startPosition: {
+        row: 46,
+        column: 46,
+      },
+      endPosition: {
+        row: 46,
+        column: 53,
+      },
       value: "MC/VB",
     },
   },
   {
     name: {
-      startPosition: { row: 51, column: 11 },
-      endPosition: { row: 51, column: 16 },
+      startPosition: {
+        row: 51,
+        column: 11,
+      },
+      endPosition: {
+        row: 51,
+        column: 16,
+      },
       value: "Lev",
     },
     parent: {
-      startPosition: { row: 51, column: 24 },
-      endPosition: { row: 51, column: 27 },
+      startPosition: {
+        row: 51,
+        column: 24,
+      },
+      endPosition: {
+        row: 51,
+        column: 27,
+      },
       value: ".",
     },
     instance: {
       value: {
         type: {
-          startPosition: { row: 4, column: 19 },
-          endPosition: { row: 4, column: 32 },
+          startPosition: {
+            row: 4,
+            column: 19,
+          },
+          endPosition: {
+            row: 4,
+            column: 32,
+          },
           value: "PackedScene",
         },
         uid: {
-          startPosition: { row: 4, column: 37 },
-          endPosition: { row: 4, column: 57 },
+          startPosition: {
+            row: 4,
+            column: 37,
+          },
+          endPosition: {
+            row: 4,
+            column: 57,
+          },
           value: "uid://jt3wvha7tsv3",
         },
         id: {
-          startPosition: { row: 4, column: 116 },
-          endPosition: { row: 4, column: 125 },
+          startPosition: {
+            row: 4,
+            column: 116,
+          },
+          endPosition: {
+            row: 4,
+            column: 125,
+          },
           value: "3_qw60k",
         },
         path: {
-          startPosition: { row: 4, column: 63 },
-          endPosition: { row: 4, column: 112 },
+          startPosition: {
+            row: 4,
+            column: 63,
+          },
+          endPosition: {
+            row: 4,
+            column: 112,
+          },
           value: "res://Scenes/Main/LevelButton/level_button.tscn",
         },
       },
-      startPosition: { row: 51, column: 28 },
-      endPosition: { row: 51, column: 59 },
+      startPosition: {
+        row: 51,
+        column: 28,
+      },
+      endPosition: {
+        row: 51,
+        column: 59,
+      },
     },
   },
   {
-    type: {
-      startPosition: { row: 56, column: 24 },
-      endPosition: { row: 56, column: 31 },
+    name: {
+      startPosition: {
+        row: 56,
+        column: 11,
+      },
+      endPosition: {
+        row: 56,
+        column: 18,
+      },
       value: "Level",
     },
-    name: {
-      startPosition: { row: 56, column: 11 },
-      endPosition: { row: 56, column: 18 },
+    type: {
+      startPosition: {
+        row: 56,
+        column: 24,
+      },
+      endPosition: {
+        row: 56,
+        column: 31,
+      },
       value: "Level",
     },
     parent: {
-      startPosition: { row: 56, column: 39 },
-      endPosition: { row: 56, column: 42 },
+      startPosition: {
+        row: 56,
+        column: 39,
+      },
+      endPosition: {
+        row: 56,
+        column: 42,
+      },
       value: ".",
     },
   },

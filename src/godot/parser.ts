@@ -11,19 +11,12 @@ import {
 import {
   ExtResourcesQuery,
   NodesQuery,
-  TitleQuery,
+  UidQuery,
 } from "../queries/loadQueries";
-import { FullPathFile } from "../types";
-import { readFile } from "fs/promises";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
   nodes: Node[] = [];
-
-  static async new(source: FullPathFile): Promise<TscnParser> {
-    source = await readFile(source, { encoding: "utf-8" });
-    return new TscnParser(source);
-  }
 
   get lang(): Parser.Language {
     return GODOT as Parser.Language;
@@ -38,7 +31,8 @@ export class TscnParser extends TreeSitterParser {
   }
 
   getUid(): string {
-    let q = new Query(GODOT as Parser.Language, TitleQuery);
+    let q = new Query(GODOT as Parser.Language, UidQuery);
+    let ra = q.matches(this.rootNode);
     return this._getStringAttributeUnsafe("uid", q.captures(this.rootNode))
       .value; // ! ok
   }
@@ -125,7 +119,6 @@ export class TscnParser extends TreeSitterParser {
       captures
     ); // if instance => constructor and resUid always non null
     if (!constructor || constructor.value !== "ExtResource") {
-      console.log(constructor);
       return; // we don't support other cases, are there ?
     }
     let resId = this._getStringAttributeUnsafe("resId", captures);
@@ -154,3 +147,7 @@ export class TscnParser extends TreeSitterParser {
     } as T;
   }
 }
+
+export const tscnParser = (content: string) => {
+  return new TscnParser(content);
+};

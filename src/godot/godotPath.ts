@@ -3,7 +3,7 @@ import { FullPathDir, FullPathFile } from "../types";
 import { ResPath } from "./types";
 
 export class GodotPath {
-  private _base: string;
+  _base: string;
 
   constructor(base: string) {
     this._base = base;

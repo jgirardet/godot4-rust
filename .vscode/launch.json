@@ -51,52 +51,21 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
 			"args": [
-				"out/test/unit"
+				"out/test/unit",
 			],
 			// other options...
 		},
 		{
-			"name": "YYY",
-			"type": "extensionHost",
+			"name": "MochaLaunchSelectedTest",
+			"type": "node",
+			"cwd": "${workspaceFolder}",
 			"request": "launch",
-			"runtimeExecutable": "${execPath}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/vscode"
+				"out/test/unit/${fileBasenameNoExtension}.js",
+				"-g",
+				"${selectedText}"
 			],
-			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceFolder}/editors/code/out/test/vsocde/**/*.js"
-			],
-			// "preLaunchTask": "Pretest"
-		},
-		{
-			"name": "uite 1",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/other/suite"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
-			],
-			// "preLaunchTask": "npm: watch"
-		},
-		{
-			"name": "uite 2",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/other/suite2"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
-			],
-			// "preLaunchTask": "npm: watch"
 		},
 	]
 }

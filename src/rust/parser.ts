@@ -14,7 +14,7 @@ export class RustParser extends TreeSitterParser {
   }
 
   get isGodotModule(): boolean {
-    return this.source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
+    return this._source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
   }
 
   /// Find the First GodotClass in module
