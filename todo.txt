@@ -13,15 +13,15 @@ features:
     - drag/click onready/preload from explorer
     - explorer indicate some things (onready or others)
     - icons + from godotClass
+- le nombre de worker en option
 
 
 code refactor
+- parser rust: voir si is godot avec matcher + efficace pour virer source
 - parser TSCN:
     - delete pas au point sur manager (ou ok grace au set ?)
     - deativer extension si godotproject not set and exists
     - load query ne marche pas dans les tests
-    - voir pour ne parser 2 fois la mme scene
-    - FIXER le type ?
     - parser node avec - _ et /
     - echec avec scalzard à retester
     - un grand nombre de test de tscn différent pour tester plantage
@@ -31,3 +31,5 @@ code refactor
     coadeaction provider n'arien à faire là: rust ? ui ?
 - 2 case converts
 
+
+- parametrer l(install de scalazar)

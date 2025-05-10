@@ -1,9 +1,9 @@
 (resource
-  .
-    (section
+.
+    (section 
+        (identifier) @gdscene (#eq? @gdscene "gd_scene")
         (attribute 
-            (identifier)
             (string) @uid (#match? @uid "^\"uid.+")
         )
-    )
+     )
 )
