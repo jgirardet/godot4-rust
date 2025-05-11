@@ -4,25 +4,21 @@ import { TscnParser } from "./parser";
 import { GDScene, Uid } from "./types";
 
 export class GodotScene {
-  _gdscene: GDScene;
-  _path: GodotPath;
+  readonly gdscene: GDScene;
+  readonly path: GodotPath;
 
   constructor(tscnPath: GodotPath, gdScene: GDScene) {
-    this._path = tscnPath;
-    this._gdscene = gdScene;
-  }
-
-  get path(): GodotPath {
-    return this._path;
+    this.path = tscnPath;
+    this.gdscene = gdScene;
   }
 
   get uid(): Uid {
-    return this._gdscene.uid;
+    return this.gdscene.uid;
   }
 
   get depedencies(): GodotPath[] {
     let acc = [];
-    for (const ressou of this._gdscene.extResources) {
+    for (const ressou of this.gdscene.extResources) {
       if (ressou.type.value === "PackedScene") {
         acc.push(GodotPath.fromRes(ressou.path.value));
       }

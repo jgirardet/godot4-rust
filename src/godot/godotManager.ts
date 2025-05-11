@@ -53,8 +53,8 @@ export class GodotManager {
       for (const ghostScene of bunch) {
         // js worker make loosing getter and other, need to redo the object
         const scene = new GodotScene(
-          gp(ghostScene._path._base),
-          ghostScene._gdscene
+          gp(ghostScene.path.base),
+          ghostScene.gdscene
         );
         for (const dep of scene.depedencies) {
           this._setDependency(dep, scene.path);

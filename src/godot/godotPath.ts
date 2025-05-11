@@ -3,10 +3,10 @@ import { FullPathDir, FullPathFile } from "../types";
 import { ResPath } from "./types";
 
 export class GodotPath {
-  _base: string;
+  readonly base: string;
 
   constructor(base: string) {
-    this._base = base;
+    this.base = base;
   }
 
   static fromRes(res: ResPath): GodotPath {
@@ -18,19 +18,15 @@ export class GodotPath {
   }
 
   get toRes(): ResPath {
-    return "res://" + this._base;
+    return "res://" + this.base;
   }
 
   toAbs(godotDir: FullPathDir): FullPathFile {
-    return path.join(godotDir, this._base);
-  }
-
-  get base(): string {
-    return this._base;
+    return path.join(godotDir, this.base);
   }
 
   eq(other: GodotPath): boolean {
-    return this._base === other.base;
+    return this.base === other.base;
   }
 }
 

@@ -158,7 +158,7 @@ function benchNbWorkersScalAndGodotProject() {
       // console.log(scal.lastUpdate);
 
       // await scal._loadTscns(fichiers(), fn);
-      // await scal.load(fn);
+      await scal.load(fn);
     };
   }).args("fn", [1, 4, 8, 12, 16, 1]);
   // console.log(scal.scenes);
