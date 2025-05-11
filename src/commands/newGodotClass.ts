@@ -40,7 +40,7 @@ export const newGodotClass = async () => {
     return;
   }
 
-  let nodes = new TscnParser(path.resolve(selectedTscn)).parse().nodes;
+  let nodes = (await TscnParser.file(path.resolve(selectedTscn))).parse().nodes;
 
   const methods = buildMethodsList();
   const pickedMethod = await pickMethods(methods);
