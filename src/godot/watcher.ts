@@ -1,7 +1,4 @@
-import { FullPathDir, FullPathFile } from "../types.js";
-import { getGodotProjectDir, getGodotProjectFile } from "../godotProject.js";
-import { glob } from "glob";
-import path from "path";
+import { FullPathFile } from "../types.js";
 import {
   FileSystemWatcher,
   RelativePattern,
@@ -11,33 +8,27 @@ import {
   ExtensionContext,
 } from "vscode";
 import { logger } from "../log.js";
+import { GodotManager } from "./godotManager.js";
 
 export default class GodotProvider implements Disposable {
   _disposables: Disposable[] = [];
 
-  _godotProjectDir: FullPathDir;
-
-  _godotProjectFile: FullPathFile;
+  _manager: GodotManager;
 
   filesWatcher: FileSystemWatcher;
 
-  // scenes: GodotScene[] = [];
+  constructor(context: ExtensionContext, godotProjectFile: FullPathFile) {
+    this._manager = new GodotManager(godotProjectFile);
 
-  constructor(context: ExtensionContext) {
-    this._godotProjectFile = getGodotProjectFile();
-    this._godotProjectDir = getGodotProjectDir(this._godotProjectFile);
-
-    const pattern = new RelativePattern(this._godotProjectDir, "**/*.tscn");
+    const pattern = new RelativePattern(this._manager.projectDir, "**/*.tscn");
     this.filesWatcher = workspace.createFileSystemWatcher(pattern);
     context.subscriptions.push(
       this,
       this.filesWatcher,
       this.filesWatcher.onDidCreate(this.onTscnChanged),
-      this.filesWatcher.onDidDelete(this.onTscnDeleted),
-      this.filesWatcher.onDidChange(this.onTscnDeleted)
+      this.filesWatcher.onDidChange(this.onTscnChanged),
+      this.filesWatcher.onDidDelete(this.onTscnDeleted)
     );
-
-    logger.info("GodotProvider Activated");
     logger.info(`watching ${pattern.baseUri} ${pattern.pattern}`);
   }
   dispose() {
@@ -47,20 +38,22 @@ export default class GodotProvider implements Disposable {
     }
   }
 
-  async loadProject() {
-    for await (const absPath of glob.globIterate(
-      path.join(this._godotProjectDir, "**/*.tscn"),
-      { absolute: true }
-    )) {
-      // this.scenes.push(await GodotScene.new(absPath));
-    }
+  start() {
+    this._manager.load().then(
+      (_) => {
+        logger.info("GodotProvider Activated");
+      },
+      (r) => {
+        logger.error(`Starting Godot4 Rust Provider failed`);
+        logger.error(r);
+      }
+    );
   }
 
   onTscnChanged(u: Uri) {
     logger.info(`Changed detected to : ${u}`);
   }
   onTscnDeleted(u: Uri) {
-    logger.info(`Changed detected to : ${u}`);
+    logger.info(`File Deleted : ${u}`);
   }
 }
-

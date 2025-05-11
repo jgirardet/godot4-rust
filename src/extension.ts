@@ -7,6 +7,7 @@ import { newGodotClass } from "./commands/newGodotClass";
 import { createGdextensionCommand } from "./commands/createGdextension";
 import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
+import GodotProvider from "./godot/watcher";
 
 export function activate(context: vscode.ExtensionContext) {
   logger.info(`Extension${NAME} activating`);
@@ -20,7 +21,8 @@ export function activate(context: vscode.ExtensionContext) {
   let godotProjectFile = getGodotProjectFile(); //throw if fails
   vscode.commands
     .executeCommand("setContext", GODOTPROJET_IS_SET_KEY, true)
-    .then((_) => _activateAfterProjectSet(context, godotProjectFile)); // not if no godot project
+    .then((_) => _activateAfterProjectSet(context, godotProjectFile)) // not if no godot project
+    .then((_) => logger.info("Starting complete"));
 }
 
 export function deactivate() {
@@ -31,6 +33,9 @@ function _activateAfterProjectSet(
   context: vscode.ExtensionContext,
   godotProjectFile: string
 ) {
+  let provider = new GodotProvider(context, godotProjectFile);
+  provider.start();
+
   const commandInsertOnReady = vscode.commands.registerCommand(
     NAME + "." + "insertOnReady",
     () => log_error(insertOnready)

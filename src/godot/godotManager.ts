@@ -1,11 +1,17 @@
-import { glob } from "glob";
+import { globSync } from "glob";
 import { FullPathDir, FullPathFile } from "../types";
 import { GodotScene } from "./godotScene";
 import { GodotPath, gp } from "./godotPath";
 import { getGodotProjectDir } from "./godotUtils";
-import { Worker } from "worker_threads";
 import { availableParallelism } from "os";
 import path from "path";
+import Piscina from "piscina";
+import { CreateSceneWorkerArgs, workerFilename } from "./workerGodot";
+
+const createScenesWorker = new Piscina<CreateSceneWorkerArgs, GodotScene[]>({
+  filename: path.resolve(__dirname, "./workerWrapper.js"),
+  workerData: { fullpath: workerFilename },
+});
 
 export class GodotManager {
   private _godotProjectFile: FullPathFile;
@@ -19,6 +25,14 @@ export class GodotManager {
     this._godotProjectDir = getGodotProjectDir(godotProjectFile);
   }
 
+  get projectDir(): FullPathDir {
+    return this._godotProjectDir;
+  }
+
+  get projectFile(): FullPathFile {
+    return this._godotProjectFile;
+  }
+
   async reset() {
     this.scenes.clear();
     this.dependencies.clear();
@@ -26,9 +40,9 @@ export class GodotManager {
   }
 
   async load(nbWorker?: number) {
-    let files = await glob("**/*.tscn", {
+    let files = globSync("**/*.tscn", {
       absolute: true,
-      cwd: this._godotProjectDir,
+      cwd: this.projectDir,
       nodir: true,
     });
     await this.addScenes(files, nbWorker);
@@ -96,22 +110,28 @@ export class GodotManager {
     nbWorker?: number
   ): Promise<GodotScene[][]> {
     let chu = chunks(files, nbWorker || getWorkersNb(files.length));
-    return await Promise.all(
-      chu.map(
-        (i) =>
-          new Promise<GodotScene[]>((resolve, reject) => {
-            const worker = new Worker("./src/godot/worker.js", {
-              workerData: { bunch: i, gododir: this._godotProjectDir },
-            })
-              .on("message", (scenes: GodotScene[]) => {
-                resolve(scenes);
-              })
 
-              .on("error", (e) => {
-                reject(`Fail to parse scene ${e}`);
-              });
-          })
-      )
+    return await Promise.all(
+      // []
+      chu.map((i) => {
+        return createScenesWorker.run(
+          { bunch: i, godotdir: this.projectDir },
+          { name: "createBunchOfGodotScenes" }
+        );
+        //   new Promise<GodotScene[]>((resolve, reject) => {
+        //     const worker = new Worker(WorkerScript as string, {
+        //       eval: true,
+        //       workerData: { bunchFiles: i, gododir: this._godotProjectDir },
+        //     })
+        //       .on("message", (scenes: GodotScene[]) => {
+        //         resolve(scenes);
+        //       })
+
+        //       .on("error", (e) => {
+        //         reject(`Fail to parse scene ${e}`);
+        //       });
+        // })
+      })
     );
   }
 
@@ -140,7 +160,6 @@ export class GodotManager {
   }
 }
 function chunks<T>(arr: T[], n: number): T[][] {
-  const list = arr;
   const chunkSize = Math.ceil(arr.length / n);
   return [...Array(n).keys()].map((_) => arr.splice(0, chunkSize));
 }
