@@ -37,7 +37,7 @@ export class GodotManager {
   async addScenes(files: string[], nbWorker?: number) {
     for (const bunch of await this._loadTscns(files, nbWorker)) {
       for (const ghostScene of bunch) {
-        // js worken make loosing getter and other, need to redo the object
+        // js worker make loosing getter and other, need to redo the object
         const scene = new GodotScene(
           gp(ghostScene._path._base),
           ghostScene._gdscene

@@ -1,9 +1,7 @@
 import { FullPathDir, FullPathFile } from "../types.js";
 import { getGodotProjectDir, getGodotProjectFile } from "../godotProject.js";
-import { GDScene } from "./types.js";
 import { glob } from "glob";
 import path from "path";
-import { TscnParser } from "./parser.js";
 import {
   FileSystemWatcher,
   RelativePattern,
@@ -12,9 +10,7 @@ import {
   Uri,
   ExtensionContext,
 } from "vscode";
-import { Stats } from "fs";
 import { logger } from "../log.js";
-import { lookup } from "dns";
 
 export default class GodotProvider implements Disposable {
   _disposables: Disposable[] = [];
