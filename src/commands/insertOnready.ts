@@ -20,7 +20,7 @@ export const insertOnready = async () => {
     return;
   }
 
-  let nodes = new TscnParser(path.resolve(tscn)).parse().nodes;
+  let nodes = (await TscnParser.file(path.resolve(tscn))).parse().nodes;
 
   const nodePicked = (await selectNode(nodes)) as Node | undefined;
   if (!nodePicked) {

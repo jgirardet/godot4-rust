@@ -26,6 +26,10 @@ describe("TSCN Parser", () => {
     let scene = p.parse();
     expect(scene.uid).toEqual("uid://dtkeetr8r8u3l");
     expect(scene.extResources).toEqual(extRes);
+    expect(scene.nodes.filter((m) => m.name.value === "Label").length).toEqual(
+      1
+    );
+    expect(scene.nodes.filter((m) => m.name.value === "VB").length).toEqual(1);
     expect(scene.nodes).toEqual(nodes);
   });
   it("tscn en vrac à tester", async () => {
@@ -236,6 +240,41 @@ const nodes = [
         column: 48,
       },
       value: "MC",
+    },
+  },
+  {
+    name: {
+      endPosition: {
+        column: 18,
+        row: 39,
+      },
+      startPosition: {
+        column: 11,
+        row: 39,
+      },
+      value: "Label",
+    },
+    parent: {
+      endPosition: {
+        column: 46,
+        row: 39,
+      },
+      startPosition: {
+        column: 39,
+        row: 39,
+      },
+      value: "MC/VB",
+    },
+    type: {
+      endPosition: {
+        column: 31,
+        row: 39,
+      },
+      startPosition: {
+        column: 24,
+        row: 39,
+      },
+      value: "Label",
     },
   },
   {
