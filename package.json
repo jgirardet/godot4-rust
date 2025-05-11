@@ -42,6 +42,26 @@
         "title": "Godot4-Rust: Start a new GDExtension project"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "godot4-rust.insertOnReady",
+          "when": "godot4-rust.project_set"
+        },
+        {
+          "command": "godot4-rust.newGodotClass",
+          "when": "godot4-rust.project_set"
+        },
+        {
+          "command": "godot4-rust.createGdextension",
+          "when": "godot4-rust.project_set"
+        },
+        {
+          "command": "godot4-rust.startNewGDExtensionProject",
+          "when": "godot4-rust.project_set"
+        }
+      ]
+    },
     "configuration": {
       "title": "Godot4 Rust",
       "properties": {

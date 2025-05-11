@@ -3,13 +3,15 @@ import { DISPLAY_NAME, NAME } from "../constantes";
 import { logger } from "../log";
 import { FullPathFile } from "../types";
 
-export const setGodotProject = async () => {
+export const setGodotProjectCommand = async () => {
   let path = await selectGodotProject();
   if (path === undefined) {
     return;
   }
   vscode.workspace.getConfiguration(NAME).update("godotProjectFilePath", path);
   logger.info(`Set Godot Project to: ${path}`);
+  logger.info("Reloading extensions");
+  await vscode.commands.executeCommand("workbench.action.restartExtensionHost");
 };
 
 export const selectGodotProject = async (): Promise<
