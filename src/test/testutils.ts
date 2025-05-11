@@ -40,21 +40,10 @@ export const addGodotProjectPathSetting = (
   let setting = {
     "godot4-rust.godotProjectFilePath": godotProject,
   };
-  // console.log(godotProject);
-  // fs.writeFileSync(
-  //   path.resolve(projectPath, ".vscode/settings.json"),
-  //   JSON.stringify(setting)
-  // );
-  // console.log(
-  //   fs.readFileSync(path.resolve(projectPath, ".vscode/settings.json"), {
-  //     encoding: "utf-8",
-  //   })
-  // );
-  // console.log(
-  //   fs.readFileSync(godotProject, {
-  //     encoding: "utf-8",
-  //   })
-  // );
+  fs.writeFileSync(
+    path.resolve(projectPath, ".vscode/settings.json"),
+    JSON.stringify(setting)
+  );
 };
 
 export const getSettings = (filepath: string): GodotSettings | undefined => {

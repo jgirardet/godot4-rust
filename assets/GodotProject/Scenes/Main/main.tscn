@@ -37,7 +37,7 @@ theme_override_constants/margin_bottom = 24
 [node name="VB" type="VBoxContainer" parent="MC"]
 layout_mode = 2
 
-[node type="Label" name="Label" parent="MC/VB"]
+[node name="Label" type="Label" parent="MC/VB"]
 layout_mode = 2
 text = "SKOBAN ISH"
 label_settings = ExtResource("2_qw60k")

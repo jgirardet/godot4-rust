@@ -3,7 +3,7 @@
     (identifier) @section (#eq? @section "node")
     .
     ([
-        (
+        (;; a root node
             (attribute 
                 (identifier) @keyname (#eq? @keyname "name")
                 (string) @name
@@ -13,7 +13,7 @@
                 (string) @type 
             )
         )
-        (
+        (;; a subnode
             (attribute 
                 (identifier) @keyname (#eq? @keyname "name")
                 (string) @name
@@ -30,12 +30,13 @@
                 )
                 ]
             )
-            (   [
-                (attribute 
+            (   
+                [
+                (attribute ;; classic sub node
                     (identifier) @keyParent (#eq? @keyParent "parent") 
                     (string) @parent
                 )
-                (attribute 
+                (attribute ;; depedency node
                     (identifier) @instance (#eq? @instance "instance")
                     
                     (constructor
