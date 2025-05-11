@@ -19,11 +19,6 @@ features:
 code refactor
 - parser rust: voir si is godot avec matcher + efficace pour virer source
 - parser TSCN:
-    - delete pas au point sur manager (ou ok grace au set ?)
-    - deativer extension si godotproject not set and exists
-    - load query ne marche pas dans les tests
-    - parser node avec - _ et /
-    - echec avec scalzard à retester
     - un grand nombre de test de tscn différent pour tester plantage
 - godotprojectdir sans dep vscode
     
@@ -32,4 +27,3 @@ code refactor
 - 2 case converts
 
 
-- parametrer l(install de scalazar)
