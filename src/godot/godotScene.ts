@@ -16,10 +16,6 @@ export class GodotScene {
     return this._path;
   }
 
-  set path(val: GodotPath) {
-    console.log("DAZDAZDAZD");
-  }
-
   get uid(): Uid {
     return this._gdscene.uid;
   }
