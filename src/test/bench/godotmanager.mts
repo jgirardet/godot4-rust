@@ -144,12 +144,19 @@ function benchNbWorkersScalAndGodotProject() {
   let s = "/home/jim/Rien/Scalazard/project.godot";
   let scal = new GodotManager(s);
   bench("load $fn", function* load(state: any) {
+    scal.load().then((x) => {});
     let fn = state.get("fn");
     yield async () => {
-      await scal.load();
+      scal.lastUpdate = [];
+      await scal.onChange("/home/jim/Rien/Scalazard/Entities/Bat/bat.tscn");
+      // console.log(scal.lastUpdate);
+
+      // await scal.load();
       // await scal.load(fn);
     };
   }).args("fn", [8]);
+  // console.log(scal.scenes);
+  // bench("on change", async () => {});
 }
 
 async function benchArrays() {

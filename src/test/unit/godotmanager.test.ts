@@ -4,9 +4,11 @@ import { GodotScene } from "../../godot/godotScene";
 import { GodotPath, gp } from "../../godot/godotPath";
 import { GodotManager } from "../../godot/godotManager";
 
-const dep = (file: string): string => path.resolve("assets/depedencies", file);
+const godotdir = path.resolve("assets/depedencies");
+console.log(godotdir);
+const dep = (file: string): string => path.join(godotdir, file);
 
-describe("Test Godot Watcher", () => {
+describe("Test Godomanager Scenes", () => {
   it("test eq godotpath", () => {
     let a = gp("un");
     let b = gp("un");
@@ -38,5 +40,46 @@ describe("Test Godot Watcher", () => {
     let gm = new GodotManager(dep("project.godot"));
     let res = await gm.load();
     expect(gm.scenes.size).toEqual(7);
+  });
+});
+
+describe("on change godotmanager", () => {
+  it("test onchange no dep", async () => {
+    let gm = new GodotManager(dep("project.godot"));
+    await gm.load();
+    gm.scenes.set("main.tscn", gm.scenes.get("child1.tscn")!);
+    await gm.onChange(dep("main.tscn"));
+    expect(gm.scenes.get("main.tscn")?.path.base).toEqual("main.tscn");
+    expect(gm.lastUpdate.map((x) => path.basename(x))).toEqualUnsorted([
+      "main.tscn",
+    ]);
+  });
+
+  it("test onchange 1 seul dependance", async () => {
+    let gm = new GodotManager(dep("project.godot"));
+    await gm.load();
+    gm.scenes.set("main.tscn", gm.scenes.get("child2.tscn")!);
+    gm.scenes.set("child1.tscn", gm.scenes.get("child111.tscn")!);
+    await gm.onChange(dep("child1.tscn"));
+    expect(gm.scenes.get("main.tscn")?.path.base).toEqual("main.tscn");
+    expect(gm.scenes.get("child1.tscn")?.path.base).toEqual("child1.tscn");
+    expect(gm.lastUpdate.map((x) => path.basename(x))).toEqualUnsorted([
+      "main.tscn",
+      "child1.tscn",
+    ]);
+  });
+
+  it("test onchange plsuieurs dépendances", async () => {
+    let gm = new GodotManager(dep("project.godot"));
+    await gm.load();
+    await gm.onChange(dep("child2.tscn"));
+    // console.log(gm.dependencies);
+    expect(gm.lastUpdate.map((x) => path.basename(x))).toEqualUnsorted([
+      "child2.tscn",
+      "main.tscn",
+      "child111.tscn",
+      "child11.tscn",
+      "child1.tscn",
+    ]);
   });
 });
