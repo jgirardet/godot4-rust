@@ -20,6 +20,14 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "godot4-rust",
+          "name": "Godot4 Rust"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "godot4-rust.insertOnReady",

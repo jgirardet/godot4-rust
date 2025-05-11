@@ -1,8 +1,15 @@
 todo:
 
+Prochain en cours :
+- connecter les provider ensemble
+- gérer "parent"
+- mater la ram
+- drag and drop
+- lien ficher ouvert et panel
+
 
 Bug:
-    - loadFileQueries path
+    - loadFileQueries path : simplement filename ?
 
 features:
 - changer le nom du tscn
@@ -14,12 +21,15 @@ features:
     - explorer indicate some things (onready or others)
     - icons + from godotClass
 - le nombre de worker en option
+- ajouter les groups dans godot parse
+_ parser les extResources image pour les afficher en icone
 
 
 code refactor
 - parser rust: voir si is godot avec matcher + efficace pour virer source
 - parser TSCN:
     - un grand nombre de test de tscn différent pour tester plantage
+adapter pour  IGODOTSCNE dans load
 - godotprojectdir sans dep vscode
     
 - les utils:

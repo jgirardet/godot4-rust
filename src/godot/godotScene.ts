@@ -1,9 +1,9 @@
-import { FullPathDir, FullPathFile } from "../types";
-import { GodotPath } from "./godotPath";
+import { FullPathDir, FullPathFile, Name } from "../types";
+import { GodotPath, IGodotPath } from "./godotPath";
 import { TscnParser } from "./parser";
-import { GDScene, Uid } from "./types";
+import { GDScene, Node, Uid } from "./types";
 
-export class GodotScene {
+export class GodotScene implements IGodotScene {
   readonly gdscene: GDScene;
   readonly path: GodotPath;
 
@@ -14,6 +14,10 @@ export class GodotScene {
 
   get uid(): Uid {
     return this.gdscene.uid;
+  }
+
+  get rootNode(): Node {
+    return this.gdscene.nodes.at(0)!; // there always id a root node
   }
 
   get depedencies(): GodotPath[] {
@@ -34,4 +38,9 @@ export class GodotScene {
     let gdScene = (await TscnParser.file(tscnFile)).parse();
     return new GodotScene(GodotPath.fromAbs(tscnFile, godotDir), gdScene);
   }
+}
+
+export interface IGodotScene {
+  path: IGodotPath;
+  gdscene: GDScene;
 }

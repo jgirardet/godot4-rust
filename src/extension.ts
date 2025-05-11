@@ -8,6 +8,7 @@ import { createGdextensionCommand } from "./commands/createGdextension";
 import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
 import GodotProvider from "./godot/watcher";
+import { PanelProvider } from "./ui/panel";
 
 export function activate(context: vscode.ExtensionContext) {
   logger.info(`Extension${NAME} activating`);
@@ -33,8 +34,9 @@ function _activateAfterProjectSet(
   context: vscode.ExtensionContext,
   godotProjectFile: string
 ) {
-  let provider = new GodotProvider(context, godotProjectFile);
-  provider.start();
+  const godotProvider = new GodotProvider(context, godotProjectFile);
+  godotProvider.start();
+  const panelProvider = new PanelProvider(context);
 
   const commandInsertOnReady = vscode.commands.registerCommand(
     NAME + "." + "insertOnReady",

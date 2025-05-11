@@ -2,7 +2,7 @@ import path from "path";
 import { FullPathDir, FullPathFile } from "../types";
 import { ResPath } from "./types";
 
-export class GodotPath {
+export class GodotPath implements IGodotPath {
   readonly base: string;
 
   constructor(base: string) {
@@ -31,3 +31,7 @@ export class GodotPath {
 }
 
 export const gp = (file: string): GodotPath => new GodotPath(file);
+
+export interface IGodotPath {
+  base: string;
+}
