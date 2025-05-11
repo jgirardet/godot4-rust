@@ -8,9 +8,9 @@ import { availableParallelism } from "os";
 import path from "path";
 
 export class GodotManager {
+  private _godotProjectFile: FullPathFile;
+  private _godotProjectDir: FullPathDir;
   dependencies: Map<string, Set<string>> = new Map();
-  _godotProjectFile: FullPathFile;
-  _godotProjectDir: FullPathDir;
   scenes: Map<string, GodotScene> = new Map();
   lastUpdate: string[] = [];
 
@@ -54,20 +54,26 @@ export class GodotManager {
     let filepath = GodotPath.fromAbs(filename, this._godotProjectDir);
 
     let scene = this.getScene(filepath);
+
+    // Create Scene
     if (!scene) {
       await this.addScenes([filename], 1);
       this.lastUpdate = [filepath.base];
     }
 
     let toUpdate = this._findDependants(filepath.base);
+
+    // Delete Scene
     if (remove) {
       const toRemove = toUpdate.delete(filepath.base);
-      // this.unloadScene(filepath);
+      this._deleteScene(filepath);
     }
 
     let toUpdateFinale = [...toUpdate].map((m) =>
       path.join(this._godotProjectDir, m)
     );
+
+    // Reload only Scenes impacted by change (delete or change)
     await this.addScenes(toUpdateFinale);
     this.lastUpdate = [...toUpdate];
   }

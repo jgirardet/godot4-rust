@@ -5,7 +5,6 @@ import { GodotPath, gp } from "../../godot/godotPath";
 import { GodotManager } from "../../godot/godotManager";
 
 const godotdir = path.resolve("assets/depedencies");
-console.log(godotdir);
 const dep = (file: string): string => path.join(godotdir, file);
 
 describe("Test Godomanager Scenes", () => {
@@ -54,7 +53,6 @@ describe("on change godotmanager", () => {
       "main.tscn",
     ]);
   });
-
   it("test onchange 1 seul dependance", async () => {
     let gm = new GodotManager(dep("project.godot"));
     await gm.load();
@@ -68,7 +66,6 @@ describe("on change godotmanager", () => {
       "child1.tscn",
     ]);
   });
-
   it("test onchange plsuieurs dépendances", async () => {
     let gm = new GodotManager(dep("project.godot"));
     await gm.load();
@@ -81,5 +78,31 @@ describe("on change godotmanager", () => {
       "child11.tscn",
       "child1.tscn",
     ]);
+  });
+  it("test should depeencies are updated, add anytime", async () => {
+    let gm = new GodotManager(dep("project.godot"));
+    await gm.load();
+    let bm = new GodotManager(dep("project.godot"));
+    await bm.load();
+    [Array(3).keys()].forEach(async (_) => {
+      await gm.onChange(dep("child2.tscn"));
+    });
+    expect(gm.scenes).toEqual(bm.scenes);
+    expect(gm.dependencies).toEqual(bm.dependencies);
+  });
+});
+
+describe("delete item", () => {
+  it("test onchange delete", async () => {
+    let gm = new GodotManager(dep("project.godot"));
+    await gm.load();
+    await gm.onChange(dep("child2.tscn"), true);
+    expect(gm.lastUpdate).toEqualUnsorted([
+      "main.tscn",
+      "child111.tscn",
+      "child11.tscn",
+      "child1.tscn",
+    ]);
+    expect(gm.scenes.get("child2.tscn")).toBeNullish();
   });
 });
