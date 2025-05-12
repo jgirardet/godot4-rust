@@ -8,11 +8,7 @@ import {
   ExtResourceAttribute,
   GDScene,
 } from "./types";
-import {
-  ExtResourcesQuery,
-  NodesQuery,
-  UidQuery,
-} from "../queries/loadQueries";
+import { ExtResourcesQuery, NodesQuery, UidQuery } from "../constantes";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];

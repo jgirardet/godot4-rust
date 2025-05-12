@@ -26,5 +26,5 @@ export const selectGodotProject = async (): Promise<
     logger.info(": No project File selected");
     return;
   }
-  return godotfilepath[0].path;
+  return godotfilepath[0].fsPath;
 };
