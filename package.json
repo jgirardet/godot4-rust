@@ -48,6 +48,14 @@
       {
         "command": "godot4-rust.startNewGDExtensionProject",
         "title": "Godot4-Rust: Start a new GDExtension project"
+      },
+      {
+        "command": "godot4-rust.reveal",
+        "title": "Godot4-Rust: Reveal current class in panel"
+      },
+      {
+        "command": "godot4-rust.collapseAll",
+        "title": "Godot4-Rust: Collapse all element in panel"
       }
     ],
     "menus": {
@@ -67,6 +75,12 @@
         {
           "command": "godot4-rust.startNewGDExtensionProject",
           "when": "godot4-rust.project_set"
+        }
+      ],
+      "view/item/context": [
+        {
+          "when": "view == godot4-rust && viewItem =~ /^root/",
+          "command": "godot4-rust.newGodotClass"
         }
       ]
     },

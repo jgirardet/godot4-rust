@@ -7,7 +7,7 @@ import GODOT from "tree-sitter-godot-resource";
 import Parser, { Query, QueryCapture } from "tree-sitter";
 import { bench, run } from "mitata";
 import { assert } from "console";
-import { GodotManager } from "../../godot/godotManager.js";
+import { GodotProjectLoader } from "../../godot/godotProjectLoader.js";
 import { execSync } from "child_process";
 import { glob, globSync } from "glob";
 import { mkdtempSync } from "fs";
@@ -131,7 +131,7 @@ function benchNbWorkerBigDirs() {
     let files = state.get("files");
     let cpus = state.get("cpus");
     yield async () => {
-      await new GodotManager(files)._loadTscns(cpus);
+      // await new GodotProjectLoader(files)._loadTscns(cpus);
     };
   })
     .args("cpus", [4, 8, undefined])
@@ -140,7 +140,7 @@ function benchNbWorkerBigDirs() {
 
 function benchNbWorkersScalAndGodotProject() {
   let p = path.resolve("assets/GodotProject/project.godot");
-  let g = new GodotManager(p);
+  let g = new GodotProjectLoader(p);
   let s = "/home/jim/Rien/Scalazard/project.godot";
   let fichiers = () =>
     globSync("**/*.tscn", {
@@ -148,7 +148,7 @@ function benchNbWorkersScalAndGodotProject() {
       absolute: true,
       nodir: true,
     });
-  let scal = new GodotManager(s);
+  let scal = new GodotProjectLoader(s);
   bench("load $fn", function* load(state: any) {
     // scal.load().then((x) => {});
     let fn = state.get("fn");

@@ -13,7 +13,7 @@ const createScenesWorker = new Piscina<CreateSceneWorkerArgs, GodotScene[]>({
   workerData: { fullpath: workerFilename },
 });
 
-export class GodotManager {
+export class GodotProjectLoader {
   private _godotProjectFile: FullPathFile;
   private _godotProjectDir: FullPathDir;
   dependencies: Map<string, Set<string>> = new Map();
@@ -33,38 +33,25 @@ export class GodotManager {
     return this._godotProjectFile;
   }
 
-  async reset() {
+  async reload(): Promise<Map<string, GodotScene>> {
     this.scenes.clear();
     this.dependencies.clear();
-    await this.load();
+    return this.load();
   }
 
-  async load(nbWorker?: number) {
+  async load(nbWorker?: number): Promise<Map<string, GodotScene>> {
     let files = globSync("**/*.tscn", {
       absolute: true,
       cwd: this.projectDir,
       nodir: true,
     });
-    await this.addScenes(files, nbWorker);
+    return await this.addScenes(files, nbWorker);
   }
 
-  async addScenes(files: string[], nbWorker?: number) {
-    for (const bunch of await this._loadTscns(files, nbWorker)) {
-      for (const ghostScene of bunch) {
-        // js worker make loosing getter and other, need to redo the object
-        const scene = new GodotScene(
-          gp(ghostScene.path.base),
-          ghostScene.gdscene
-        );
-        for (const dep of scene.depedencies) {
-          this._setDependency(dep, scene.path);
-        }
-        this._addScene(scene);
-      }
-    }
-  }
-
-  async onChange(filename: FullPathFile, remove: boolean = false) {
+  async onChange(
+    filename: FullPathFile,
+    remove: boolean = false
+  ): Promise<Map<string, GodotScene>> {
     let filepath = GodotPath.fromAbs(filename, this._godotProjectDir);
 
     let scene = this.getScene(filepath);
@@ -88,15 +75,36 @@ export class GodotManager {
     );
 
     // Reload only Scenes impacted by change (delete or change)
-    await this.addScenes(toUpdateFinale);
     this.lastUpdate = [...toUpdate];
+    return await this.addScenes(toUpdateFinale);
   }
 
   getScene(gp: GodotPath): GodotScene | undefined {
     return this.scenes.get(gp.base);
   }
 
-  _findDependants(scenePath: string, acc?: Set<string>): Set<string> {
+  private async addScenes(
+    files: string[],
+    nbWorker?: number
+  ): Promise<Map<string, GodotScene>> {
+    for (const bunch of await this._loadTscns(files, nbWorker)) {
+      // RetpanelElementurn IGodotScene
+      for (const ghostScene of bunch) {
+        // js worker make loosing getter and other, need to redo the object
+        const scene = new GodotScene(
+          gp(ghostScene.tscnpath.base),
+          ghostScene.gdscene
+        );
+        for (const dep of scene.depedencies) {
+          this._setDependency(dep, scene.tscnpath);
+        }
+        this._addScene(scene);
+      }
+    }
+    return this.scenes;
+  }
+
+  private _findDependants(scenePath: string, acc?: Set<string>): Set<string> {
     let res = acc ?? new Set();
     res.add(scenePath);
     for (let r of this._getDependencies(scenePath)) {
@@ -105,57 +113,43 @@ export class GodotManager {
     return res;
   }
 
-  async _loadTscns(
+  private async _loadTscns(
     files: string[],
     nbWorker?: number
   ): Promise<GodotScene[][]> {
     let chu = chunks(files, nbWorker || getWorkersNb(files.length));
 
     return await Promise.all(
-      // []
       chu.map((i) => {
         return createScenesWorker.run(
           { bunch: i, godotdir: this.projectDir },
           { name: "createBunchOfGodotScenes" }
         );
-        //   new Promise<GodotScene[]>((resolve, reject) => {
-        //     const worker = new Worker(WorkerScript as string, {
-        //       eval: true,
-        //       workerData: { bunchFiles: i, gododir: this._godotProjectDir },
-        //     })
-        //       .on("message", (scenes: GodotScene[]) => {
-        //         resolve(scenes);
-        //       })
-
-        //       .on("error", (e) => {
-        //         reject(`Fail to parse scene ${e}`);
-        //       });
-        // })
       })
     );
   }
 
-  _getDependencies(key: string): Set<string> {
+  private _getDependencies(key: string): Set<string> {
     return this.dependencies.get(key) || new Set();
   }
 
-  _deleteDependencies(key: GodotPath) {
+  private _deleteDependencies(key: GodotPath) {
     this.dependencies.delete(key.base);
     for (const [k, v] of this.dependencies) {
       v.delete(key.base);
     }
   }
 
-  _setDependency(child: GodotPath, parent: GodotPath) {
+  private _setDependency(child: GodotPath, parent: GodotPath) {
     this.dependencies.get(child.base)?.add(parent.base) ||
       this.dependencies.set(child.base, new Set([parent.base]));
   }
 
-  _addScene(scene: GodotScene) {
-    this.scenes.set(scene.path.base, scene);
+  private _addScene(scene: GodotScene) {
+    this.scenes.set(scene.tscnpath.base, scene);
   }
 
-  _deleteScene(scene: GodotPath) {
+  private _deleteScene(scene: GodotPath) {
     this.scenes.delete(scene.base);
   }
 }

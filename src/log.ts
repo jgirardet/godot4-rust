@@ -16,9 +16,12 @@ const logger = winston.createLogger({
   transports: [new LogOutputChannelTransport({ outputChannel })],
 });
 
-const log_error = async (f: () => Promise<void>) => {
+const log_error = async (
+  f: (...args: any[]) => Promise<void>,
+  ...args: any[]
+) => {
   try {
-    await f();
+    await f(...args);
   } catch (e) {
     logger.error(e);
     vscode.window.showErrorMessage(`Godot 4 Rust Error: ${e}`);

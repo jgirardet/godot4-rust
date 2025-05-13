@@ -1,15 +1,13 @@
 todo:
 
 Prochain en cours :
-- connecter les provider ensemble
-- gérer "parent"
-- mater la ram
 - drag and drop
-- lien ficher ouvert et panel
+- lien ficher ouvert et panel et reverse
+- icon qui si c ruste et peut êtr emphasé l'actif (highilit )
 
 
 Bug:
-    - loadFileQueries path : simplement filename ?
+    - UPDATE depencencies when deleted !!!!!!!!!!!!!!!!!
 
 features:
 - changer le nom du tscn
@@ -20,6 +18,7 @@ features:
     - drag/click onready/preload from explorer
     - explorer indicate some things (onready or others)
     - icons + from godotClass
+    _ afficher + masque les path des fichiers
 - le nombre de worker en option
 - ajouter les groups dans godot parse
 _ parser les extResources image pour les afficher en icone
@@ -37,3 +36,10 @@ adapter pour  IGODOTSCNE dans load
 - 2 case converts
 
 
+configaration  à ajouter: 
+- workern
+- auto focus node
+
+doc:
+- panel
+- add godot class

@@ -5,10 +5,10 @@ import { GDScene, Node, Uid } from "./types";
 
 export class GodotScene implements IGodotScene {
   readonly gdscene: GDScene;
-  readonly path: GodotPath;
+  readonly tscnpath: GodotPath;
 
   constructor(tscnPath: GodotPath, gdScene: GDScene) {
-    this.path = tscnPath;
+    this.tscnpath = tscnPath;
     this.gdscene = gdScene;
   }
 
@@ -41,6 +41,6 @@ export class GodotScene implements IGodotScene {
 }
 
 export interface IGodotScene {
-  path: IGodotPath;
+  tscnpath: IGodotPath;
   gdscene: GDScene;
 }

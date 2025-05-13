@@ -23,8 +23,14 @@ import { selectNodes, selectTscn } from "../ui/select";
 import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
 import { Node } from "../godot/types";
+import { NodeItem } from "../panel/nodeItem";
 
-export const newGodotClass = async () => {
+export const newGodotClass = async (item?: NodeItem) => {
+  if (item && !item.isRoot) {
+    logger.warn("Only root nodes can be derived, aborting");
+    return;
+  }
+
   let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {
     title: "Create new a new Rust module ?",
   });
@@ -34,10 +40,13 @@ export const newGodotClass = async () => {
 
   let gpf = getGodotProjectFile();
   let gpd = getGodotProjectDir(gpf);
-  const tscnFiles = listTscnFiles(gpf);
-  const selectedTscn = await selectTscn(tscnFiles, gpd);
+  let selectedTscn = item?.tscn?.toAbs(gpd);
   if (!selectedTscn) {
-    return;
+    const tscnFiles = listTscnFiles(gpf);
+    selectedTscn = await selectTscn(tscnFiles, gpd);
+    if (!selectedTscn) {
+      return;
+    }
   }
 
   let nodes = (await TscnParser.file(path.resolve(selectedTscn))).parse().nodes;
