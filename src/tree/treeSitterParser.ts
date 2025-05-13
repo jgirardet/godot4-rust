@@ -5,14 +5,14 @@ import { readFile } from "fs/promises";
 /// Base class to derive Parser From
 /// Must reimplment lang()
 export class TreeSitterParser {
-  _source: string;
-  _parser: Parser = new Parser();
-  _tree: Tree;
+  readonly source: string;
+  readonly parser: Parser = new Parser();
+  readonly tree: Tree;
 
   constructor(source: string) {
-    this._parser.setLanguage(this.lang);
-    this._tree = this._parser.parse(source);
-    this._source = source;
+    this.parser.setLanguage(this.lang);
+    this.tree = this.parser.parse(source);
+    this.source = source;
   }
   static async file<T extends typeof TreeSitterParser>(
     this: T,
@@ -22,10 +22,10 @@ export class TreeSitterParser {
     return new this(content) as InstanceType<T>;
   }
 
-  static async source<T extends typeof TreeSitterParser>(
+  static source<T extends typeof TreeSitterParser>(
     this: T,
     content: string
-  ): Promise<InstanceType<T>> {
+  ): InstanceType<T> {
     return new this(content) as InstanceType<T>;
   }
 
@@ -36,7 +36,7 @@ export class TreeSitterParser {
   }
 
   get rootNode(): SyntaxNode {
-    return this._tree.rootNode;
+    return this.tree.rootNode;
   }
 
   parse(): any {

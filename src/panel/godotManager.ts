@@ -1,5 +1,4 @@
 import {
-  CancellationToken,
   commands,
   Event,
   EventEmitter,
@@ -7,6 +6,7 @@ import {
   FileSystemWatcher,
   ProviderResult,
   RelativePattern,
+  TextEditor,
   TreeDataProvider,
   TreeItem,
   TreeView,
@@ -22,6 +22,8 @@ import { NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { GodotScene } from "../godot/godotScene";
 import { logger } from "../log";
+import { RustParser } from "../rust/parser";
+import { registerGCommand } from "../utils";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -36,22 +38,29 @@ export class GodotManager {
     this.loader = new GodotProjectLoader(godotProjectFile);
 
     context.subscriptions.push(
+      //  treview
       (this.treeView = window.createTreeView(NAME, {
         treeDataProvider: this.treeData,
         showCollapseAll: true,
       })),
+      this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
+
+      // watcher
       (this.watcher = workspace.createFileSystemWatcher(
         new RelativePattern(this.godotDir, "**/*.tscn")
       )),
       this.watcher.onDidChange(this.onFileChanged.bind(this)),
       this.watcher.onDidCreate(this.onFileChanged.bind(this)),
       this.watcher.onDidDelete(this.onFileDeleted.bind(this)),
-      this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
 
-      commands.registerCommand(`${NAME}.reveal`, this.reveal.bind(this)),
-      commands.registerCommand(
-        `${NAME}.collapseAll`,
-        this.collapseAll.bind(this)
+      // commands
+      registerGCommand(`reveal`, this.reveal.bind(this)),
+      registerGCommand(
+        `collapseAll`,
+        this.collapseAll.bind(this),
+
+        // connect signals
+        window.onDidChangeActiveTextEditor(this.reveal.bind(this))
       )
     );
 
@@ -80,19 +89,32 @@ export class GodotManager {
 
   async reload() {
     const scenes = await this.loader.reload();
-    console.log(scenes);
     this.treeData.updateData(scenes);
   }
 
-  async reveal() {
-    let elm = this.treeData.data.get("Entities/Dracula/dracula.tscn");
-    await this.collapseAll();
-    console.log();
-    await this.treeView.reveal(elm!, {
-      expand: true,
-      focus: true, // good scroll position
-    });
-    await commands.executeCommand("workbench.action.focusActiveEditorGroup"); //optionnable
+  async reveal(editor?: TextEditor) {
+    editor = window.activeTextEditor;
+    let doc = editor?.document.getText();
+    if (!doc) {
+      return;
+    }
+    let parser = RustParser.source(doc);
+    if (parser.isGodotModule) {
+      let godotClass = parser.findGodotClass()?.className;
+      console.log(godotClass);
+      if (godotClass) {
+        for (const [k, v] of this.treeData.data.entries()) {
+          if (v.type === godotClass) {
+            return this._reveal(v);
+          }
+        }
+      }
+    }
+
+    if (!editor) {
+      // aka manual launch
+      logger.info("No corresponding Godot Scene found");
+    }
   }
 
   async collapseAll() {
@@ -101,7 +123,15 @@ export class GodotManager {
     );
   }
 
-  async createNewGodotClass() {}
+  async _reveal(node: NodeItem) {
+    await this.collapseAll();
+    logger.info(`Revealing ${node.name} with type ${node.type}`);
+    await this.treeView.reveal(node, {
+      expand: true,
+      focus: true, // good scroll position
+    });
+    await commands.executeCommand("workbench.action.focusActiveEditorGroup"); //optionnable
+  }
 }
 
 class TscnTreeProvider implements TreeDataProvider<NodeItem> {

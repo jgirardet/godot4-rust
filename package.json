@@ -30,53 +30,41 @@
     },
     "commands": [
       {
-        "command": "godot4-rust.insertOnReady",
-        "title": "Godot4-Rust: Insert OnReady field"
-      },
-      {
         "command": "godot4-rust.setGodotProject",
         "title": "Godot4-Rust: Set Godot Project"
       },
       {
+        "command": "godot4-rust.insertOnReady",
+        "title": "Godot4-Rust: Insert OnReady field",
+        "enablement": "godot4-rust.project_set"
+      },
+      {
         "command": "godot4-rust.newGodotClass",
-        "title": "Godot4-Rust: Create a new GodotClass from Godot Scene"
+        "title": "Godot4-Rust: Create a new GodotClass from Godot Scene",
+        "enablement": "godot4-rust.project_set"
       },
       {
         "command": "godot4-rust.createGdextension",
-        "title": "Godot4-Rust: Create a the .gdextension file in your project"
+        "title": "Godot4-Rust: Create a the .gdextension file in your project",
+        "enablement": "godot4-rust.project_set"
       },
       {
         "command": "godot4-rust.startNewGDExtensionProject",
-        "title": "Godot4-Rust: Start a new GDExtension project"
+        "title": "Godot4-Rust: Start a new GDExtension project",
+        "enablement": "godot4-rust.project_set"
       },
       {
         "command": "godot4-rust.reveal",
-        "title": "Godot4-Rust: Reveal current class in panel"
+        "title": "Godot4-Rust: Reveal current class in panel",
+        "enablement": "godot4-rust.project_set"
       },
       {
         "command": "godot4-rust.collapseAll",
-        "title": "Godot4-Rust: Collapse all element in panel"
+        "title": "Godot4-Rust: Collapse all element in panel",
+        "enablement": "godot4-rust.project_set"
       }
     ],
     "menus": {
-      "commandPalette": [
-        {
-          "command": "godot4-rust.insertOnReady",
-          "when": "godot4-rust.project_set"
-        },
-        {
-          "command": "godot4-rust.newGodotClass",
-          "when": "godot4-rust.project_set"
-        },
-        {
-          "command": "godot4-rust.createGdextension",
-          "when": "godot4-rust.project_set"
-        },
-        {
-          "command": "godot4-rust.startNewGDExtensionProject",
-          "when": "godot4-rust.project_set"
-        }
-      ],
       "view/item/context": [
         {
           "when": "view == godot4-rust && viewItem =~ /^root/",

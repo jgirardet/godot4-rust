@@ -86,7 +86,7 @@ export class TscnParser extends TreeSitterParser {
       startPosition: node.startPosition,
       endPosition: node.endPosition,
 
-      value: this._tree.getText(node).replaceAll('"', ""),
+      value: this.tree.getText(node).replaceAll('"', ""),
     };
   }
 
@@ -139,7 +139,7 @@ export class TscnParser extends TreeSitterParser {
       startPosition: node.startPosition,
       endPosition: node.endPosition,
 
-      value: this._tree.getText(node),
+      value: this.tree.getText(node),
     } as T;
   }
 }

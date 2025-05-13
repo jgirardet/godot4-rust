@@ -1,6 +1,6 @@
 import Parser, { Query, SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
-import { ParsedGodotModule } from "./types";
+import { GodotModule } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
 import { godotModuleQuery } from "../constantes";
 
@@ -10,15 +10,15 @@ export class RustParser extends TreeSitterParser {
   }
 
   get rootNode(): SyntaxNode {
-    return this._tree.rootNode;
+    return this.tree.rootNode;
   }
 
   get isGodotModule(): boolean {
-    return this._source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
+    return this.source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
   }
 
   /// Find the First GodotClass in module
-  findGodotClass(): ParsedGodotModule | undefined {
+  findGodotClass(): GodotModule | undefined {
     let q = new Query(Rust as Parser.Language, godotModuleQuery);
 
     let captures = q.matches(this.rootNode).at(0)?.captures;
@@ -26,11 +26,11 @@ export class RustParser extends TreeSitterParser {
       return;
     }
 
-    let res: ParsedGodotModule = {};
+    let res: GodotModule = {};
 
     for (const c of captures) {
       if (["className", "baseClass", "init"].includes(c.name)) {
-        res[c.name as keyof ParsedGodotModule] = this._tree.getText(c.node);
+        res[c.name as keyof GodotModule] = this.tree.getText(c.node);
       }
     }
 

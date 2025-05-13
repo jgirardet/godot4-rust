@@ -1,17 +1,20 @@
-import * as vscode from "vscode";
 import { NAME } from "./constantes";
-import { glob } from "glob";
-import { logger } from "./log";
-import { FullPathDir } from "./types";
+import { log_error } from "./log";
+import {
+  CodeAction,
+  CodeActionKind,
+  commands,
+  Disposable,
+  Range,
+  TextEditor,
+  workspace,
+  WorkspaceConfiguration,
+} from "vscode";
 
-export {
-  getProjectConfig,
-  getConfigValue,
-  applyCodeActionNamed,
-};
+export { getProjectConfig, getConfigValue, applyCodeActionNamed };
 
-const getProjectConfig = (): vscode.WorkspaceConfiguration => {
-  return vscode.workspace.getConfiguration(NAME);
+const getProjectConfig = (): WorkspaceConfiguration => {
+  return workspace.getConfiguration(NAME);
 };
 
 const getConfigValue = (key: string): string => {
@@ -25,22 +28,18 @@ const getConfigValue = (key: string): string => {
   }
 };
 
-
 /// Apply the code titled at current cursor position
-const applyCodeActionNamed = async (
-  editor: vscode.TextEditor,
-  title: string
-) => {
+const applyCodeActionNamed = async (editor: TextEditor, title: string) => {
   const { document, selection } = editor;
   const range = selection.isEmpty
-    ? new vscode.Range(selection.start, selection.start)
+    ? new Range(selection.start, selection.start)
     : selection;
 
-  const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>(
-    "vscode.executeCodeActionProvider",
+  const actions = await commands.executeCommand<CodeAction[]>(
+    "executeCodeActionProvider",
     document.uri,
     range,
-    vscode.CodeActionKind.QuickFix.value
+    CodeActionKind.QuickFix.value
   );
 
   if (actions?.length) {
@@ -49,8 +48,18 @@ const applyCodeActionNamed = async (
       return;
     }
     if (action.edit) {
-      await vscode.workspace.applyEdit(action.edit);
+      await workspace.applyEdit(action.edit);
     }
   }
 };
 
+// export function registerCommand(command: string, callback: (...args: any[]) => any, thisArg?: any): Disposable;
+export const registerGCommand = (
+  commandName: string,
+  command: (...args: any[]) => any,
+  ...args: any[]
+): Disposable => {
+  return commands.registerCommand(NAME + "." + commandName, () => {
+    log_error(command, ...args);
+  });
+};
