@@ -95,7 +95,7 @@
     "unit-test": "mocha out/test/unit",
     "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
-    "ui-testone": "extest run-tests --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
+    "ui-testone": "extest run-tests './out/test/ui/testCHANGE*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",

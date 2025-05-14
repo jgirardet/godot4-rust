@@ -166,9 +166,9 @@ const selecRustParentDirStep = async (
     openLabel: "Choose",
     title: "Select parent folder of the new generated crate",
   });
-  if (res !== undefined) {
-    logger.info(`New Rust crate will created inside ${res[0].path}`);
-    return res[0].path;
+  if (res) {
+    logger.info(`New Rust crate will created inside ${res[0].fsPath}`);
+    return res[0].fsPath;
   }
 };
 

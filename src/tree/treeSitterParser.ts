@@ -1,6 +1,7 @@
 import Parser, { Tree, SyntaxNode } from "tree-sitter";
 import { FullPathFile } from "../types";
 import { readFile } from "fs/promises";
+import { readUtf8 } from "../novscodeutils";
 
 /// Base class to derive Parser From
 /// Must reimplment lang()
@@ -18,7 +19,7 @@ export class TreeSitterParser {
     this: T,
     file: FullPathFile
   ): Promise<InstanceType<T>> {
-    let content = await readFile(file, { encoding: "utf-8" });
+    let content = await readUtf8(file);
     return new this(content) as InstanceType<T>;
   }
 

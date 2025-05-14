@@ -1,5 +1,5 @@
 import { NAME } from "./constantes";
-import { log_error } from "./log";
+import { logger } from "./log";
 import {
   CodeAction,
   CodeActionKind,
@@ -7,6 +7,7 @@ import {
   Disposable,
   Range,
   TextEditor,
+  window,
   workspace,
   WorkspaceConfiguration,
 } from "vscode";
@@ -53,13 +54,17 @@ const applyCodeActionNamed = async (editor: TextEditor, title: string) => {
   }
 };
 
-// export function registerCommand(command: string, callback: (...args: any[]) => any, thisArg?: any): Disposable;
 export const registerGCommand = (
   commandName: string,
   command: (...args: any[]) => any,
   ...args: any[]
 ): Disposable => {
-  return commands.registerCommand(NAME + "." + commandName, () => {
-    log_error(command, ...args);
+  return commands.registerCommand(NAME + "." + commandName, async () => {
+    try {
+      await command(...args);
+    } catch (e) {
+      logger.error(e);
+      window.showErrorMessage(`Godot 4 Rust Error: ${e}`);
+    }
   });
 };
