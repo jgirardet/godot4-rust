@@ -15,16 +15,11 @@ export class NodeItem extends TreeItem {
     super(node.name.value);
     this.parent = parent;
 
-    this.collapsibleState = this.children
-      ? this.parent
-        ? TreeItemCollapsibleState.Expanded
-        : TreeItemCollapsibleState.Collapsed
-      : TreeItemCollapsibleState.None;
-
     this.description = this.type;
     this.tooltip = this.type;
     this.iconPath = NodeItem.getIconUri(this.type);
     this.contextValue = this.isRoot ? "root" : "child";
+    this.collapsibleState = TreeItemCollapsibleState.None;
   }
 
   get isRoot(): boolean {
@@ -52,22 +47,40 @@ export class NodeItem extends TreeItem {
   static createRoot(scene: GodotScene): NodeItem {
     let root = new NodeItem(scene.rootNode);
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
+    root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
     return root;
   }
 
   private static createChildren(nodes: Node[], root: NodeItem) {
-    let rootChildren = [];
+    let parents = new Map();
+    parents.set(".", root);
     for (const n of nodes.slice(1)) {
+      let asParentPath =
+        n.parent!.value === "."
+          ? n.name.value
+          : n.parent!.value + "/" + n.name.value;
+      const item = new NodeItem(n, parents[n.parent!.value as keyof object]);
+      parents.set(asParentPath, item);
+      parents.get(n.parent!.value)!.children.push(item);
+
       // toujours défini à ce stade
-      if (n.parent!.value === ".") {
-        rootChildren.push(new NodeItem(n, root));
-      } else {
-        const ancestor = rootChildren[rootChildren.length - 1];
-        ancestor.children.push(new NodeItem(n, ancestor));
-      }
+      // let parent =
+      //   n.parent!.value === "." ? root : rootChildren[rootChildren.length - 1];
+      // parent.children.push(new NodeItem(n, parent));
+      // parent.collapsibleState = TreeItemCollapsibleState.Expanded;
+      // if (n.parent!.value === ".") {
+      //   rootChildren.push(new NodeItem(n, root));
+      // } else {
+      //   const ancestor = rootChildren[rootChildren.length - 1];
+      //   const newNode = new NodeItem(n, ancestor);
+      //   ancestor.children.push(new NodeItem(n, ancestor));
+      //   ancestor.collapsibleState = TreeItemCollapsibleState.Expanded;
+      //   lastParent = ancestor;
+      // }
     }
-    return rootChildren;
+    console.log(parents)
+    return parents.get(".")!;
   }
 
   static getIconUri(nom: string): Uri | undefined {
@@ -81,8 +94,5 @@ export class NodeItem extends TreeItem {
       `${nom}.svg`
     );
     return uri;
-    
-
-    
   }
 }

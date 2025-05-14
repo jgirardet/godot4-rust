@@ -1,6 +1,7 @@
 todo:
 
 Prochain en cours :
+- expand at load
 - register pour les autrs commands
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
@@ -23,6 +24,7 @@ features:
 - le nombre de worker en option
 - ajouter les groups dans godot parse
 _ parser les extResources image pour les afficher en icone
+- build.tsk pour le cargo build de fond
 
 
 code refactor

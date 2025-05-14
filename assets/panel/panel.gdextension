@@ -1,0 +1,14 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.4
+reloadable = true
+
+[libraries]
+linux.debug.x86_64 =     "res://panel/target/debug/libpanel.so"
+linux.release.x86_64 =   "res://panel/target/release/libpanel.so"
+windows.debug.x86_64 =   "res://panel/target/debug/panel.dll"
+windows.release.x86_64 = "res://panel/target/release/panel.dll"
+macos.debug =            "res://panel/target/debug/libpanel.dylib"
+macos.release =          "res://panel/target/release/libpanel.dylib"
+macos.debug.arm64 =      "res://panel/target/debug/libpanel.dylib"
+macos.release.arm64 =    "res://panel/target/release/libpanel.dylib"

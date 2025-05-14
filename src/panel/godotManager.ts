@@ -72,7 +72,6 @@ export class GodotManager {
   }
 
   onChangeSelection(e: TreeViewSelectionChangeEvent<NodeItem>) {
-    console.log(e);
   }
 
   async onFileChanged(file: Uri) {
@@ -101,7 +100,6 @@ export class GodotManager {
     let parser = RustParser.source(doc);
     if (parser.isGodotModule) {
       let godotClass = parser.findGodotClass()?.className;
-      console.log(godotClass);
       if (godotClass) {
         for (const [k, v] of this.treeData.data.entries()) {
           if (v.type === godotClass) {
