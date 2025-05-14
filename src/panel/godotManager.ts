@@ -64,15 +64,22 @@ export class GodotManager {
       )
     );
 
-    this.reload().then(() => "Godot Manager Loaded");
+    this.reload().then(() =>
+      commands
+        .executeCommand(
+          "godot4-rust.resetViewLocation"
+        )
+        .then(() => {
+          logger.info("Godot Manager Loaded");
+        })
+    );
   }
 
   get godotDir(): FullPathDir {
     return getGodotProjectDir(this.godotProjectFile);
   }
 
-  onChangeSelection(e: TreeViewSelectionChangeEvent<NodeItem>) {
-  }
+  onChangeSelection(e: TreeViewSelectionChangeEvent<NodeItem>) {}
 
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);
