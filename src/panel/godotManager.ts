@@ -24,6 +24,7 @@ import { logger } from "../log";
 import { RustParser } from "../rust/parser";
 import { registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
+import { RustManager } from "../rust/rustmanager";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -31,11 +32,13 @@ export class GodotManager {
   watcher: FileSystemWatcher;
   godotProjectFile: FullPathFile;
   loader: GodotProjectLoader;
+  rust: RustManager;
 
   constructor(context: ExtensionContext, godotProjectFile: FullPathFile) {
     this.godotProjectFile = godotProjectFile;
     this.treeData = new TscnTreeProvider();
     this.loader = new GodotProjectLoader(godotProjectFile);
+    this.rust = new RustManager(context);
 
     context.subscriptions.push(
       //  treview
@@ -65,13 +68,9 @@ export class GodotManager {
     );
 
     this.reload().then(() =>
-      commands
-        .executeCommand(
-          "godot4-rust.resetViewLocation"
-        )
-        .then(() => {
-          logger.info("Godot Manager Loaded");
-        })
+      commands.executeCommand("godot4-rust.resetViewLocation").then(() => {
+        logger.info("Godot Manager Loaded");
+      })
     );
   }
 
@@ -100,21 +99,34 @@ export class GodotManager {
 
   async reveal(editor?: TextEditor) {
     editor = window.activeTextEditor;
-    let doc = editor?.document.getText();
-    if (!doc) {
+    if (!editor) {
       return;
     }
-    let parser = RustParser.source(doc);
-    if (parser.isGodotModule) {
-      let godotClass = parser.findGodotClass()?.className;
-      if (godotClass) {
-        for (const [k, v] of this.treeData.data.entries()) {
-          if (v.type === godotClass) {
-            return this._reveal(v);
-          }
+    const file = editor?.document.fileName;
+
+    if (this.rust.files.has(file)) {
+      let godoclass = this.rust.files.get(file)?.className;
+      for (const [k, v] of this.treeData.data.entries()) {
+        if (v.type === godotClass) {
+          return this._reveal(v);
         }
       }
     }
+    // let doc = editor?.document.getText();
+    // if (!doc) {
+    //   return;
+    // }
+    // let parser = RustParser.source(doc);
+    // if (parser.isGodotModule) {
+    //   let godotClass = parser.findGodotClass()?.className;
+    //   if (godotClass) {
+    //     for (const [k, v] of this.treeData.data.entries()) {
+    //       if (v.type === godotClass) {
+    //         return this._reveal(v);
+    //       }
+    //     }
+    //   }
+    // }
 
     if (!editor) {
       // aka manual launch

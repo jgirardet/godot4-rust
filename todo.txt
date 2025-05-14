@@ -1,15 +1,11 @@
 todo:
 
 Prochain en cours :
-- expand at load
-- register pour les autrs commands
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 - icon qui si c ruste et peut êtr emphasé l'actif (highilit )
 
 
-Bug:
-    - UPDATE depencencies when deleted !!!!!!!!!!!!!!!!!
 
 features:
 - changer le nom du tscn
