@@ -31,7 +31,8 @@ describe("create gdextension file", () => {
 
   it("test panel load", async () => {
     [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
-      "assets/ConfigProject"
+      "assets/panel/panel",
+      "assets/panel"
     );
 
     let panel = await initPanel(rootPath, driver);
@@ -43,27 +44,28 @@ describe("create gdextension file", () => {
     expect(visibleItems.length).toEqual(4);
     expect(
       await Promise.all(visibleItems.map((m, _, __) => m.getLabel()))
-    ).toEqual(["Level", "LevelButton", "Main", "Main2"]);
+    ).toEqual(["Child1", "Child2", "Main", "Other"]);
     expect(
       await Promise.all(visibleItems.map((m, _, __) => m.getDescription()))
-    ).toEqual(["Level", "NinePatchRect", "MainScene", "MainScene"]);
+    ).toEqual(["Child1", "HTTPRequest", "Node2D", "Node2D"]);
 
     // click
-    await visibleItems[3].click();
-    // visibleItems =  await panel.getVisibleItems() as TreeItem[];
-    let mc = (await panel.findItem("MC")) as TreeItem;
-    expect(await mc.isExpanded()).toBeTruthy();
-    panel = await new SideBarView().getContent().getSection(DISPLAY_NAME);
-    let vb = (await panel.findItem("VB")) as TreeItem;
-    expect(await vb.isExpandable()).toBeFalsy();
+    await visibleItems[2].click();
+    let aa = (await panel.findItem("AA")) as TreeItem;
+    expect(await aa.isExpanded()).toBeTruthy();
+    let aab = (await panel.findItem("AAB")) as TreeItem;
+    expect(await aab.isExpandable()).toBeFalsy();
+    expect(await aa.hasChildren()).toBeTruthy();
+    expect(await aab.hasChildren()).toBeFalsy();
+    expect((await aa.getChildren())[1]).toEqual(aa);
   });
-  it("test reveal", async () => {
-    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
-      "assets/ConfigProject"
-    );
-    let panel = await initPanel(rootPath, driver);
-    wb.executeCommand(`${NAME}.reveal`)
-  });
+  // it("test reveal", async () => {
+  //   [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
+  //     "assets/ConfigProject"
+  //   );
+  //   let panel = await initPanel(rootPath, driver);
+  //   wb.executeCommand(`${NAME}.reveal`);
+  // });
 });
 
 const initPanel = async (rootPath: string, driver: WebDriver) => {

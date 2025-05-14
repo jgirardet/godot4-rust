@@ -49,10 +49,11 @@ export class NodeItem extends TreeItem {
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
     root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
+    console.log(root);
     return root;
   }
 
-  private static createChildren(nodes: Node[], root: NodeItem) {
+  private static createChildren(nodes: Node[], root: NodeItem): NodeItem[] {
     let parents = new Map();
     parents.set(".", root);
     for (const n of nodes.slice(1)) {
@@ -63,24 +64,11 @@ export class NodeItem extends TreeItem {
       const item = new NodeItem(n, parents[n.parent!.value as keyof object]);
       parents.set(asParentPath, item);
       parents.get(n.parent!.value)!.children.push(item);
-
-      // toujours défini à ce stade
-      // let parent =
-      //   n.parent!.value === "." ? root : rootChildren[rootChildren.length - 1];
-      // parent.children.push(new NodeItem(n, parent));
-      // parent.collapsibleState = TreeItemCollapsibleState.Expanded;
-      // if (n.parent!.value === ".") {
-      //   rootChildren.push(new NodeItem(n, root));
-      // } else {
-      //   const ancestor = rootChildren[rootChildren.length - 1];
-      //   const newNode = new NodeItem(n, ancestor);
-      //   ancestor.children.push(new NodeItem(n, ancestor));
-      //   ancestor.collapsibleState = TreeItemCollapsibleState.Expanded;
-      //   lastParent = ancestor;
-      // }
+      parents.get(n.parent!.value)!.collapsibleState =
+        TreeItemCollapsibleState.Expanded;
     }
-    console.log(parents)
-    return parents.get(".")!;
+    console.log(parents);
+    return parents.get(".")!.children;
   }
 
   static getIconUri(nom: string): Uri | undefined {

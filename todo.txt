@@ -36,6 +36,9 @@ adapter pour  IGODOTSCNE dans load
     
 - 2 case converts
 
+-test :
+    reveal
+
 
 configaration  à ajouter: 
 - workern
