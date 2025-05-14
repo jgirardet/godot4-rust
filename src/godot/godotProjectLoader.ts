@@ -95,12 +95,10 @@ export class GodotProjectLoader {
           gp(ghostScene.tscnpath.base),
           ghostScene.gdscene
         );
-        for (const dep of scene.depedencies) {
-          this._setDependency(dep, scene.tscnpath);
-        }
         this._addScene(scene);
       }
     }
+    this._resetDepencies();
     return this.scenes;
   }
 
@@ -133,10 +131,11 @@ export class GodotProjectLoader {
     return this.dependencies.get(key) || new Set();
   }
 
-  private _deleteDependencies(key: GodotPath) {
-    this.dependencies.delete(key.base);
-    for (const [k, v] of this.dependencies) {
-      v.delete(key.base);
+  private _resetDepencies() {
+    for (const scene of this.scenes.values()) {
+      for (const dep of scene.depedencies) {
+        this._setDependency(dep, scene.tscnpath);
+      }
     }
   }
 

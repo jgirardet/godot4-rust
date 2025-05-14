@@ -49,7 +49,6 @@ export class NodeItem extends TreeItem {
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
     root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
-    console.log(root);
     return root;
   }
 
@@ -67,7 +66,6 @@ export class NodeItem extends TreeItem {
       parents.get(n.parent!.value)!.collapsibleState =
         TreeItemCollapsibleState.Expanded;
     }
-    console.log(parents);
     return parents.get(".")!.children;
   }
 
