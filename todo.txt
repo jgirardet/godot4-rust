@@ -32,8 +32,6 @@ code refactor
 adapter pour  IGODOTSCNE dans load
 - godotprojectdir sans dep vscode
     
-- les utils:
-    coadeaction provider n'arien à faire là: rust ? ui ?
 - 2 case converts
 
 

@@ -9,7 +9,7 @@ import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
 import { GodotManager } from "./panel/godotManager";
 import { NodeItem } from "./panel/nodeItem";
-import { registerGCommand } from "./utils";
+import { registerGCommand } from "./vscodeUtils";
 
 export function activate(context: vscode.ExtensionContext) {
   logger.info(`Extension${NAME} activating`);

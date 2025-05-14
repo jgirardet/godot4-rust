@@ -1,4 +1,4 @@
-import { getConfigValue } from "./utils";
+import { getConfigValue } from "./vscodeUtils";
 import * as ini from "ini";
 import { logger } from "./log";
 import { window } from "vscode";

@@ -2,11 +2,11 @@ import { globSync } from "glob";
 import { FullPathDir, FullPathFile } from "../types";
 import { GodotScene } from "./godotScene";
 import { GodotPath, gp } from "./godotPath";
-import { getGodotProjectDir } from "./godotUtils";
 import { availableParallelism } from "os";
 import path from "path";
 import Piscina from "piscina";
 import { CreateSceneWorkerArgs, workerFilename } from "./workerGodot";
+import { getGodotProjectDir } from "../utils";
 
 const createScenesWorker = new Piscina<CreateSceneWorkerArgs, GodotScene[]>({
   filename: path.resolve(__dirname, "./workerWrapper.js"),

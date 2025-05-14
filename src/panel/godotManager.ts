@@ -17,13 +17,13 @@ import {
 } from "vscode";
 import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
-import { getGodotProjectDir } from "../godot/godotUtils";
 import { NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { GodotScene } from "../godot/godotScene";
 import { logger } from "../log";
 import { RustParser } from "../rust/parser";
-import { registerGCommand } from "../utils";
+import { registerGCommand } from "../vscodeUtils";
+import { getGodotProjectDir } from "../utils";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;

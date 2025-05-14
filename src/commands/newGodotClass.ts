@@ -10,7 +10,6 @@ import {
 } from "../snippets";
 import { logger } from "../log";
 import { GODOT_CLASSES } from "../godot/godotClasses";
-import { applyCodeActionNamed } from "../utils";
 import path from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
@@ -24,6 +23,7 @@ import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
 import { Node } from "../godot/types";
 import { NodeItem } from "../panel/nodeItem";
+import { applyCodeActionNamed } from "../rust/utils";
 
 export const newGodotClass = async (item?: NodeItem) => {
   if (item && !item.isRoot) {

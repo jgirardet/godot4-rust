@@ -1,7 +1,7 @@
 import Parser, { Tree, SyntaxNode } from "tree-sitter";
 import { FullPathFile } from "../types";
 import { readFile } from "fs/promises";
-import { readUtf8 } from "../novscodeutils";
+import { readUtf8 } from "../utils";
 
 /// Base class to derive Parser From
 /// Must reimplment lang()

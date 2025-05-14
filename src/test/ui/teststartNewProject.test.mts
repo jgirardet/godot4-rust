@@ -16,7 +16,7 @@ import {
 } from "../testutils.js";
 import { mkdirSync, readFileSync } from "fs";
 import { expect } from "earl";
-import { readUtf8Sync } from "../../novscodeutils.js";
+import { readUtf8Sync } from "../../utils.js";
 
 describe("start new gdextensin project", () => {
   let browser: VSBrowser;
