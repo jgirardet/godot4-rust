@@ -2,6 +2,7 @@ import { QuickPickItem, QuickPickOptions, window } from "vscode";
 import { FullPathDir, FullPathFile } from "../types";
 import { logger } from "../log";
 import { Node } from "../godot/types";
+import path from "path";
 
 export const selectTscn = async (
   tscnFiles: FullPathFile[],
@@ -12,8 +13,9 @@ export const selectTscn = async (
   // show relative path
   if (godotDir) {
     const asRelative = tscnFiles.reduce((acc, val: string, idx, _) => {
-      return { [val.replace(godotDir, "")]: val, ...acc };
+      return { [val.replace(godotDir, "").replaceAll("\\", "/")]: val, ...acc };
     }, {});
+    console.log(asRelative);
     selected = await window.showQuickPick(Object.keys(asRelative), options);
     if (!selected) {
       return;
