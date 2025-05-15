@@ -1,5 +1,5 @@
 export interface GodotModule {
-  className: string;
+  className?: string;
   init?: string;
   baseClass?: string;
 }

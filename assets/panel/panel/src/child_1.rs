@@ -5,7 +5,7 @@ use godot::{
 
 #[derive(GodotClass)]
 #[class(base=Node2D,init)]
-struct Child1 {
+pub struct Child1 {
     base: Base<Node2D>,
     #[init(node = "AChild1/AAChild1")]
     a_a_child_1: OnReady<Gd<Camera2D>>,

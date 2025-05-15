@@ -10,6 +10,7 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeView,
+  TreeViewExpansionEvent,
   TreeViewSelectionChangeEvent,
   Uri,
   window,
@@ -21,10 +22,11 @@ import { NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { GodotScene } from "../godot/godotScene";
 import { logger } from "../log";
-import { RustParser } from "../rust/parser";
 import { registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
-import { RustManager } from "../rust/rustmanager";
+import { RustFiles, RustManager } from "../rust/rustmanager";
+import { GodotPath } from "../godot/godotPath";
+import path from "path";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -36,7 +38,7 @@ export class GodotManager {
 
   constructor(context: ExtensionContext, godotProjectFile: FullPathFile) {
     this.godotProjectFile = godotProjectFile;
-    this.treeData = new TscnTreeProvider();
+    this.treeData = new TscnTreeProvider(getGodotProjectDir(godotProjectFile));
     this.loader = new GodotProjectLoader(godotProjectFile);
     this.rust = new RustManager(context);
 
@@ -44,10 +46,10 @@ export class GodotManager {
       //  treview
       (this.treeView = window.createTreeView(NAME, {
         treeDataProvider: this.treeData,
-        showCollapseAll: true,
       })),
-      this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
-
+      // this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
+      this.treeView.onDidExpandElement(this.onChangeSelection.bind(this)),
+      //
       // watcher
       (this.watcher = workspace.createFileSystemWatcher(
         new RelativePattern(this.godotDir, "**/*.tscn")
@@ -58,43 +60,55 @@ export class GodotManager {
 
       // commands
       registerGCommand(`reveal`, this.reveal.bind(this)),
-      registerGCommand(
-        `collapseAll`,
-        this.collapseAll.bind(this),
+      registerGCommand(`refresh`, this.reload.bind(this)),
 
-        // connect signals
-        window.onDidChangeActiveTextEditor(this.reveal.bind(this))
-      )
+      // connect signals
+      window.onDidChangeActiveTextEditor(this.reveal.bind(this))
     );
 
-    this.reload().then(() =>
-      commands.executeCommand("godot4-rust.resetViewLocation").then(() => {
-        logger.info("Godot Manager Loaded");
-      })
-    );
+    this.rust
+      .reload()
+      .then(this.reload.bind(this))
+      .then(() =>
+        commands.executeCommand("godot4-rust.resetViewLocation").then(() => {
+          logger.info("Godot Manager Loaded");
+        })
+      );
   }
 
   get godotDir(): FullPathDir {
     return getGodotProjectDir(this.godotProjectFile);
   }
 
-  onChangeSelection(e: TreeViewSelectionChangeEvent<NodeItem>) {}
+  async onChangeSelection(e: TreeViewExpansionEvent<NodeItem>) {
+    // for (const f of e.element) {
+    //   f.reveal();
+    // }
+    //
+    // console.log("EXpand");
+    // console.log(e.element);
+    // if (e.element.hasChildren) {
+    //   await this._reveal(e.element);
+    // }
+  }
 
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);
     const scenes = await this.loader.onChange(file.fsPath);
-    this.treeData.updateData(scenes);
+    this.treeData.updateData(scenes, this.rust.files);
   }
 
   async onFileDeleted(file: Uri) {
     logger.info(`${file.fsPath} deleted, updating`);
     const scenes = await this.loader.onChange(file.fsPath, true);
-    this.treeData.updateData(scenes);
+    this.treeData.updateData(scenes, this.rust.files);
   }
+
+  // refresh = this.reload;
 
   async reload() {
     const scenes = await this.loader.reload();
-    this.treeData.updateData(scenes);
+    this.treeData.updateData(scenes, this.rust.files);
   }
 
   async reveal(editor?: TextEditor) {
@@ -103,30 +117,16 @@ export class GodotManager {
       return;
     }
     const file = editor?.document.fileName;
-
-    if (this.rust.files.has(file)) {
-      let godoclass = this.rust.files.get(file)?.className;
-      for (const [k, v] of this.treeData.data.entries()) {
-        if (v.type === godotClass) {
-          return this._reveal(v);
-        }
+    // if (this.rust.files.has(file)) {
+    let godotClass = this.rust.files.get(file)?.className;
+    if (!godotClass) {
+      return;
+    }
+    for (const [k, v] of this.treeData.data.entries()) {
+      if (v.type === godotClass) {
+        return this._reveal(v);
       }
     }
-    // let doc = editor?.document.getText();
-    // if (!doc) {
-    //   return;
-    // }
-    // let parser = RustParser.source(doc);
-    // if (parser.isGodotModule) {
-    //   let godotClass = parser.findGodotClass()?.className;
-    //   if (godotClass) {
-    //     for (const [k, v] of this.treeData.data.entries()) {
-    //       if (v.type === godotClass) {
-    //         return this._reveal(v);
-    //       }
-    //     }
-    //   }
-    // }
 
     if (!editor) {
       // aka manual launch
@@ -141,13 +141,22 @@ export class GodotManager {
   }
 
   async _reveal(node: NodeItem) {
-    await this.collapseAll();
+    // await this.collapseAll();
     logger.info(`Revealing ${node.name} with type ${node.type}`);
-    await this.treeView.reveal(node, {
-      expand: true,
-      focus: true, // good scroll position
-    });
-    await commands.executeCommand("workbench.action.focusActiveEditorGroup"); //optionnable
+    // let toShow = node.findLastChildren();
+    await this.treeView.reveal(
+      node,
+      // await this.treeView.reveal(c,
+      {
+        //{
+        expand: true,
+        // select: true,
+        focus: true, // good scroll position
+        // }
+      }
+    );
+    // node.reveal();
+    // await commands.executeCommand("workbench.action.focusActiveEditorGroup"); //optionnable
   }
 }
 
@@ -158,20 +167,39 @@ class TscnTreeProvider implements TreeDataProvider<NodeItem> {
     void | NodeItem | NodeItem[] | null | undefined
   >();
 
+  constructor(private godotDir: FullPathDir) {}
+
   onDidChangeTreeData:
     | Event<void | NodeItem | NodeItem[] | null | undefined>
     | undefined = this.treeChanged.event;
 
-  updateData(scenes: Map<string, GodotScene>) {
+  updateData(scenes: Map<string, GodotScene>, rust: RustFiles) {
     this.data.clear();
     for (const [k, s] of scenes.entries()) {
       this.data.set(k, NodeItem.createRoot(s));
+    }
+    // if (s.)
+    for (const [k, v] of this.data.entries()) {
+      let packed = v.getPackedSceneChildren();
+      console.log(packed);
+      for (const p of packed) {
+        let val = p.node.instance?.value.path.value;
+        console.log(val);
+        if (val) {
+          p.description = this.data.get(GodotPath.fromRes(val).base)?.name;
+          p.iconPath = NodeItem.getGodotIcon()
+        }
+      }
     }
     this.treeChanged.fire();
   }
 
   getTreeItem(element: NodeItem): TreeItem | Thenable<TreeItem> {
     return element;
+  }
+
+  refresh() {
+    this.treeChanged.fire();
   }
 
   async getChildren(

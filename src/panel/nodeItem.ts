@@ -1,10 +1,17 @@
 import { GodotPath } from "../godot/godotPath";
 import { Node } from "../godot/types";
-import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
+import {
+  TreeItem,
+  TreeItemCheckboxState,
+  TreeItemCollapsibleState,
+  Uri,
+  window,
+} from "vscode";
 import { GodotScene } from "../godot/godotScene";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
+  instanceType?: string;
 
   tscn?: GodotPath;
 
@@ -44,6 +51,24 @@ export class NodeItem extends TreeItem {
     return "instance" in this.node;
   }
 
+  get hasChildren(): boolean {
+    return this.children.length > 0;
+  }
+
+  reveal() {
+    this.collapsibleState = TreeItemCollapsibleState.Expanded;
+    // revealChildren(this.children);
+    for (const c of this.children) {
+      c.reveal();
+    }
+  }
+
+  getPackedSceneChildren(): NodeItem[] {
+    let acc: NodeItem[] = [];
+    getPackedChildren(this.children, acc);
+    return acc;
+  }
+
   static createRoot(scene: GodotScene): NodeItem {
     let root = new NodeItem(scene.rootNode);
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
@@ -71,6 +96,10 @@ export class NodeItem extends TreeItem {
 
   static getIconUri(nom: string): Uri | undefined {
     const godotIconPath = "../../../resources/godotIcons/godot_icons/";
+    const godotRustPath =
+      "../../../resources/godotIcons/godotrust/godot-ferris.svg";
+    
+      if (nom == "PackedScene")
 
     let theme = window.activeColorTheme.kind;
     let uri = Uri.joinPath(
@@ -81,4 +110,32 @@ export class NodeItem extends TreeItem {
     );
     return uri;
   }
+
+  static getGodotIcon() {
+    const godotIconPath =
+      "../../../resources/godotIcons/godotrust/godot-ferris.svg";
+
+    // let theme = window.activeColorTheme.kind;
+    let uri = Uri.joinPath(Uri.file(__filename), godotIconPath);
+    //   `${[1, 4].includes(theme) ? "light" : "dark"}`,
+    //   `${nom}.svg`
+    // );
+    return uri;
+  }
 }
+const revealChildren = (children: NodeItem[]) => {
+  for (const c of children) {
+    c.collapsibleState = TreeItemCollapsibleState.Expanded;
+    revealChildren(c.children);
+  }
+};
+
+const getPackedChildren = (children: NodeItem[], acc: NodeItem[]) => {
+  for (const c of children) {
+    if (c.isInstance) {
+      acc.push(c);
+    } else {
+      getPackedChildren(c.children, acc);
+    }
+  }
+};

@@ -59,12 +59,19 @@
         "enablement": "godot4-rust.project_set"
       },
       {
-        "command": "godot4-rust.collapseAll",
-        "title": "Godot4-Rust: Collapse all element in panel",
+        "command": "godot4-rust.refresh",
+        "title": "Godot4-Rust: Refresh panel",
         "enablement": "godot4-rust.project_set"
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "godot4-rust.refresh",
+          "when": "godot4-rust.project_set",
+          "group": "inline"
+        }
+      ],
       "view/item/context": [
         {
           "when": "view == godot4-rust && viewItem =~ /^root/",

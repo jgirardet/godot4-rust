@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bkntn1rovgg28" path="res://child1.tscn" id="1_4clav"]
 [ext_resource type="PackedScene" uid="uid://de3up17wr31l0" path="res://child_2.tscn" id="2_esrft"]
 
-[node name="Other" type="Node2D"]
+[node name="Other" type="Other"]
 
 [node name="Other1" type="CanvasLayer" parent="."]
 
@@ -12,5 +12,11 @@
 [node name="Other111" type="Sprite2D" parent="Other1/Other11"]
 
 [node name="Child1" parent="Other1/Other11/Other111" instance=ExtResource("1_4clav")]
+
+[node name="TextEdit" type="TextEdit" parent="Other1/Other11/Other111/Child1"]
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="Node2D" type="Node2D" parent="Other1/Other11/Other111/Child1/TextEdit"]
 
 [node name="Child2" parent="Other1" instance=ExtResource("2_esrft")]
