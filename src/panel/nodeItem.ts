@@ -11,7 +11,7 @@ import { GodotScene } from "../godot/godotScene";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
-  instanceType?: string;
+  private _instanceType?: string;
 
   tscn?: GodotPath;
 
@@ -39,7 +39,10 @@ export class NodeItem extends TreeItem {
 
   get type(): string {
     return (
-      this.node.type?.value || this.node.instance?.value.type.value || "Unknow"
+      this.instanceType ||
+      this.node.type?.value ||
+      this.node.instance?.value.type.value ||
+      "Unknow"
     );
   }
 
@@ -53,6 +56,16 @@ export class NodeItem extends TreeItem {
 
   get hasChildren(): boolean {
     return this.children.length > 0;
+  }
+
+  get instanceType(): string | undefined {
+    return this._instanceType;
+  }
+
+  set instanceType(value: string) {
+    this._instanceType = value;
+    this.description = value;
+    // this.tooltip = value
   }
 
   reveal() {
@@ -98,8 +111,6 @@ export class NodeItem extends TreeItem {
     const godotIconPath = "../../../resources/godotIcons/godot_icons/";
     const godotRustPath =
       "../../../resources/godotIcons/godotrust/godot-ferris.svg";
-    
-      if (nom == "PackedScene")
 
     let theme = window.activeColorTheme.kind;
     let uri = Uri.joinPath(
@@ -113,7 +124,7 @@ export class NodeItem extends TreeItem {
 
   static getGodotIcon() {
     const godotIconPath =
-      "../../../resources/godotIcons/godotrust/godot-ferris.svg";
+      "../../../resources/godotIcons/godotrust/godot-ferris-16x16.svg";
 
     // let theme = window.activeColorTheme.kind;
     let uri = Uri.joinPath(Uri.file(__filename), godotIconPath);

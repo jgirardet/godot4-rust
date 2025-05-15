@@ -95,20 +95,20 @@ export class GodotManager {
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);
     const scenes = await this.loader.onChange(file.fsPath);
-    this.treeData.updateData(scenes, this.rust.files);
+    this.treeData.updateData(scenes, this.rust);
   }
 
   async onFileDeleted(file: Uri) {
     logger.info(`${file.fsPath} deleted, updating`);
     const scenes = await this.loader.onChange(file.fsPath, true);
-    this.treeData.updateData(scenes, this.rust.files);
+    this.treeData.updateData(scenes, this.rust);
   }
 
   // refresh = this.reload;
 
   async reload() {
     const scenes = await this.loader.reload();
-    this.treeData.updateData(scenes, this.rust.files);
+    this.treeData.updateData(scenes, this.rust);
   }
 
   async reveal(editor?: TextEditor) {
@@ -173,21 +173,38 @@ class TscnTreeProvider implements TreeDataProvider<NodeItem> {
     | Event<void | NodeItem | NodeItem[] | null | undefined>
     | undefined = this.treeChanged.event;
 
-  updateData(scenes: Map<string, GodotScene>, rust: RustFiles) {
+  updateData(scenes: Map<string, GodotScene>, rust: RustManager) {
     this.data.clear();
+    let rustTypes = rust.rustStructs;
+    let baseTypes = rust.getBaseTypesForStrucst();
     for (const [k, s] of scenes.entries()) {
-      this.data.set(k, NodeItem.createRoot(s));
+      let root = NodeItem.createRoot(s);
+      if (rust.isRustStruct(s.rootNode.type!.value, rustTypes)) {
+        // ! ok
+        root.iconPath = NodeItem.getGodotIcon();
+        // root.description = baseTypes.get(s.rootNode.type!.value);
+        root.tooltip = baseTypes.get(s.rootNode.type!.value);
+      }
+      this.data.set(k, root);
     }
     // if (s.)
     for (const [k, v] of this.data.entries()) {
       let packed = v.getPackedSceneChildren();
-      console.log(packed);
       for (const p of packed) {
-        let val = p.node.instance?.value.path.value;
-        console.log(val);
-        if (val) {
-          p.description = this.data.get(GodotPath.fromRes(val).base)?.name;
-          p.iconPath = NodeItem.getGodotIcon()
+        let packedResPath = p.node.instance?.value.path.value;
+        if (packedResPath) {
+          let packedGPath = GodotPath.fromRes(packedResPath);
+          let rootNodeItem = this.data.get(packedGPath.base);
+          if (rootNodeItem) {
+            p.instanceType = rootNodeItem.name;
+            if (rust.isRustStruct(p.instanceType, rustTypes)) {
+              p.iconPath = NodeItem.getGodotIcon();
+              p.tooltip = baseTypes.get(p.instanceType);
+            } else {
+              p.tooltip = rootNodeItem.type;
+              p.iconPath = NodeItem.getIconUri(rootNodeItem.type);
+            }
+          }
         }
       }
     }

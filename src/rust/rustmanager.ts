@@ -47,6 +47,24 @@ export class RustManager {
   // }
   async onFileDeleted(u: Uri) {}
 
+  get rustStructs(): string[] {
+    return Array.from(this.files, ([k, v]) => v.className!);
+  }
+
+  isRustStruct(godotType: string, rustStructs?: string[]): boolean {
+    return (rustStructs || this.rustStructs).includes(godotType);
+  }
+
+  getBaseTypesForStrucst() {
+    let res = new Map();
+    for (const { className, baseClass } of this.files.values()) {
+      if (className && baseClass) {
+        res.set(className, baseClass);
+      }
+    }
+    return res;
+  }
+
   async reload() {
     let ws = workspace.workspaceFolders?.at(0);
     if (!ws) {
