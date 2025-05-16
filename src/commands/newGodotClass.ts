@@ -10,7 +10,6 @@ import {
 } from "../snippets";
 import { logger } from "../log";
 import { GODOT_CLASSES } from "../godot/godotClasses";
-import { applyCodeActionNamed } from "../utils";
 import path from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
@@ -23,8 +22,15 @@ import { selectNodes, selectTscn } from "../ui/select";
 import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
 import { Node } from "../godot/types";
+import { NodeItem } from "../panel/nodeItem";
+import { applyCodeActionNamed } from "../rust/utils";
 
-export const newGodotClass = async () => {
+export const newGodotClass = async (item?: NodeItem) => {
+  if (item && !item.isRoot) {
+    logger.warn("Only root nodes can be derived, aborting");
+    return;
+  }
+
   let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {
     title: "Create new a new Rust module ?",
   });
@@ -34,10 +40,13 @@ export const newGodotClass = async () => {
 
   let gpf = getGodotProjectFile();
   let gpd = getGodotProjectDir(gpf);
-  const tscnFiles = listTscnFiles(gpf);
-  const selectedTscn = await selectTscn(tscnFiles, gpd);
+  let selectedTscn = item?.tscn?.toAbs(gpd);
   if (!selectedTscn) {
-    return;
+    const tscnFiles = listTscnFiles(gpf);
+    selectedTscn = await selectTscn(tscnFiles, gpd);
+    if (!selectedTscn) {
+      return;
+    }
   }
 
   let nodes = (await TscnParser.file(path.resolve(selectedTscn))).parse().nodes;
@@ -176,7 +185,6 @@ class NodeMethodQuickItem implements QuickPickItem {
   picked: boolean;
 
   constructor(label: string, detail: string, picked: boolean) {
-    console.log(picked);
     this.label = label;
     this.detail = detail.trimEnd();
     this.picked = picked;

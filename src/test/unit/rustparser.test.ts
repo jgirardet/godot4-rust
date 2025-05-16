@@ -23,11 +23,11 @@ struct GodotStruct;
       let res = rp.findGodotClass();
       expect(res).toEqual({
         className: "GodotStruct",
-        init: "init",
+        init: true,
         baseClass: "CharacterBody2D",
       });
     });
-    it("parse is no 'class'", function () {
+    it("parse is no 'baseclass'", function () {
       let rp = new RustParser(`
 #[derive(GodotClass)]
 struct GodotStruct;
@@ -36,6 +36,8 @@ struct GodotStruct;
       let res = rp.findGodotClass();
       expect(res).toEqual({
         className: "GodotStruct",
+        init: false,
+        baseClass: undefined
       });
     });
     it("get only the first one", function () {
@@ -50,6 +52,8 @@ struct GodotStruct2;
       let res = rp.findGodotClass();
       expect(res).toEqual({
         className: "GodotStruct",
+        init: false,
+        baseClass: undefined
       });
     });
   });
@@ -61,11 +65,11 @@ struct GodotStruct2;
         "rien du tout": false,
         "use godot;": true,
         '"use godot"': false,
-        "godot": false,
+        godot: false,
         "use godot::bla{abla, bla};": true,
         "use godot::bla::abla{bla,blie};": true,
         "use godot as bla;": true,
-        "use godot::bla as bla;": true
+        "use godot::bla as bla;": true,
       })) {
         expect(new RustParser(fe).isGodotModule).toEqual(res);
       }

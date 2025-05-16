@@ -12,7 +12,7 @@ export const selectTscn = async (
   // show relative path
   if (godotDir) {
     const asRelative = tscnFiles.reduce((acc, val: string, idx, _) => {
-      return { [val.replace(godotDir, "")]: val, ...acc };
+      return { [val.replace(godotDir, "").replaceAll("\\", "/")]: val, ...acc };
     }, {});
     selected = await window.showQuickPick(Object.keys(asRelative), options);
     if (!selected) {

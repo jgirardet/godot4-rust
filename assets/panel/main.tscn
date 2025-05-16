@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4nvt3qsbyqji"]
+
+[ext_resource type="PackedScene" uid="uid://bkntn1rovgg28" path="res://child1.tscn" id="1_ig7tw"]
+
+[node name="Main" type="Node2D"]
+
+[node name="A" type="CanvasLayer" parent="."]
+
+[node name="AA" type="Camera2D" parent="A"]
+
+[node name="AAA" type="Sprite2D" parent="A/AA"]
+
+[node name="AAB" type="Line2D" parent="A/AA"]
+
+[node name="Child1" parent="." instance=ExtResource("1_ig7tw")]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+script = null
+
+[node name="Node2D" type="Node2D" parent="Child1"]

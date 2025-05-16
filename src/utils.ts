@@ -1,56 +1,16 @@
-import * as vscode from "vscode";
-import { NAME } from "./constantes";
-import { glob } from "glob";
-import { logger } from "./log";
-import { FullPathDir } from "./types";
+import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
+import path from "path";
+import { FullPathDir, FullPathFile } from "./types";
 
-export {
-  getProjectConfig,
-  getConfigValue,
-  applyCodeActionNamed,
+export const readUtf8Sync = (path: string): string => {
+  return readFileSync(path, { encoding: "utf-8" });
 };
 
-const getProjectConfig = (): vscode.WorkspaceConfiguration => {
-  return vscode.workspace.getConfiguration(NAME);
+export const readUtf8 = (path: string): Promise<string> => {
+  return readFile(path, { encoding: "utf-8" });
 };
 
-const getConfigValue = (key: string): string => {
-  let v = getProjectConfig().get<string>(key);
-  if (v === undefined) {
-    throw new Error(`The config key ${key} is undefined`);
-  } else if (v === null) {
-    throw new Error(`The config key ${key} is not set`);
-  } else {
-    return v;
-  }
+export const getGodotProjectDir = (projectFile: FullPathFile): FullPathDir => {
+  return path.dirname(projectFile);
 };
-
-
-/// Apply the code titled at current cursor position
-const applyCodeActionNamed = async (
-  editor: vscode.TextEditor,
-  title: string
-) => {
-  const { document, selection } = editor;
-  const range = selection.isEmpty
-    ? new vscode.Range(selection.start, selection.start)
-    : selection;
-
-  const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>(
-    "vscode.executeCodeActionProvider",
-    document.uri,
-    range,
-    vscode.CodeActionKind.QuickFix.value
-  );
-
-  if (actions?.length) {
-    const action = actions.find((f) => f.title === title);
-    if (action === undefined) {
-      return;
-    }
-    if (action.edit) {
-      await vscode.workspace.applyEdit(action.edit);
-    }
-  }
-};
-

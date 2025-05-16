@@ -1,8 +1,8 @@
-import Parser, { Query, SyntaxNode } from "tree-sitter";
+import Parser, { Query, QueryCapture, SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
-import { godotModuleQuery } from "../queries/loadQueries";
-import { ParsedGodotModule } from "./types";
+import { RustParsed } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
+import { godotModuleQuery } from "../constantes";
 
 export class RustParser extends TreeSitterParser {
   get lang(): Parser.Language {
@@ -10,15 +10,15 @@ export class RustParser extends TreeSitterParser {
   }
 
   get rootNode(): SyntaxNode {
-    return this._tree.rootNode;
+    return this.tree.rootNode;
   }
 
   get isGodotModule(): boolean {
-    return this._source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
+    return this.source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
   }
 
   /// Find the First GodotClass in module
-  findGodotClass(): ParsedGodotModule | undefined {
+  findGodotClass(): RustParsed | undefined {
     let q = new Query(Rust as Parser.Language, godotModuleQuery);
 
     let captures = q.matches(this.rootNode).at(0)?.captures;
@@ -26,14 +26,23 @@ export class RustParser extends TreeSitterParser {
       return;
     }
 
-    let res: ParsedGodotModule = {};
+    return {
+      className: this._getStringUnsafe("className", captures),
+      baseClass: this._getString("baseClass", captures),
+      init: this._getString("init", captures) ? true : false,
+    };
+  }
+  //
+  /// Warning: use only if key always is in capture
+  _getStringUnsafe(key: string, captures: QueryCapture[]): string {
+    const node = captures.find((a) => a.name === key)!.node;
+    return this.tree.getText(node).replaceAll('"', "");
+  }
 
-    for (const c of captures) {
-      if (["className", "baseClass", "init"].includes(c.name)) {
-        res[c.name as keyof ParsedGodotModule] = this._tree.getText(c.node);
-      }
+  _getString(key: string, captures: QueryCapture[]): string | undefined {
+    const node = captures.find((a) => a.name === key)?.node;
+    if (node) {
+      return this.tree.getText(node).replaceAll('"', "");
     }
-
-    return res;
   }
 }

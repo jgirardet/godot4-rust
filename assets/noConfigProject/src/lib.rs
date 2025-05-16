@@ -1,4 +1,3 @@
-mod bla;
 
 use godot::prelude::*;
 

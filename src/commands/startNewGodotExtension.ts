@@ -149,7 +149,7 @@ const writeCrateNameStep = async (
       logger.info(`New crate name selected: ${name}`);
       return name;
     } else {
-      console.log("Fail validating");
+      logger.error("Fail validating crate name");
       value = name;
     }
   }
@@ -166,9 +166,9 @@ const selecRustParentDirStep = async (
     openLabel: "Choose",
     title: "Select parent folder of the new generated crate",
   });
-  if (res !== undefined) {
-    logger.info(`New Rust crate will created inside ${res[0].path}`);
-    return res[0].path;
+  if (res) {
+    logger.info(`New Rust crate will created inside ${res[0].fsPath}`);
+    return res[0].fsPath;
   }
 };
 
@@ -223,7 +223,6 @@ const setupGit = (crateDir: FullPathDir) => {
     }
   }
 
-  console.log(`resdore: ${resdir}`);
   if (resdir) {
     logger.info(`.git found at ${resdir}, skipping`);
   } else {

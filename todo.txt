@@ -1,19 +1,28 @@
 todo:
 
 
-Bug:
-    - loadFileQueries path
+- BUG:
+- lenter de chargement depuis rust
+- add class from panel ask for tscn (should not)
+- insert onready fails with Rust types
+- fixier pub ou pub crate pour new godot class
+
+Prochain en cours :
+- drag and drop
+- lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
+
+
 
 features:
 - changer le nom du tscn
 - option pub crate or pub scene : à définir
 - explorer
-    - godot Tscn explorer
-    - godot res dir explorer 
-    - drag/click onready/preload from explorer
     - explorer indicate some things (onready or others)
-    - icons + from godotClass
+    _ afficher + masque les path des fichiers
 - le nombre de worker en option
+- ajouter les groups dans godot parse
+_ parser les extResources image pour les afficher en icone
+- build.tsk pour le cargo build de fond
 
 
 code refactor
@@ -22,8 +31,16 @@ code refactor
     - un grand nombre de test de tscn différent pour tester plantage
 - godotprojectdir sans dep vscode
     
-- les utils:
-    coadeaction provider n'arien à faire là: rust ? ui ?
 - 2 case converts
 
+-test :
+    reveal
 
+
+configaration  à ajouter: 
+- workern
+- auto focus node
+
+doc:
+- panel
+- add godot class

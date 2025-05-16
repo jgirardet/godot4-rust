@@ -14,9 +14,6 @@ import {
 import { initTest, multiSelect } from "../testutils.js";
 
 let LEVEL_SCENE_PATH = "/Scenes/Main/LevelButton/level_button.tscn";
-if (os.platform() === "win32") {
-  LEVEL_SCENE_PATH = LEVEL_SCENE_PATH.replaceAll("/", "\\");
-}
 describe("addNewGodot class Command", () => {
   let browser: VSBrowser;
   let driver: WebDriver;

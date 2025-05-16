@@ -1,4 +1,5 @@
 import { Point } from "tree-sitter";
+import { GodotScene } from "./godotScene";
 
 export type Uid = string;
 export type ResPath = string;
@@ -31,3 +32,5 @@ export interface Attribute<T> {
 
 export type StringAttribute = Attribute<string>;
 export type ExtResourceAttribute = Attribute<ExtResource>;
+
+export type GodotRes = GodotScene;

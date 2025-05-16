@@ -58,11 +58,14 @@ export const getSettings = (filepath: string): GodotSettings | undefined => {
   return undefined;
 };
 
-export const initTest = async (): Promise<
+export const initTest = async (
+  rustbase: string = "assets/noConfigProject",
+  godotbase: string = "assets/GodotProject"
+): Promise<
   [string, VSBrowser, WebDriver, Workbench, BottomBarPanel, OutputView]
 > => {
-  let rootPath = cloneDirToTemp("assets/noConfigProject");
-  addGodotProjectPathSetting(rootPath, cloneGrudotDirTemp());
+  let rootPath = cloneDirToTemp(rustbase);
+  addGodotProjectPathSetting(rootPath, cloneGrudotDirTemp(godotbase));
   let browser = VSBrowser.instance;
   await browser.openResources(rootPath);
   let driver = browser.driver;
