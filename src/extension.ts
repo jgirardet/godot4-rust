@@ -1,9 +1,7 @@
 import * as vscode from "vscode";
-import { insertOnready } from "./commands/insertOnready";
 import { setGodotProjectCommand } from "./commands/setGodotProject";
 import { GODOTPROJET_IS_SET_KEY, NAME } from "./constantes";
 import { logger } from "./log";
-import { newGodotClass } from "./commands/newGodotClass";
 import { createGdextensionCommand } from "./commands/createGdextension";
 import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
@@ -35,7 +33,6 @@ function _activateAfterProjectSet(
   new GodotManager(context, godotProjectFile);
 
   context.subscriptions.push(
-    registerGCommand("newGodotClass", newGodotClass),
     registerGCommand("createGdextension", createGdextensionCommand),
     registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)
   );

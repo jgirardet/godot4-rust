@@ -2,7 +2,6 @@ todo:
 
 
 - BUG:
-- fixier pub ou pub crate pour new godot class
 - insert onready: PascalCase pour types
 
 Prochain en cours :
@@ -38,6 +37,7 @@ code refactor
 configaration  à ajouter: 
 - workern
 - auto focus node
+- pub ou pub(crate) by default
 
 doc:
 - panel

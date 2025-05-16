@@ -20,14 +20,14 @@ const onready_snippet = (node: NodeItem): string[] => {
 };
 
 const declGodotClassStart = (
-  node: Node,
+  nodeItem: NodeItem,
   withInit: boolean = true
 ): string[] => {
   return [
     "#[derive(GodotClass)]",
-    `#[class(base=${node.type?.value}${withInit ? ",init" : ""})]`,
-    `struct ${node.name.value} {`,
-    `base: Base<${node.type?.value}>,`,
+    `#[class(base=${nodeItem.type}${withInit ? ",init" : ""})]`,
+    `pub struct ${nodeItem.name} {`,
+    `base: Base<${nodeItem.type}>,`,
   ];
 };
 
@@ -35,19 +35,22 @@ const declGodotClassEnd = (): string[] => {
   return ["}", "\n"];
 };
 
-const implVirtualMethodsStart = (node: Node): string[] => {
-  return [`#[godot_api]`, `impl I${node.type?.value} for ${node.name.value} {`];
+const implVirtualMethodsStart = (nodeItem: NodeItem): string[] => {
+  return [`#[godot_api]`, `impl I${nodeItem.type} for ${nodeItem.name} {`];
 };
 
 const implVirtualMethodsEnd = (): string[] => {
   return ["}"];
 };
 
-const classImports = (node: Node, otherClassesImports: string[]): string[] => {
-  let imports = new Set([node.type?.value, ...otherClassesImports]);
+const classImports = (
+  nodeItem: NodeItem,
+  otherClassesImports: string[]
+): string[] => {
+  let imports = new Set([nodeItem.type, ...otherClassesImports]);
   return [
     `use godot::{classes::{${[...imports].join(",")},I${
-      node.type?.value
+      nodeItem.type
     }}, prelude::*,};\n`,
   ];
 };

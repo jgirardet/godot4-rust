@@ -6,13 +6,13 @@ import {
   ProviderResult,
 } from "vscode";
 import { NodeItem } from "./nodeItem";
-import { FullPathDir } from "../types";
+import { FullPathDir, FullPathFile } from "../types";
 import { GodotScene } from "../godot/godotScene";
 import { RustManager } from "../rust/rustmanager";
 import { GodotPath } from "../godot/godotPath";
 
 export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
-  data: Map<string, NodeItem> = new Map();
+  data: Map<FullPathFile, NodeItem> = new Map();
 
   treeChanged = new EventEmitter<
     void | NodeItem | NodeItem[] | null | undefined

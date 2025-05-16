@@ -64,7 +64,7 @@ export class NodeItem extends TreeItem {
     // this.tooltip = value
   }
 
-  isRustStruct(): boolean {
+  get isRustStruct(): boolean {
     return this.rustModule !== undefined;
   }
 

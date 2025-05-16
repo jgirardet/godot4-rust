@@ -3,3 +3,9 @@
 [node name="Child2" type="HTTPRequest"]
 
 [node name="Node2D" type="Node2D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Node2D"]
+
+[node name="AudioListener2D" type="AudioListener2D" parent="."]
+
+[node name="ResourcePreloader" type="ResourcePreloader" parent="."]
