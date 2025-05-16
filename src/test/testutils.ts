@@ -1,5 +1,5 @@
 import path from "path";
-import { GodotSettings } from "../constantes";
+import { DISPLAY_NAME, GodotSettings } from "../constantes";
 import * as fs from "fs";
 import * as os from "os";
 import { glob } from "glob";
@@ -7,6 +7,7 @@ import {
   BottomBarPanel,
   InputBox,
   OutputView,
+  SideBarView,
   VSBrowser,
   WebDriver,
   Workbench,
@@ -138,6 +139,20 @@ const clearTmp = async () => {
     fs.rmSync(d, { recursive: true, force: true });
   }
   // fs.rmSync(".test-extensions", { recursive: true, force: true });
+};
+
+export const initPanel = async (rootPath: string, driver: WebDriver) => {
+  let explorer = await new SideBarView()
+    .getContent()
+    .getSection(path.basename(rootPath));
+  await explorer.collapse();
+  let panel = await new SideBarView().getContent().getSection(DISPLAY_NAME);
+  await panel.expand();
+  await driver.wait(
+    async () => (await panel.getVisibleItems()).length > 0,
+    5000
+  );
+  return panel;
 };
 
 clearTmp();

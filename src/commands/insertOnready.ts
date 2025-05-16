@@ -13,22 +13,16 @@ import { Node } from "../godot/types";
 import { NodeItem } from "../panel/nodeItem";
 
 export const insertOnready = async (node: NodeItem) => {
-  // let gpf = getGodotProjectFile();
-  // let gpd = getGodotProjectDir(gpf);
-  // const tscnFiles = listTscnFiles(gpf);
-  // const tscn = await selectTscn(tscnFiles, gpd);
-  // if (!tscn) {
-  //   return;
-  // }
-
-  // let nodes = (await TscnParser.file(path.resolve(tscn))).parse().nodes;
-
-  console.log(node)
-  const nodePicked = (await selectNode(node)) ;
-  if (!nodePicked) {
-    return;
+  let nodePicked;
+  if (node.isRoot) {
+    nodePicked = await selectNode(node);
+    if (!nodePicked) {
+      return;
+    }
+  } else {
+    nodePicked = node;
   }
-  logger.info(`Node selected: \"${nodePicked.parent?.value}\"`);
+  logger.info(`Node selected: \"${nodePicked.name}\"`);
   let onreadsnip = onready_snippet(nodePicked);
 
   if (

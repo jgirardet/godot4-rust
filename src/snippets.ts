@@ -15,7 +15,7 @@ export {
 const onready_snippet = (node: NodeItem): string[] => {
   return [
     `#[init(node = "${formatParentString(node)}")]`,
-    `${toSnake(node.name.value)}: OnReady<Gd<${node.type?.value}>>,`,
+    `${toSnake(node.name)}: OnReady<Gd<${node.type}>>,`,
   ];
 };
 
@@ -79,9 +79,6 @@ const node_methods = {
   //   "fn get_configuration_warnings(&self) -> PackedStringArray {}",
 };
 
-function formatParentString(node: Node) {
-  return (
-    (node.parent?.value === "." ? "" : node.parent?.value + "/") +
-    node.name.value
-  );
+function formatParentString(node: NodeItem) {
+  return (node.path === "." ? "" : node.path + "/") + node.name;
 }
