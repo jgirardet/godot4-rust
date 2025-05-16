@@ -2,8 +2,6 @@ todo:
 
 
 - BUG:
-- lenter de chargement depuis rust
-- add class from panel ask for tscn (should not)
 - insert onready fails with Rust types
 - fixier pub ou pub crate pour new godot class
 
