@@ -28,6 +28,7 @@ import { RustFiles, RustManager } from "../rust/rustmanager";
 import { GodotPath } from "../godot/godotPath";
 import path from "path";
 import { TscnTreeProvider } from "./tscnTreeData";
+import { insertOnready } from "../commands/insertOnready";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -62,6 +63,7 @@ export class GodotManager {
       // commands
       registerGCommand(`reveal`, this.reveal.bind(this)),
       registerGCommand(`refresh`, this.reload.bind(this)),
+      registerGCommand("insertOnReady", this.insertOnReady.bind(this)),
 
       // connect signals
       window.onDidChangeActiveTextEditor(this.reveal.bind(this))
@@ -95,7 +97,6 @@ export class GodotManager {
     this.treeData.updateData(scenes, this.rust);
   }
 
-
   async reload() {
     const scenes = await this.loader.reload();
     this.treeData.updateData(scenes, this.rust);
@@ -123,10 +124,20 @@ export class GodotManager {
     }
   }
 
-  async collapseAll() {
-    return commands.executeCommand(
-      `workbench.actions.treeView.${NAME}.collapseAll`
-    );
+  async insertOnReady() {
+    let doc = window.activeTextEditor?.document;
+    if (!doc) {
+      return;
+    }
+    let nodeItem = Array.from(this.treeData.data, ([k, v]) => {
+      if (v.rustModule?.path === doc.fileName) {
+        return v;
+      }
+    })[0];
+    if (!nodeItem) {
+      return;
+    }
+    await insertOnready(nodeItem);
   }
 
   async _reveal(node: NodeItem) {

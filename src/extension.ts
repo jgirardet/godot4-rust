@@ -35,7 +35,6 @@ function _activateAfterProjectSet(
   new GodotManager(context, godotProjectFile);
 
   context.subscriptions.push(
-    registerGCommand("insertOnReady", insertOnready),
     registerGCommand("newGodotClass", newGodotClass),
     registerGCommand("createGdextension", createGdextensionCommand),
     registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)

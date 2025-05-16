@@ -2,6 +2,7 @@ import { QuickPickItem, QuickPickOptions, window } from "vscode";
 import { FullPathDir, FullPathFile } from "../types";
 import { logger } from "../log";
 import { Node } from "../godot/types";
+import { NodeItem } from "../panel/nodeItem";
 
 export const selectTscn = async (
   tscnFiles: FullPathFile[],
@@ -32,12 +33,12 @@ export const selectTscn = async (
 };
 
 export const selectNode = async (
-  nodes: Node[],
+  node: NodeItem,
   options?: QuickPickOptions
-): Promise<Node | undefined> => {
-  const picks = nodes.slice(1).map((n) => new NodeQuickPickItem(n));
+): Promise<NodeItem | undefined> => {
+  const picks = node.flatChildren.map((n) => new NodeQuickPickItem(n));
   const selected = await window.showQuickPick(picks, {
-    title: `Nodes of ${nodes[0].name.value}`,
+    title: `Nodes of ${node.label}`,
     ...options,
   });
   if (selected === undefined) {
@@ -52,12 +53,12 @@ export const selectNodes = async (
   nodes: Node[],
   options?: QuickPickOptions
 ): Promise<Node[] | undefined> => {
-  const picks = nodes.slice(1).map((n) => new NodeQuickPickItem(n));
+  const picks = nodes.slice(1).map((n) => new NodeQuickPickItem2(n));
   const selected = (await window.showQuickPick(picks, {
     title: `Nodes of ${nodes[0].name}`,
     canPickMany: true,
     ...options,
-  })) as NodeQuickPickItem[] | undefined;
+  })) as NodeQuickPickItem2[] | undefined;
   if (selected === undefined) {
     logger.info("No node selected, aborting");
     return;
@@ -66,7 +67,7 @@ export const selectNodes = async (
   return selected.map((x) => x.node);
 };
 
-class NodeQuickPickItem implements QuickPickItem {
+class NodeQuickPickItem2 implements QuickPickItem {
   label: string;
   node: Node;
   constructor(node: Node) {
@@ -76,5 +77,17 @@ class NodeQuickPickItem implements QuickPickItem {
       (node.parent?.value === "." ? "" : node.parent?.value + "/") +
       node.name.value
     }  (${node.type?.value})`;
+  }
+}
+
+class NodeQuickPickItem implements QuickPickItem {
+  label: string;
+  node: NodeItem;
+  constructor(node: NodeItem) {
+    this.node = node;
+    let nb_sub = node.path.split("/").length || 0;
+    this.label = `${"-".repeat(nb_sub * 4)}> ${
+      (node.path === "." ? "" : node.parent?.name + "/") + node.name
+    }  (${node.description})`;
   }
 }

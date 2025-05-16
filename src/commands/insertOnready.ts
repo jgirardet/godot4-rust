@@ -10,19 +10,21 @@ import {
 import { TscnParser } from "../godot/parser";
 import path from "path";
 import { Node } from "../godot/types";
+import { NodeItem } from "../panel/nodeItem";
 
-export const insertOnready = async () => {
-  let gpf = getGodotProjectFile();
-  let gpd = getGodotProjectDir(gpf);
-  const tscnFiles = listTscnFiles(gpf);
-  const tscn = await selectTscn(tscnFiles, gpd);
-  if (!tscn) {
-    return;
-  }
+export const insertOnready = async (node: NodeItem) => {
+  // let gpf = getGodotProjectFile();
+  // let gpd = getGodotProjectDir(gpf);
+  // const tscnFiles = listTscnFiles(gpf);
+  // const tscn = await selectTscn(tscnFiles, gpd);
+  // if (!tscn) {
+  //   return;
+  // }
 
-  let nodes = (await TscnParser.file(path.resolve(tscn))).parse().nodes;
+  // let nodes = (await TscnParser.file(path.resolve(tscn))).parse().nodes;
 
-  const nodePicked = (await selectNode(nodes)) as Node | undefined;
+  console.log(node)
+  const nodePicked = (await selectNode(node)) ;
   if (!nodePicked) {
     return;
   }

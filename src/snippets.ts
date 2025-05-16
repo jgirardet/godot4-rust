@@ -1,5 +1,6 @@
 import { toSnake } from "ts-case-convert";
 import { Node } from "./godot/types";
+import { NodeItem } from "./panel/nodeItem";
 
 export {
   onready_snippet,
@@ -11,7 +12,7 @@ export {
   classImports,
 };
 
-const onready_snippet = (node: Node): string[] => {
+const onready_snippet = (node: NodeItem): string[] => {
   return [
     `#[init(node = "${formatParentString(node)}")]`,
     `${toSnake(node.name.value)}: OnReady<Gd<${node.type?.value}>>,`,
