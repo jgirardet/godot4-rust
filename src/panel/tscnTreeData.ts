@@ -1,4 +1,10 @@
-import { EventEmitter, TreeDataProvider, Event, TreeItem, ProviderResult } from "vscode";
+import {
+  EventEmitter,
+  TreeDataProvider,
+  Event,
+  TreeItem,
+  ProviderResult,
+} from "vscode";
 import { NodeItem } from "./nodeItem";
 import { FullPathDir } from "../types";
 import { GodotScene } from "../godot/godotScene";
@@ -23,13 +29,8 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
 
     // initial load
     for (const [k, s] of scenes.entries()) {
-      let root = NodeItem.createRoot(s);
-      let serchedStruct = rust.modules.get(s.rootNode.type!.value); //ok
-      if (serchedStruct) {
-        root.iconPath = NodeItem.getGodotRustIcon();
-        root.tooltip = serchedStruct.className;
-        root.rustModule = serchedStruct;
-      }
+      let searchedStruct = rust.modules.get(s.rootNode.type!.value); //ok
+      let root = NodeItem.createRoot(s, searchedStruct);
       this.data.set(k, root);
     }
 

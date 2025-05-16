@@ -2,13 +2,12 @@ import { GodotPath } from "../godot/godotPath";
 import { Node } from "../godot/types";
 import {
   TreeItem,
-  TreeItemCheckboxState,
   TreeItemCollapsibleState,
   Uri,
   window,
 } from "vscode";
 import { GodotScene } from "../godot/godotScene";
-import { RustParsed } from "../rust/types";
+import { GodotModule, RustParsed } from "../rust/types";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
@@ -80,11 +79,17 @@ export class NodeItem extends TreeItem {
     return acc;
   }
 
-  static createRoot(scene: GodotScene): NodeItem {
+  static createRoot(scene: GodotScene, rustStruct?: GodotModule): NodeItem {
     let root = new NodeItem(scene.rootNode);
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
     root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
+    if (rustStruct) {
+      root.iconPath = NodeItem.getGodotRustIcon();
+      root.tooltip = rustStruct.className;
+      root.rustModule = rustStruct;
+      root.contextValue = root.contextValue += "-rust";
+    }
     return root;
   }
 

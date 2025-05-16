@@ -74,7 +74,7 @@
       ],
       "view/item/context": [
         {
-          "when": "view == godot4-rust && viewItem =~ /^root/",
+          "when": "view == godot4-rust && viewItem =~ /^root$/",
           "command": "godot4-rust.newGodotClass"
         }
       ]
