@@ -69,7 +69,6 @@ describe("start new gdextensin project", () => {
 
     // content of files
     const contenttoml = readUtf8Sync(path.join(newRustDir, "Cargo.toml"));
-    console.log(contenttoml);
     expect(contenttoml).toEqual(
       `[package]
 name = "projet"

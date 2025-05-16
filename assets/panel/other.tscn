@@ -11,12 +11,12 @@
 
 [node name="Other111" type="Sprite2D" parent="Other1/Other11"]
 
-[node name="Child1" parent="Other1/Other11/Other111" instance=ExtResource("1_4clav")]
+[node name="OneChild1" parent="Other1/Other11/Other111" instance=ExtResource("1_4clav")]
 
-[node name="TextEdit" type="TextEdit" parent="Other1/Other11/Other111/Child1"]
+[node name="TextEdit" type="TextEdit" parent="Other1/Other11/Other111/OneChild1"]
 offset_right = 8.0
 offset_bottom = 8.0
 
-[node name="Node2D" type="Node2D" parent="Other1/Other11/Other111/Child1/TextEdit"]
+[node name="Node2D" type="Node2D" parent="Other1/Other11/Other111/OneChild1/TextEdit"]
 
 [node name="Child2" parent="Other1" instance=ExtResource("2_esrft")]

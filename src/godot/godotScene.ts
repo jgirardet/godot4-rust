@@ -34,7 +34,6 @@ export class GodotScene implements IGodotScene {
     tscnFile: FullPathFile,
     godotDir: FullPathDir
   ): Promise<GodotScene> {
-    console.log("SCNENFCZ");
     let gdScene = (await TscnParser.file(tscnFile)).parse();
     return new GodotScene(GodotPath.fromAbs(tscnFile, godotDir), gdScene);
   }

@@ -1,6 +1,6 @@
-import Parser, { Query, SyntaxNode } from "tree-sitter";
+import Parser, { Query, QueryCapture, SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
-import { GodotModule } from "./types";
+import { RustParsed } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
 import { godotModuleQuery } from "../constantes";
 
@@ -18,7 +18,7 @@ export class RustParser extends TreeSitterParser {
   }
 
   /// Find the First GodotClass in module
-  findGodotClass(): GodotModule | undefined {
+  findGodotClass(): RustParsed | undefined {
     let q = new Query(Rust as Parser.Language, godotModuleQuery);
 
     let captures = q.matches(this.rootNode).at(0)?.captures;
@@ -26,14 +26,23 @@ export class RustParser extends TreeSitterParser {
       return;
     }
 
-    let res: GodotModule = {};
+    return {
+      className: this._getStringUnsafe("className", captures),
+      baseClass: this._getString("baseClass", captures),
+      init: this._getString("init", captures) ? true : false,
+    };
+  }
+  //
+  /// Warning: use only if key always is in capture
+  _getStringUnsafe(key: string, captures: QueryCapture[]): string {
+    const node = captures.find((a) => a.name === key)!.node;
+    return this.tree.getText(node).replaceAll('"', "");
+  }
 
-    for (const c of captures) {
-      if (["className", "baseClass", "init"].includes(c.name)) {
-        res[c.name as keyof GodotModule] = this.tree.getText(c.node);
-      }
+  _getString(key: string, captures: QueryCapture[]): string | undefined {
+    const node = captures.find((a) => a.name === key)?.node;
+    if (node) {
+      return this.tree.getText(node).replaceAll('"', "");
     }
-
-    return res;
   }
 }

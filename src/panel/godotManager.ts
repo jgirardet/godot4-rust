@@ -80,17 +80,7 @@ export class GodotManager {
     return getGodotProjectDir(this.godotProjectFile);
   }
 
-  async onChangeSelection(e: TreeViewExpansionEvent<NodeItem>) {
-    // for (const f of e.element) {
-    //   f.reveal();
-    // }
-    //
-    // console.log("EXpand");
-    // console.log(e.element);
-    // if (e.element.hasChildren) {
-    //   await this._reveal(e.element);
-    // }
-  }
+  async onChangeSelection(e: TreeViewExpansionEvent<NodeItem>) {}
 
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);
@@ -117,8 +107,7 @@ export class GodotManager {
       return;
     }
     const file = editor?.document.fileName;
-    // if (this.rust.files.has(file)) {
-    let godotClass = this.rust.files.get(file)?.className;
+    let godotClass = this.rust.getByPath(file)?.className;
     if (!godotClass) {
       return;
     }
@@ -141,22 +130,11 @@ export class GodotManager {
   }
 
   async _reveal(node: NodeItem) {
-    // await this.collapseAll();
     logger.info(`Revealing ${node.name} with type ${node.type}`);
-    // let toShow = node.findLastChildren();
-    await this.treeView.reveal(
-      node,
-      // await this.treeView.reveal(c,
-      {
-        //{
-        expand: true,
-        // select: true,
-        focus: true, // good scroll position
-        // }
-      }
-    );
-    // node.reveal();
-    // await commands.executeCommand("workbench.action.focusActiveEditorGroup"); //optionnable
+    await this.treeView.reveal(node, {
+      expand: true,
+      focus: true, // good scroll position
+    });
   }
 }
 
@@ -175,19 +153,20 @@ class TscnTreeProvider implements TreeDataProvider<NodeItem> {
 
   updateData(scenes: Map<string, GodotScene>, rust: RustManager) {
     this.data.clear();
-    let rustTypes = rust.rustStructs;
-    let baseTypes = rust.getBaseTypesForStrucst();
+
+    // initial load
     for (const [k, s] of scenes.entries()) {
       let root = NodeItem.createRoot(s);
-      if (rust.isRustStruct(s.rootNode.type!.value, rustTypes)) {
-        // ! ok
-        root.iconPath = NodeItem.getGodotIcon();
-        // root.description = baseTypes.get(s.rootNode.type!.value);
-        root.tooltip = baseTypes.get(s.rootNode.type!.value);
+      let serchedStruct = rust.modules.get(s.rootNode.type!.value); //ok
+      if (serchedStruct) {
+        root.iconPath = NodeItem.getGodotRustIcon();
+        root.tooltip = serchedStruct.className;
+        root.rustModule = serchedStruct;
       }
       this.data.set(k, root);
     }
-    // if (s.)
+
+    // process packed scenes, afterwards
     for (const [k, v] of this.data.entries()) {
       let packed = v.getPackedSceneChildren();
       for (const p of packed) {
@@ -196,13 +175,14 @@ class TscnTreeProvider implements TreeDataProvider<NodeItem> {
           let packedGPath = GodotPath.fromRes(packedResPath);
           let rootNodeItem = this.data.get(packedGPath.base);
           if (rootNodeItem) {
-            p.instanceType = rootNodeItem.name;
-            if (rust.isRustStruct(p.instanceType, rustTypes)) {
-              p.iconPath = NodeItem.getGodotIcon();
-              p.tooltip = baseTypes.get(p.instanceType);
+            p.instanceType = rootNodeItem.type;
+            let serchedStruct = rust.modules.get(p.instanceType);
+            if (serchedStruct) {
+              p.iconPath = NodeItem.getGodotRustIcon();
+              p.tooltip = serchedStruct.baseClass;
             } else {
-              p.tooltip = rootNodeItem.type;
-              p.iconPath = NodeItem.getIconUri(rootNodeItem.type);
+              p.tooltip = rootNodeItem.tooltip;
+              p.iconPath = rootNodeItem.iconPath;
             }
           }
         }

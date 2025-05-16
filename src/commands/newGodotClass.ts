@@ -185,7 +185,6 @@ class NodeMethodQuickItem implements QuickPickItem {
   picked: boolean;
 
   constructor(label: string, detail: string, picked: boolean) {
-    console.log(picked);
     this.label = label;
     this.detail = detail.trimEnd();
     this.picked = picked;

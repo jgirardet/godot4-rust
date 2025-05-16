@@ -149,7 +149,7 @@ const writeCrateNameStep = async (
       logger.info(`New crate name selected: ${name}`);
       return name;
     } else {
-      console.log("Fail validating");
+      logger.error("Fail validating crate name");
       value = name;
     }
   }
@@ -223,7 +223,6 @@ const setupGit = (crateDir: FullPathDir) => {
     }
   }
 
-  console.log(`resdore: ${resdir}`);
   if (resdir) {
     logger.info(`.git found at ${resdir}, skipping`);
   } else {

@@ -15,7 +15,6 @@ export const selectTscn = async (
     const asRelative = tscnFiles.reduce((acc, val: string, idx, _) => {
       return { [val.replace(godotDir, "").replaceAll("\\", "/")]: val, ...acc };
     }, {});
-    console.log(asRelative);
     selected = await window.showQuickPick(Object.keys(asRelative), options);
     if (!selected) {
       return;

@@ -8,10 +8,12 @@ import {
   window,
 } from "vscode";
 import { GodotScene } from "../godot/godotScene";
+import { RustParsed } from "../rust/types";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
   private _instanceType?: string;
+  rustModule?: RustParsed;
 
   tscn?: GodotPath;
 
@@ -68,12 +70,8 @@ export class NodeItem extends TreeItem {
     // this.tooltip = value
   }
 
-  reveal() {
-    this.collapsibleState = TreeItemCollapsibleState.Expanded;
-    // revealChildren(this.children);
-    for (const c of this.children) {
-      c.reveal();
-    }
+  isRustStruct(): boolean {
+    return this.rustModule !== undefined;
   }
 
   getPackedSceneChildren(): NodeItem[] {
@@ -122,15 +120,10 @@ export class NodeItem extends TreeItem {
     return uri;
   }
 
-  static getGodotIcon() {
+  static getGodotRustIcon() {
     const godotIconPath =
       "../../../resources/godotIcons/godotrust/godot-ferris-16x16.svg";
-
-    // let theme = window.activeColorTheme.kind;
     let uri = Uri.joinPath(Uri.file(__filename), godotIconPath);
-    //   `${[1, 4].includes(theme) ? "light" : "dark"}`,
-    //   `${nom}.svg`
-    // );
     return uri;
   }
 }

@@ -1,24 +1,18 @@
 import {
-  Extension,
   ExtensionContext,
   FileSystemWatcher,
   Uri,
-  window,
   workspace,
-  GlobPattern,
   RelativePattern,
-  EventEmitter,
-  Event,
 } from "vscode";
-import { FullPathDir, FullPathFile } from "../types";
-import { GodotModule } from "./types";
-import { globIterate } from "glob";
+import { FullPathFile, Name } from "../types";
+import { GodotModule, RustParsed } from "./types";
 import { RustParser } from "./parser";
 
-export type RustFiles = Map<FullPathFile, GodotModule>;
+export type RustFiles = Map<FullPathFile, RustParsed>;
 
 export class RustManager {
-  files: Map<FullPathFile, GodotModule> = new Map();
+  modules: Map<Name, GodotModule> = new Map();
   readonly watcher: FileSystemWatcher;
 
   // rustFilesChanged = new EventEmitter<RustFiles>();
@@ -47,22 +41,12 @@ export class RustManager {
   // }
   async onFileDeleted(u: Uri) {}
 
-  get rustStructs(): string[] {
-    return Array.from(this.files, ([k, v]) => v.className!);
+  isRustStruct(godotType: string): boolean {
+    return godotType in this.modules;
   }
 
-  isRustStruct(godotType: string, rustStructs?: string[]): boolean {
-    return (rustStructs || this.rustStructs).includes(godotType);
-  }
-
-  getBaseTypesForStrucst() {
-    let res = new Map();
-    for (const { className, baseClass } of this.files.values()) {
-      if (className && baseClass) {
-        res.set(className, baseClass);
-      }
-    }
-    return res;
+  getByPath(filepath: FullPathFile): GodotModule | undefined {
+    return [...this.modules.values()].find((p) => p.path === filepath);
   }
 
   async reload() {
@@ -70,7 +54,7 @@ export class RustManager {
     if (!ws) {
       return;
     }
-    this.files.clear();
+    this.modules.clear();
     for (const f of await workspace.findFiles(
       new RelativePattern(ws, "**/*.rs")
     )) {
@@ -78,23 +62,10 @@ export class RustManager {
       if (parser.isGodotModule) {
         let cls = parser.findGodotClass();
         if (cls) {
-          this.files.set(f.fsPath, cls);
+          // this.files.set(f.fsPath, cls);
+          this.modules.set(cls.className, { path: f.fsPath, ...cls });
         }
       }
     }
-  }
-
-  async _parse(f: FullPathFile): Promise<boolean> {
-    let parser = await RustParser.file(f);
-    if (parser.isGodotModule) {
-      let cls = parser.findGodotClass();
-      if (cls) {
-        if (!this.files.has(f)) {
-          this.files.set(f, cls);
-          return true;
-        }
-      }
-    }
-    return false;
   }
 }

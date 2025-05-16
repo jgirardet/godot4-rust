@@ -1,6 +1,6 @@
 import { globSync } from "glob";
 import { FullPathDir, FullPathFile } from "../types";
-import { GodotScene } from "./godotScene";
+import { GodotScene, IGodotScene } from "./godotScene";
 import { GodotPath, gp } from "./godotPath";
 import { availableParallelism } from "os";
 import path from "path";
@@ -88,9 +88,7 @@ export class GodotProjectLoader {
     nbWorker?: number
   ): Promise<Map<string, GodotScene>> {
     for (const bunch of await this._loadTscns(files, nbWorker)) {
-      // RetpanelElementurn IGodotScene
       for (const ghostScene of bunch) {
-        // js worker make loosing getter and other, need to redo the object
         const scene = new GodotScene(
           gp(ghostScene.tscnpath.base),
           ghostScene.gdscene
@@ -114,9 +112,9 @@ export class GodotProjectLoader {
   private async _loadTscns(
     files: string[],
     nbWorker?: number
-  ): Promise<GodotScene[][]> {
+  ): Promise<IGodotScene[][]> {
+    // js worker make loosing getter and other, need to redo the object
     let chu = chunks(files, nbWorker || getWorkersNb(files.length));
-
     return await Promise.all(
       chu.map((i) => {
         return createScenesWorker.run(

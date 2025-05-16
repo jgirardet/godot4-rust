@@ -71,7 +71,6 @@ describe("on change godotmanager", () => {
     let gm = new GodotProjectLoader(dep("project.godot"));
     await gm.load();
     await gm.onChange(dep("child2.tscn"));
-    // console.log(gm.dependencies);
     expect(gm.lastUpdate.map((x) => path.basename(x))).toEqualUnsorted([
       "child2.tscn",
       "main.tscn",
@@ -116,7 +115,6 @@ describe("delete item", () => {
     await gm.load();
     let main = "Scenes/Main/main.tscn";
     let scenes = await gm.onChange(path.join(godotdir, main), true);
-    console.log(scenes);
     expect(gm.scenes.get(main)).toBeNullish();
     // expect(gm.scenes).toEqual(bm.scenes);
   });

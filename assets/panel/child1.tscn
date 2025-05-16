@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bkntn1rovgg28"]
 
-[node name="Child1" type="Child1"]
+[node name="Child1" type="Child1Struct"]
 
 [node name="AChild1" type="CanvasLayer" parent="."]
 
