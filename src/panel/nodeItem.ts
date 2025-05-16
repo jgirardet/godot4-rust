@@ -1,18 +1,13 @@
 import { GodotPath } from "../godot/godotPath";
 import { Node } from "../godot/types";
-import {
-  TreeItem,
-  TreeItemCollapsibleState,
-  Uri,
-  window,
-} from "vscode";
+import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
 import { GodotScene } from "../godot/godotScene";
 import { GodotModule, RustParsed } from "../rust/types";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
   private _instanceType?: string;
-  rustModule?: RustParsed;
+  rustModule?: GodotModule;
 
   tscn?: GodotPath;
 
@@ -76,6 +71,12 @@ export class NodeItem extends TreeItem {
   getPackedSceneChildren(): NodeItem[] {
     let acc: NodeItem[] = [];
     getPackedChildren(this.children, acc);
+    return acc;
+  }
+
+  get flatChildren(): NodeItem[] {
+    let acc: NodeItem[] = [];
+    getFlatChildren(this.children, acc);
     return acc;
   }
 
@@ -144,5 +145,12 @@ const getPackedChildren = (children: NodeItem[], acc: NodeItem[]) => {
     } else {
       getPackedChildren(c.children, acc);
     }
+  }
+};
+
+const getFlatChildren = (children: NodeItem[], acc: NodeItem[]) => {
+  for (const c of children) {
+    acc.push(c);
+    getFlatChildren(c.children, acc);
   }
 };
