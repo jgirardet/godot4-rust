@@ -1,17 +1,11 @@
 import {
   commands,
-  Event,
-  EventEmitter,
   ExtensionContext,
   FileSystemWatcher,
-  ProviderResult,
   RelativePattern,
   TextEditor,
-  TreeDataProvider,
-  TreeItem,
   TreeView,
   TreeViewExpansionEvent,
-  TreeViewSelectionChangeEvent,
   Uri,
   window,
   workspace,
@@ -20,15 +14,13 @@ import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
 import { NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
-import { GodotScene } from "../godot/godotScene";
 import { logger } from "../log";
 import { registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
-import { RustFiles, RustManager } from "../rust/rustmanager";
-import { GodotPath } from "../godot/godotPath";
-import path from "path";
+import { RustManager } from "../rust/rustmanager";
 import { TscnTreeProvider } from "./tscnTreeData";
 import { insertOnready } from "../commands/insertOnready";
+import { newGodotClass } from "../commands/newGodotClass";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -64,6 +56,7 @@ export class GodotManager {
       registerGCommand(`reveal`, this.reveal.bind(this)),
       registerGCommand(`refresh`, this.reload.bind(this)),
       registerGCommand("insertOnReady", this.insertOnReady.bind(this)),
+      registerGCommand("newGodotClass", this.newGodotClass.bind(this)),
 
       // connect signals
       window.onDidChangeActiveTextEditor(this.reveal.bind(this))
@@ -141,6 +134,10 @@ export class GodotManager {
 
     logger.info(`Insert OnReady: Using ${nodeItem}`);
     await insertOnready(nodeItem);
+  }
+
+  async newGodotClass(nodeItem?: NodeItem) {
+    await newGodotClass(this.treeData, nodeItem);
   }
 
   async _reveal(node: NodeItem) {

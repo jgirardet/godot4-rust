@@ -11,7 +11,7 @@ import {
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
-import { initTest, multiSelect } from "../testutils.js";
+import { initPanel, initTest, multiSelect } from "../testutils.js";
 
 let LEVEL_SCENE_PATH = "/Scenes/Main/LevelButton/level_button.tscn";
 describe("addNewGodot class Command", () => {
@@ -28,11 +28,13 @@ describe("addNewGodot class Command", () => {
   });
 
   it("tests to add a new class from an empty file", async () => {
+    let panel = await initPanel(rootPath, driver)
     await browser.openResources(path.join(rootPath, "src/empty.rs"));
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
     await inp.selectQuickPick("No");
-    await inp.selectQuickPick(LEVEL_SCENE_PATH);
+    inp = await InputBox.create();
+    await inp.selectQuickPick(1);
     inp = await InputBox.create();
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();
@@ -55,7 +57,8 @@ describe("addNewGodot class Command", () => {
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
-    await inp.selectQuickPick(LEVEL_SCENE_PATH);
+    inp = await InputBox.create();
+    await inp.selectQuickPick(1);
     inp = await InputBox.create();
     await multiSelect(inp, ["ready", "enter_tree"]);
     await inp.confirm();

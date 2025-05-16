@@ -2,7 +2,7 @@ use godot::{classes::{NinePatchRect,Label,TextureRect,INinePatchRect}, prelude::
 
 #[derive(GodotClass)]
 #[class(base=NinePatchRect,init)]
-struct LevelButton {
+pub struct LevelButton {
 base: Base<NinePatchRect>,
 #[init(node = "LevelLabel")]
 level_label: OnReady<Gd<Label>>,
