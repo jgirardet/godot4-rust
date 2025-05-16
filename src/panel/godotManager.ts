@@ -74,6 +74,7 @@ export class GodotManager {
       .then(this.reload.bind(this))
       .then(() =>
         commands.executeCommand("godot4-rust.resetViewLocation").then(() => {
+          commands.executeCommand("godot4-rust.reveal");
           logger.info("Godot Manager Loaded");
         })
       );
@@ -124,19 +125,21 @@ export class GodotManager {
     }
   }
 
-  async insertOnReady() {
-    let doc = window.activeTextEditor?.document;
-    if (!doc) {
-      return;
-    }
-    let nodeItem = Array.from(this.treeData.data, ([k, v]) => {
-      if (v.rustModule?.path === doc.fileName) {
-        return v;
-      }
-    })[0];
+  async insertOnReady(nodeItem?: NodeItem) {
     if (!nodeItem) {
-      return;
+      let doc = window.activeTextEditor?.document;
+      if (!doc) {
+        return;
+      }
+      nodeItem = Array.from(this.treeData.data, ([_, v]) => v).find(
+        (v) => v.rustModule?.path === doc.fileName
+      );
+      if (!nodeItem) {
+        return;
+      }
     }
+
+    logger.info(`Insert OnReady: Using ${nodeItem}`);
     await insertOnready(nodeItem);
   }
 

@@ -2,8 +2,8 @@ todo:
 
 
 - BUG:
-- insert onready fails with Rust types
 - fixier pub ou pub crate pour new godot class
+- insert onready: PascalCase pour types
 
 Prochain en cours :
 - drag and drop
@@ -19,7 +19,7 @@ features:
     _ afficher + masque les path des fichiers
 - le nombre de worker en option
 - ajouter les groups dans godot parse
-_ parser les extResources image pour les afficher en icone
+_ parser les extResources image pour les affic-her en icone
 - build.tsk pour le cargo build de fond
 
 
@@ -42,3 +42,10 @@ configaration  à ajouter:
 doc:
 - panel
 - add godot class
+
+
+features du panel non testable: 
+- context sur root: new class mais pas si rusttype
+- context sur child:
+    - insertOnready: mais pas sur root
+    

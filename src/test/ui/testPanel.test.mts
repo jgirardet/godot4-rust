@@ -2,17 +2,13 @@ import {
   BottomBarPanel,
   InputBox,
   OutputView,
-  SideBarView,
   TreeItem,
-  ViewItem,
   VSBrowser,
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
-import { cloneGrudotDirTemp, initTest } from "../testutils.js";
-import { DISPLAY_NAME, NAME } from "../../constantes.js";
+import { initPanel, initTest } from "../testutils.js";
 import { expect } from "earl";
-import path from "path";
 
 describe("create gdextension file", () => {
   let browser: VSBrowser;
@@ -68,16 +64,3 @@ describe("create gdextension file", () => {
   // });
 });
 
-const initPanel = async (rootPath: string, driver: WebDriver) => {
-  let explorer = await new SideBarView()
-    .getContent()
-    .getSection(path.basename(rootPath));
-  await explorer.collapse();
-  let panel = await new SideBarView().getContent().getSection(DISPLAY_NAME);
-  await panel.expand();
-  await driver.wait(
-    async () => (await panel.getVisibleItems()).length > 0,
-    5000
-  );
-  return panel;
-};

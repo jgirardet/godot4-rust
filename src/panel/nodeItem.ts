@@ -8,6 +8,7 @@ export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
   private _instanceType?: string;
   rustModule?: GodotModule;
+  collapsibleState = TreeItemCollapsibleState.Expanded; // Expanded makes alignemnt better
 
   tscn?: GodotPath;
 
@@ -22,7 +23,6 @@ export class NodeItem extends TreeItem {
     this.tooltip = this.type;
     this.iconPath = NodeItem.getIconUri(this.type);
     this.contextValue = this.isRoot ? "root" : "child";
-    this.collapsibleState = TreeItemCollapsibleState.None;
   }
 
   get isRoot(): boolean {
@@ -98,15 +98,15 @@ export class NodeItem extends TreeItem {
     let parents = new Map();
     parents.set(".", root);
     for (const n of nodes.slice(1)) {
+      let parent =
+        n.parent!.value === "." ? root : parents.get(n.parent!.value);
       let asParentPath =
         n.parent!.value === "."
           ? n.name.value
           : n.parent!.value + "/" + n.name.value;
-      const item = new NodeItem(n, parents[n.parent!.value as keyof object]);
+      const item = new NodeItem(n, parent);
       parents.set(asParentPath, item);
       parents.get(n.parent!.value)!.children.push(item);
-      parents.get(n.parent!.value)!.collapsibleState =
-        TreeItemCollapsibleState.Expanded;
     }
     return parents.get(".")!.children;
   }
