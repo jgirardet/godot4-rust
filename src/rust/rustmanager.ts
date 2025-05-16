@@ -56,13 +56,12 @@ export class RustManager {
     }
     this.modules.clear();
     for (const f of await workspace.findFiles(
-      new RelativePattern(ws, "**/*.rs")
+      new RelativePattern(ws, "src/**/*.rs")
     )) {
       let parser = await RustParser.file(f.fsPath);
       if (parser.isGodotModule) {
         let cls = parser.findGodotClass();
         if (cls) {
-          // this.files.set(f.fsPath, cls);
           this.modules.set(cls.className, { path: f.fsPath, ...cls });
         }
       }
