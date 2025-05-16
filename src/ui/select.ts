@@ -2,7 +2,6 @@ import { QuickPickItem, QuickPickOptions, window } from "vscode";
 import { FullPathDir, FullPathFile } from "../types";
 import { logger } from "../log";
 import { Node } from "../godot/types";
-import path from "path";
 
 export const selectTscn = async (
   tscnFiles: FullPathFile[],

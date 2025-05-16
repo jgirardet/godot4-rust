@@ -107,8 +107,6 @@ export class NodeItem extends TreeItem {
 
   static getIconUri(nom: string): Uri | undefined {
     const godotIconPath = "../../../resources/godotIcons/godot_icons/";
-    const godotRustPath =
-      "../../../resources/godotIcons/godotrust/godot-ferris.svg";
 
     let theme = window.activeColorTheme.kind;
     let uri = Uri.joinPath(

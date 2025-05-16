@@ -8,7 +8,6 @@ import { createGdextensionCommand } from "./commands/createGdextension";
 import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
 import { GodotManager } from "./panel/godotManager";
-import { NodeItem } from "./panel/nodeItem";
 import { registerGCommand } from "./vscodeUtils";
 
 export function activate(context: vscode.ExtensionContext) {

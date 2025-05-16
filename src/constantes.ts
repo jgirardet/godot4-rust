@@ -13,11 +13,8 @@ export const LAST_GODOT_CRATE_VERSION_AS_TOML: string = 'godot = "0.2.4"';
 
 export const GODOTPROJET_IS_SET_KEY = NAME + ".project_set";
 
-export const WS_SCENES = NAME + ".scenes";
-
 const loadFileQueries = (file: string) =>
-
-  readFileSync(path.join(__filename,  "../../resources","queries", file), {
+  readFileSync(path.join(__filename, "../../resources", "queries", file), {
     encoding: "utf-8",
   });
 export const ExtResourcesQuery = loadFileQueries("resources.scm");
