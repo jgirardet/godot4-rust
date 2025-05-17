@@ -1,6 +1,6 @@
 import { toSnake } from "ts-case-convert";
-import { Node } from "./godot/types";
 import { NodeItem } from "./panel/nodeItem";
+import { GODOT_STRUCTS, GODOT_VIRTUAL_METHODS } from "./godotClasses";
 
 export {
   onready_snippet,
@@ -12,10 +12,10 @@ export {
   classImports,
 };
 
-const onready_snippet = (node: NodeItem): string[] => {
+const onready_snippet = (nodeItem: NodeItem): string[] => {
   return [
-    `#[init(node = "${formatParentString(node)}")]`,
-    `${toSnake(node.name)}: OnReady<Gd<${node.type}>>,`,
+    `#[init(node = "${formatParentString(nodeItem)}")]`,
+    `${toSnake(nodeItem.name)}: OnReady<Gd<${formatType(nodeItem)}>>,`,
   ];
 };
 
@@ -23,11 +23,12 @@ const declGodotClassStart = (
   nodeItem: NodeItem,
   withInit: boolean = true
 ): string[] => {
+  let struct = formatType(nodeItem);
   return [
     "#[derive(GodotClass)]",
-    `#[class(base=${nodeItem.type}${withInit ? ",init" : ""})]`,
+    `#[class(base=${struct}${withInit ? ",init" : ""})]`,
     `pub struct ${nodeItem.name} {`,
-    `base: Base<${nodeItem.type}>,`,
+    `base: Base<${struct}>,`,
   ];
 };
 
@@ -36,7 +37,12 @@ const declGodotClassEnd = (): string[] => {
 };
 
 const implVirtualMethodsStart = (nodeItem: NodeItem): string[] => {
-  return [`#[godot_api]`, `impl I${nodeItem.type} for ${nodeItem.name} {`];
+  return [
+    `#[godot_api]`,
+    `impl ${
+      GODOT_VIRTUAL_METHODS[nodeItem.type as keyof typeof GODOT_VIRTUAL_METHODS]
+    } for ${nodeItem.name} {`,
+  ];
 };
 
 const implVirtualMethodsEnd = (): string[] => {
@@ -47,10 +53,10 @@ const classImports = (
   nodeItem: NodeItem,
   otherClassesImports: string[]
 ): string[] => {
-  let imports = new Set([nodeItem.type, ...otherClassesImports]);
+  let imports = new Set([formatType(nodeItem), ...otherClassesImports]);
   return [
-    `use godot::{classes::{${[...imports].join(",")},I${
-      nodeItem.type
+    `use godot::{classes::{${[...imports].join(",")},${
+      GODOT_VIRTUAL_METHODS[nodeItem.type as keyof typeof GODOT_VIRTUAL_METHODS]
     }}, prelude::*,};\n`,
   ];
 };
@@ -84,4 +90,10 @@ const node_methods = {
 
 function formatParentString(node: NodeItem) {
   return (node.path === "." ? "" : node.path + "/") + node.name;
+}
+
+function formatType(nodeItem: NodeItem) {
+  return (
+    GODOT_STRUCTS[nodeItem.type as keyof typeof GODOT_STRUCTS] || nodeItem.type
+  );
 }

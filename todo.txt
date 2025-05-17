@@ -1,9 +1,6 @@
 todo:
 
 
-- BUG:
-- insert onready: PascalCase pour types
-
 Prochain en cours :
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
@@ -12,11 +9,9 @@ Prochain en cours :
 
 features:
 - changer le nom du tscn
-- option pub crate or pub scene : à définir
 - explorer
     - explorer indicate some things (onready or others)
     _ afficher + masque les path des fichiers
-- le nombre de worker en option
 - ajouter les groups dans godot parse
 _ parser les extResources image pour les affic-her en icone
 - build.tsk pour le cargo build de fond
@@ -30,8 +25,6 @@ code refactor
     
 - 2 case converts
 
--test :
-    reveal
 
 
 configaration  à ajouter: 
