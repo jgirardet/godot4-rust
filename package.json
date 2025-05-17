@@ -102,8 +102,11 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
+    "compileScripts": "tsc -p scripts/tsconfig.json",
+    "buildGodotClasses": "node scripts/out/buildGodotClasses.js",
     "clearTmp": "node ./out/test/testutils.js",
     "unit-test": "mocha out/test/unit",
+    "vscode-test": "node out/test/vscode/runTests.js",
     "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
     "ui-testone": "extest run-tests './out/test/ui/test-*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
@@ -120,11 +123,12 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
+    "cheerio": "^1.0.0",
     "earl": "^1.3.0",
     "eslint": "^9.25.1",
     "mitata": "^1.0.34",
     "typescript": "^5.8.3",
-    "vscode-extension-tester": "^8.14.1"
+    "vscode-extension-tester": "^8.14.1",
   },
   "dependencies": {
     "find-parent-dir": "^0.3.1",

@@ -41,7 +41,7 @@
 			// 	"--extensionTestsPath=${workspaceFolder}/out/test/vscode/index"
 			// ],
 			"outFiles": [
-				"${workspaceFolder}/out/test/unit/*.js"
+				"${workspaceFolder}/out/test/vscode/run.js"
 			]
 		},
 		{

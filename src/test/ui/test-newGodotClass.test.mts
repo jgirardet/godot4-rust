@@ -12,6 +12,7 @@ import {
   Workbench,
 } from "vscode-extension-tester";
 import { initPanel, initTest, multiSelect } from "../testutils.js";
+import { expect } from "earl";
 
 let LEVEL_SCENE_PATH = "/Scenes/Main/LevelButton/level_button.tscn";
 describe("addNewGodot class Command", () => {
@@ -23,12 +24,10 @@ describe("addNewGodot class Command", () => {
   let bottomBar: BottomBarPanel;
   let outputView: OutputView;
 
-  beforeEach(async () => {
-    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
-  });
 
   it("tests to add a new class from an empty file", async () => {
-    let panel = await initPanel(rootPath, driver)
+  [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
+    let panel = await initPanel(rootPath, driver);
     await browser.openResources(path.join(rootPath, "src/empty.rs"));
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
@@ -54,6 +53,7 @@ describe("addNewGodot class Command", () => {
   });
 
   it("tests to add a new class from no file", async () => {
+  [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
@@ -77,6 +77,49 @@ describe("addNewGodot class Command", () => {
           path.resolve("src/test/ui/assets/class_from_empty_file.rs")
         )
         .toString()
+    );
+  });
+
+  it("tests add correct Rust type >< godot type", async () => {
+    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
+      "assets/panel/panel",
+      "assets/panel"
+    );
+    await wb.executeCommand("godot4-rust.newGodotClass");
+    inp = await InputBox.create();
+    await inp.selectQuickPick("Yes");
+    inp = await InputBox.create();
+    await inp.selectQuickPick("child_2.tscn");
+    inp = await InputBox.create();
+    await inp.confirm();
+    await multiSelect(inp, [0]);
+    inp = await InputBox.create();
+    await inp.confirm(); // confirm multiselect
+    inp = await InputBox.create();
+    await inp.confirm(); // confirm file path
+    driver.wait(async () => {
+      (await wb.getEditorView().getOpenTabs()).length > 0;
+    });
+    let editor = new TextEditor();
+    let content = await editor.getText();
+    await editor.save();
+    expect(content).toEqual(
+      `use godot::{classes::{HttpRequest,Node2D,IHttpRequest}, prelude::*,};
+
+#[derive(GodotClass)]
+#[class(base=HttpRequest,init)]
+pub struct Child2 {
+base: Base<HttpRequest>,
+#[init(node = "Node2D")]
+node_2_d: OnReady<Gd<Node2D>>,
+}
+
+
+#[godot_api]
+impl IHttpRequest for Child2 {
+fn ready(&mut self) {}
+fn process(&mut self, delta: f64) {}
+}`
     );
   });
 });

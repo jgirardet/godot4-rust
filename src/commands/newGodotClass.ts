@@ -9,19 +9,12 @@ import {
   onready_snippet,
 } from "../snippets";
 import { logger } from "../log";
-import { GODOT_CLASSES } from "../godot/godotClasses";
 import path from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
-import {
-  getGodotProjectDir,
-  getGodotProjectFile,
-  listTscnFiles,
-} from "../godotProject";
+import { getGodotProjectDir, getGodotProjectFile } from "../godotProject";
 import { selectNodes, selectTscn } from "../ui/select";
-import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
-import { Node } from "../godot/types";
 import { NodeItem } from "../panel/nodeItem";
 import { applyCodeActionNamed } from "../rust/utils";
 import { TscnTreeProvider } from "../panel/tscnTreeData";

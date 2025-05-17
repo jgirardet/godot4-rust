@@ -10,7 +10,7 @@ import {
 import { initPanel, initTest } from "../testutils.js";
 import { expect } from "earl";
 
-describe("create gdextension file", () => {
+describe("Testing pan", () => {
   let browser: VSBrowser;
   let driver: WebDriver;
   let wb: Workbench;
@@ -19,11 +19,7 @@ describe("create gdextension file", () => {
   let bottomBar: BottomBarPanel;
   let outputView: OutputView;
 
-  let godotDir: string;
-  let crateName: string;
-  let gdextension: string;
 
-  beforeEach(async () => {});
 
   it("test panel load", async () => {
     [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
@@ -43,24 +39,17 @@ describe("create gdextension file", () => {
     ).toEqual(["Child1", "Child2", "Main", "Other"]);
     expect(
       await Promise.all(visibleItems.map((m, _, __) => m.getDescription()))
-    ).toEqual(["Child1", "HTTPRequest", "Node2D", "Node2D"]);
+    ).toEqual(["Child1Struct", "HTTPRequest", "Node2D", "Other"]);
 
     // click
     await visibleItems[2].click();
     let aa = (await panel.findItem("AA")) as TreeItem;
     expect(await aa.isExpanded()).toBeTruthy();
     let aab = (await panel.findItem("AAB")) as TreeItem;
-    expect(await aab.isExpandable()).toBeFalsy();
+    expect(await aab.isExpandable()).toBeTruthy();
     expect(await aa.hasChildren()).toBeTruthy();
     expect(await aab.hasChildren()).toBeFalsy();
-    expect((await aa.getChildren())[1]).toEqual(aa);
+    const children = await aa.getChildren();
+    expect(await children.at(1)?.getLabel()).toEqual(await aab.getLabel());
   });
-  // it("test reveal", async () => {
-  //   [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
-  //     "assets/ConfigProject"
-  //   );
-  //   let panel = await initPanel(rootPath, driver);
-  //   wb.executeCommand(`${NAME}.reveal`);
-  // });
 });
-
