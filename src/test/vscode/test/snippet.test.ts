@@ -10,10 +10,15 @@ import {
 } from "../../../snippets";
 import { expect } from "earl";
 import { Point } from "tree-sitter";
-import path from "path";
+import path, { basename, resolve } from "path";
 import { Node } from "../../../godot/types";
+import { mkdtempSync, writeFileSync } from "fs";
+import { switchGodotNodeByrust } from "../../../commands/switchGodotNodeByRust";
+import { readUtf8Sync } from "../../../utils";
+import { tmpdir } from "os";
+import { validateCrateName } from "../../../commands/startNewGodotExtension";
 
-suite("test class type are correct", () => {
+suite("test snippets", () => {
   test("test standard import", () => {
     expect(classImports(fakeRootNodeItem("bla", "Node2D"), [])).toEqual([
       "use godot::{classes::{Node2D,INode2D}, prelude::*,};\n",
@@ -42,12 +47,12 @@ suite("test class type are correct", () => {
   test("test edge declclass, on ready", () => {
     expect(
       onready_snippet(fakeRootNodeItem("Bla", "HTTPRequest")).join("\n")
-    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<HttpRequest>>,')
+    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<HttpRequest>>,');
   });
   test("test edge declclass, on ready, no godot type", () => {
     expect(
       onready_snippet(fakeRootNodeItem("Bla", "RustStruct")).join("\n")
-    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<RustStruct>>,')
+    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<RustStruct>>,');
   });
 });
 
@@ -64,7 +69,7 @@ const fakeRootNodeItem = (nam: string, typ: string = "Node"): NodeItem => {
           },
           type: {
             value: typ,
-            endPosition: { column: 2, row: 2 },
+            endPosition: { column: 8, row: 2 },
             startPosition: { column: 2, row: 2 },
           },
         },
@@ -73,3 +78,30 @@ const fakeRootNodeItem = (nam: string, typ: string = "Node"): NodeItem => {
     })
   );
 };
+
+suite("Test switch godot Class", () => {
+  test("should switcher", async () => {
+    let tmp = mkdtempSync(path.join(tmpdir(), "testswitchgrudot"));
+    let tscn = resolve(tmp, "bla.tscn");
+    let content = '\n\nO1"Rien"etautres\n\n';
+    writeFileSync(tscn, content);
+    let nodeItem = fakeRootNodeItem("Nom", "Rien");
+    nodeItem.rustModule = {
+      className: "RustClass",
+      path: basename(tscn),
+      init: true,
+    };
+    const res = await switchGodotNodeByrust(nodeItem, tmp);
+    expect(readUtf8Sync(resolve(tmp, tscn))).toEqual(
+      '\n\nO1"RustClass"etautres\n\n'
+    );
+  });
+});
+
+suite("Test start new project", () => {
+  test("validata crate", () => {
+    expect(validateCrateName("Maj")).toBeFalsy();
+    expect(validateCrateName("Es pace")).toBeFalsy();
+    expect(validateCrateName("va-r_id")).toBeTruthy();
+  });
+});
