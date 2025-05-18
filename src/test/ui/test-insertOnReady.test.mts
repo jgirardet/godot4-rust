@@ -1,14 +1,10 @@
-import {
-  InputBox,
-  TextEditor,
-} from "vscode-extension-tester";
-import { initTest } from "../testutils.js";
+import { InputBox, TextEditor } from "vscode-extension-tester";
+import { initTest } from "./ui-testutils.js";
 import path from "path";
 import { expect } from "earl";
 
 describe("InsertSnippet Command", () => {
   let inp: InputBox;
-
 
   it("tests one snippet is added to current file", async () => {
     const { rootPath, browser, wb } = await initTest(

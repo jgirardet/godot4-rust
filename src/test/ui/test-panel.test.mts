@@ -1,15 +1,10 @@
-import {
-  TreeItem,
-} from "vscode-extension-tester";
-import { initPanel, initTest } from "../testutils.js";
+import { TreeItem } from "vscode-extension-tester";
+import { initPanel, initTest } from "./ui-testutils.js";
 import { expect } from "earl";
 
 describe("Testing pan", () => {
-
-
-
   it("test panel load", async () => {
-    const {rootPath, driver} = await initTest(
+    const { rootPath, driver } = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );

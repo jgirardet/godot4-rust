@@ -8,7 +8,9 @@ import { getGodotProjectFile } from "./godotProject";
 import { GodotManager } from "./panel/godotManager";
 import { registerGCommand } from "./vscodeUtils";
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(
+  context: vscode.ExtensionContext
+): Promise<GodotManager> {
   logger.info(`Extension${NAME} activating`);
 
   context.subscriptions.push(
@@ -16,24 +18,23 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   let godotProjectFile = getGodotProjectFile(); //throw if fails
-  vscode.commands
-    .executeCommand("setContext", GODOTPROJET_IS_SET_KEY, true)
-    .then((_) => _activateAfterProjectSet(context, godotProjectFile)) // not if no godot project
-    .then((_) => logger.info("Starting complete"));
-}
-
-export function deactivate() {
-  logger.info("Extension deactivating ");
-}
-
-function _activateAfterProjectSet(
-  context: vscode.ExtensionContext,
-  godotProjectFile: string
-) {
-  new GodotManager(context, godotProjectFile);
+  await vscode.commands.executeCommand(
+    "setContext",
+    GODOTPROJET_IS_SET_KEY,
+    true
+  );
+  let manager = new GodotManager(context, godotProjectFile);
 
   context.subscriptions.push(
     registerGCommand("createGdextension", createGdextensionCommand),
     registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)
   );
+
+  logger.info("Starting complete");
+
+  return manager;
+}
+
+export function deactivate() {
+  logger.info("Extension deactivating ");
 }

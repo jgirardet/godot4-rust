@@ -1,4 +1,3 @@
-import { assert } from "console";
 import { GodotPath } from "../../../godot/godotPath";
 import { GodotScene } from "../../../godot/godotScene";
 import { NodeItem } from "../../../panel/nodeItem";
@@ -17,6 +16,16 @@ import { switchGodotNodeByrust } from "../../../commands/switchGodotNodeByRust";
 import { readUtf8Sync } from "../../../utils";
 import { tmpdir } from "os";
 import { validateCrateName } from "../../../commands/startNewGodotExtension";
+import { GodotManager } from "../../../panel/godotManager";
+import {
+  commands,
+  ExtensionContext,
+  extensions,
+  Uri,
+  window,
+  workspace,
+} from "vscode";
+import { setupTest, SetupTest, sleep } from "../../common";
 
 suite("test snippets", () => {
   test("test standard import", () => {
@@ -103,5 +112,35 @@ suite("Test start new project", () => {
     expect(validateCrateName("Maj")).toBeFalsy();
     expect(validateCrateName("Es pace")).toBeFalsy();
     expect(validateCrateName("va-r_id")).toBeTruthy();
+  });
+});
+
+suite("Test Godot Manager", () => {
+  // contect = activate();
+
+  let $: SetupTest;
+
+  // let extensionContext: ExtensionContext;
+
+  // setup(function () {
+  // });
+
+  suiteSetup(async () => {
+    // Trigger extension activation and grab the context as some tests depend on it
+    // await extensions.getExtension("vscode.vscode-api-tests")?.activate();
+    // extensionContext = (global as any).testExtensionContext;
+  });
+
+  test("init godot manager", async function () {
+    $ = setupTest({ dirRust: "assets/panel/panel", dirGodot: "assets/panel" });
+    // await commands.executeCommand("vscode.openFolder", Uri.file($.rustPath));
+    // await sleep(3000);
+    // let gm = new GodotManager(extensionContext, $.godotProject);
+    console.log("AAAAAAAa");
+
+    console.log(extensions.all.length);
+    // let gm = extensions.getExtension("jgirardet.godot4-rust");
+    console.log("BBBBBBBBBBBBB");
+    // console.log(gm?.exports);
   });
 });

@@ -5,6 +5,8 @@ import {
   workspace,
   RelativePattern,
   window,
+  EventEmitter,
+  Event,
 } from "vscode";
 import { FullPathFile, Name } from "../types";
 import { GodotModule, RustParsed } from "./types";
@@ -16,31 +18,49 @@ export class RustManager {
   modules: Map<Name, GodotModule> = new Map();
   readonly watcher: FileSystemWatcher;
 
-  // rustFilesChanged = new EventEmitter<RustFiles>();
-  // rustFilesChangedEvent: Event<RustFiles>;
+  rustFilesChanged = new EventEmitter<RustFiles | void>();
+  rustFilesChangedEvent: Event<RustFiles | void> = this.rustFilesChanged.event;
 
   constructor(context: ExtensionContext) {
     context.subscriptions.push(
       (this.watcher = workspace.createFileSystemWatcher("**/*.rs"))
     );
-    // this.rustFilesChangedEvent = this.rustFilesChanged.event;
 
     this.reload().then(() =>
-      context.subscriptions
-        .push
-        // this.watcher.onDidChange(this.onFileChanged.bind(this)),
-        // this.watcher.onDidCreate(this.onFileChanged.bind(this)),
-        // this.watcher.onDidDelete(this.onFileChanged.bind(this))
-        ()
+      context.subscriptions.push(
+        this.watcher.onDidChange(this.onFileChanged.bind(this)),
+        this.watcher.onDidCreate(this.onFileChanged.bind(this)),
+        this.watcher.onDidDelete(this.onFileDeleted.bind(this))
+      )
     );
   }
 
-  // async onFileChanged(u: Uri) {
-  //   if (await this._parse(u.fsPath)) {
-  //     this.rustFilesChanged.fire(this.files);
-  //   }
-  // }
-  async onFileDeleted(u: Uri) {}
+  async onFileChanged(u: Uri) {
+    let gm = await this.tryGodotClass(u);
+    if (gm) {
+      return this.update(gm);
+    }
+  }
+
+  async onFileDeleted(u: Uri) {
+    let gm = await this.tryGodotClass(u);
+    if (gm) {
+      return this.update(gm, true);
+    }
+  }
+
+  async update(gm: GodotModule, remove = false) {
+    if (remove) {
+      this.modules.delete(gm.className);
+      this.rustFilesChanged.fire();
+    } else {
+      const stored = this.modules.get(gm.className);
+      if (!stored || gm !== stored) {
+        this.modules.set(gm.className, gm);
+        this.rustFilesChanged.fire();
+      }
+    }
+  }
 
   isRustStruct(godotType: string): boolean {
     return godotType in this.modules;
