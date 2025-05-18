@@ -18,11 +18,12 @@ import { QuickPickItem } from "vscode";
 import { NodeItem } from "../panel/nodeItem";
 import { applyCodeActionNamed } from "../rust/utils";
 import { TscnTreeProvider } from "../panel/tscnTreeData";
+import { GODOT_STRUCTS } from "../godotClasses";
 
 export const newGodotClass = async (
   treeData: TscnTreeProvider,
   nodeItem?: NodeItem
-) => {
+): Promise<NodeItem | undefined> => {
   if (nodeItem && !nodeItem.isRoot) {
     logger.warn("Only root nodes can be derived, aborting");
     return;
@@ -39,7 +40,6 @@ export const newGodotClass = async (
   let gpd = getGodotProjectDir(gpf);
   let selectedTscn = nodeItem?.tscn?.toAbs(gpd);
   if (!selectedTscn) {
-    // const tscnFiles = listTscnFiles(gpf);
     const tscnFiles = [...treeData.data.keys()];
     selectedTscn = await selectTscn(tscnFiles, gpd);
     if (!selectedTscn) {
@@ -68,8 +68,9 @@ export const newGodotClass = async (
   const snippet = build_snippet(nodeItem, pickedMethod, pickedOnready);
 
   let editor: vscode.TextEditor | undefined;
+  let newFile;
   if (persistFile === "Yes") {
-    let newFile = await persist(selectedTscn, snippet);
+    newFile = await persist(selectedTscn, snippet);
     if (newFile === undefined) {
       return;
     }
@@ -82,12 +83,23 @@ export const newGodotClass = async (
     await editor.insertSnippet(new vscode.SnippetString(snippet));
   }
 
-  await insertRustMod(
-    editor,
-    path.basename(editor.document.fileName).replace(".rs", "")
-  );
-  await vscode.commands.executeCommand("editor.action.formatDocument");
-  vscode.window.showTextDocument(editor.document);
+  if (newFile) {
+    nodeItem.rustModule = {
+      className: nodeItem.name,
+      baseClass: GODOT_STRUCTS[nodeItem.type as keyof typeof GODOT_STRUCTS],
+      init: true,
+      path: newFile.fsPath,
+    };
+  }
+  return nodeItem;
+  // to fix
+  //
+  // await insertRustMod(
+  //   editor,
+  //   path.basename(editor.document.fileName).replace(".rs", "")
+  // );
+  // await vscode.commands.executeCommand("editor.action.formatDocument");
+  // vscode.window.showTextDocument(editor.document);
 };
 
 const prepicked = ["ready", "process"];

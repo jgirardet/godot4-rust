@@ -1,24 +1,25 @@
-todo:
+
 
 
 Prochain en cours :
+- rust file changed
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 
 
 
+
 features:
-- changer le nom du tscn
 - explorer
     - explorer indicate some things (onready or others)
     _ afficher + masque les path des fichiers
 - ajouter les groups dans godot parse
 _ parser les extResources image pour les affic-her en icone
 - build.tsk pour le cargo build de fond
+- insert rust mod
 
 
 code refactor
-- parser rust: voir si is godot avec matcher + efficace pour virer source
 - parser TSCN:
     - un grand nombre de test de tscn différent pour tester plantage
 - godotprojectdir sans dep vscode
@@ -38,7 +39,9 @@ doc:
 
 
 features du panel non testable: 
-- context sur root: new class mais pas si rusttype
+- context sur root:
+    - new class mais pas si rusttype
+
 - context sur child:
     - insertOnready: mais pas sur root
     

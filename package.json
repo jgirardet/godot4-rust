@@ -62,9 +62,20 @@
         "command": "godot4-rust.refresh",
         "title": "Godot4-Rust: Refresh panel",
         "enablement": "godot4-rust.project_set"
+      },
+      {
+        "command": "godot4-rust.replaceBaseClass",
+        "title": "Godot4-Rust: Replace Godot's Scene root Node by Rust class",
+        "enablement": "godot4-rust.project_set"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "godot4-rust.replaceBaseClass",
+          "when": "false"
+        }
+      ],
       "view/title": [
         {
           "command": "godot4-rust.refresh",
@@ -76,6 +87,10 @@
         {
           "when": "view == godot4-rust && viewItem =~ /^root$/",
           "command": "godot4-rust.newGodotClass"
+        },
+        {
+          "when": "view == godot4-rust && viewItem =~ /^root/ && editorIsOpen",
+          "command": "godot4-rust.replaceBaseClass"
         },
         {
           "when": "view == godot4-rust && viewItem =~ /^child$/",
@@ -90,6 +105,11 @@
           "description": "The path to .godot project file",
           "type": "string",
           "default": null
+        },
+        "godot4-rust.autoReplaceInTscn": {
+          "description": "Auto replace Root Godot Node by Rust Godoclass after a new godotclass is generated",
+          "type": "boolean",
+          "default": false
         }
       }
     }
@@ -128,7 +148,7 @@
     "eslint": "^9.25.1",
     "mitata": "^1.0.34",
     "typescript": "^5.8.3",
-    "vscode-extension-tester": "^8.14.1",
+    "vscode-extension-tester": "^8.14.1"
   },
   "dependencies": {
     "find-parent-dir": "^0.3.1",

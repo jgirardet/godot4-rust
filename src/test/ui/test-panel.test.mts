@@ -1,28 +1,15 @@
 import {
-  BottomBarPanel,
-  InputBox,
-  OutputView,
   TreeItem,
-  VSBrowser,
-  WebDriver,
-  Workbench,
 } from "vscode-extension-tester";
 import { initPanel, initTest } from "../testutils.js";
 import { expect } from "earl";
 
 describe("Testing pan", () => {
-  let browser: VSBrowser;
-  let driver: WebDriver;
-  let wb: Workbench;
-  let rootPath: string;
-  let inp: InputBox;
-  let bottomBar: BottomBarPanel;
-  let outputView: OutputView;
 
 
 
   it("test panel load", async () => {
-    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
+    const {rootPath, driver} = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );

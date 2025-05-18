@@ -65,7 +65,6 @@ class NewGDExtension {
   }
 
   // Crate'sDir path
-
   get crateDir(): FullPathDir {
     return path.join(this._rustDirBase, this._crateName);
   }
@@ -118,7 +117,7 @@ class NewGDExtension {
   };
 }
 
-const validateCrateName = (name: string): boolean => {
+export const validateCrateName = (name: string): boolean => {
   if (/[^a-z|\-|_|0-9]/.test(name)) {
     return false;
   }

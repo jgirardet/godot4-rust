@@ -1,5 +1,5 @@
 import path from "path";
-import { DISPLAY_NAME, GodotSettings } from "../constantes";
+import { DISPLAY_NAME, GodotSettings, NAME } from "../constantes";
 import * as fs from "fs";
 import * as os from "os";
 import { glob } from "glob";
@@ -8,11 +8,13 @@ import {
   InputBox,
   OutputView,
   SideBarView,
+  ViewSection,
   VSBrowser,
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
 import { existsSync } from "fs";
+import { readUtf8Sync } from "../utils";
 
 export const cloneDirToTemp = (dirpath: string): string => {
   let tmp = fs.mkdtempSync(path.join(os.tmpdir(), "grudot"));
@@ -37,7 +39,6 @@ export const addGodotProjectPathSetting = (
   if (!fs.existsSync(dotvscode)) {
     fs.mkdirSync(dotvscode);
   }
-  console.log(`Using: ${dotvscode}`);
   let setting = {
     "godot4-rust.godotProjectFilePath": godotProject,
   };
@@ -62,11 +63,12 @@ export const getSettings = (filepath: string): GodotSettings | undefined => {
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
   godotbase: string = "assets/GodotProject"
-): Promise<
-  [string, VSBrowser, WebDriver, Workbench, BottomBarPanel, OutputView]
-> => {
+): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
-  addGodotProjectPathSetting(rootPath, cloneGrudotDirTemp(godotbase));
+  let godotDir = cloneGrudotDirTemp(godotbase);
+  addGodotProjectPathSetting(rootPath, godotDir);
+  console.log(`rootPath: ${rootPath}`);
+  console.log(`godotPath: ${godotDir}`);
   let browser = VSBrowser.instance;
   await browser.openResources(rootPath);
   let driver = browser.driver;
@@ -83,7 +85,17 @@ export const initTest = async (
     }
   });
   await outputView.selectChannel("Godot4 Rust");
-  return [rootPath, browser, driver, wb, bottomBar, outputView];
+  let panel = await initPanel(rootPath, driver);
+  return {
+    rootPath,
+    browser,
+    driver,
+    wb,
+    bottomBar,
+    outputView,
+    godotDir,
+    panel,
+  };
 };
 
 export const multiSelect = async (
@@ -154,5 +166,27 @@ export const initPanel = async (rootPath: string, driver: WebDriver) => {
   );
   return panel;
 };
+
+export const asset = (filename: string): string => {
+  return path.resolve(__filename, "../../../assets/", filename);
+};
+
+export const setConfig = (rootPath: string, key: string, value: any) => {
+  let setPath = path.resolve(rootPath, ".vscode/settings.json");
+  let settings = JSON.parse(readUtf8Sync(setPath));
+  Object.assign(settings, { [`${NAME}.${key}` as keyof Object]: value });
+  fs.writeFileSync(setPath, JSON.stringify(settings), { encoding: "utf-8" });
+};
+
+export interface InitTest {
+  rootPath: string;
+  browser: VSBrowser;
+  driver: WebDriver;
+  wb: Workbench;
+  bottomBar: BottomBarPanel;
+  outputView: OutputView;
+  godotDir: string;
+  panel: ViewSection;
+}
 
 clearTmp();

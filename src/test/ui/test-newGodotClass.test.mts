@@ -1,33 +1,17 @@
 import assert from "assert";
 import path from "path";
 import * as fs from "fs";
-import * as os from "os";
-import {
-  BottomBarPanel,
-  InputBox,
-  OutputView,
-  TextEditor,
-  VSBrowser,
-  WebDriver,
-  Workbench,
-} from "vscode-extension-tester";
-import { initPanel, initTest, multiSelect } from "../testutils.js";
+import { InputBox, TextEditor } from "vscode-extension-tester";
+import { asset, initTest, multiSelect, setConfig } from "../testutils.js";
 import { expect } from "earl";
+import { readUtf8Sync } from "../../utils.js";
+import { AUTO_REPLACE_TSCN_KEY } from "../../constantes.js";
 
-let LEVEL_SCENE_PATH = "/Scenes/Main/LevelButton/level_button.tscn";
 describe("addNewGodot class Command", () => {
-  let browser: VSBrowser;
-  let driver: WebDriver;
-  let wb: Workbench;
-  let rootPath: string;
   let inp: InputBox;
-  let bottomBar: BottomBarPanel;
-  let outputView: OutputView;
-
 
   it("tests to add a new class from an empty file", async () => {
-  [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
-    let panel = await initPanel(rootPath, driver);
+    const { rootPath, browser, wb } = await initTest();
     await browser.openResources(path.join(rootPath, "src/empty.rs"));
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
@@ -53,7 +37,7 @@ describe("addNewGodot class Command", () => {
   });
 
   it("tests to add a new class from no file", async () => {
-  [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
+    const { driver, wb, godotDir } = await initTest();
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
@@ -78,13 +62,23 @@ describe("addNewGodot class Command", () => {
         )
         .toString()
     );
+    let resp = readUtf8Sync(
+      path.resolve(godotDir, "Scenes/Main/LevelButton/level_button.tscn")
+    );
+    // no autoswitch of godotclass in tscn
+    expect(resp).toEqual(
+      readUtf8Sync(
+        asset("GodotProject/Scenes/Main/LevelButton/level_button.tscn")
+      )
+    );
   });
 
-  it("tests add correct Rust type >< godot type", async () => {
-    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest(
+  it("tests add correct Rust type >< godot type AND autoswitch", async () => {
+    const { driver, wb, godotDir, rootPath } = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );
+    setConfig(rootPath, AUTO_REPLACE_TSCN_KEY, true);
     await wb.executeCommand("godot4-rust.newGodotClass");
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
@@ -121,5 +115,9 @@ fn ready(&mut self) {}
 fn process(&mut self, delta: f64) {}
 }`
     );
+    //
+    // no autoswitch of godotclass in tscn
+    let tscn = readUtf8Sync(path.resolve(godotDir, "child_2.tscn"));
+    expect(tscn).toMatchRegex(/node name=\"Child2\" type=\"Child2\"/);
   });
 });

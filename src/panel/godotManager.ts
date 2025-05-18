@@ -10,17 +10,19 @@ import {
   window,
   workspace,
 } from "vscode";
+
 import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
-import { NAME } from "../constantes";
+import { AUTO_REPLACE_TSCN_KEY, NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { logger } from "../log";
-import { registerGCommand } from "../vscodeUtils";
+import { getConfigValue, registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
 import { RustManager } from "../rust/rustmanager";
 import { TscnTreeProvider } from "./tscnTreeData";
 import { insertOnready } from "../commands/insertOnready";
 import { newGodotClass } from "../commands/newGodotClass";
+import { switchGodotNodeByrust } from "../commands/switchGodotNodeByRust";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -57,6 +59,7 @@ export class GodotManager {
       registerGCommand(`refresh`, this.reload.bind(this)),
       registerGCommand("insertOnReady", this.insertOnReady.bind(this)),
       registerGCommand("newGodotClass", this.newGodotClass.bind(this)),
+      registerGCommand("replaceBaseClass", this.replaceBaseClass.bind(this)),
 
       // connect signals
       window.onDidChangeActiveTextEditor(this.reveal.bind(this))
@@ -137,7 +140,36 @@ export class GodotManager {
   }
 
   async newGodotClass(nodeItem?: NodeItem) {
-    await newGodotClass(this.treeData, nodeItem);
+    nodeItem = await newGodotClass(this.treeData, nodeItem);
+    if (getConfigValue<boolean>(AUTO_REPLACE_TSCN_KEY)) {
+      await commands.executeCommand("godot4-rust.replaceBaseClass", nodeItem);
+    }
+  }
+
+  async replaceBaseClass(nodeItem?: NodeItem) {
+    if (!nodeItem?.isRoot) {
+      logger.warn("Only root Nodes can be switched in Scenes");
+      return;
+    }
+    await this.rust.reload();
+
+    if (!nodeItem.isRustStruct) {
+      let gc = await this.rust.TryGodoClassInEditor();
+      if (gc) {
+        nodeItem.rustModule = gc;
+      } else {
+        throw new Error(
+          "Need valid peristed godotclass module. Can't modify Tscn file"
+        );
+      }
+    }
+
+    try {
+      await switchGodotNodeByrust(nodeItem, this.godotDir);
+    } catch (e: any) {
+      await this.reload();
+      throw e;
+    }
   }
 
   async _reveal(node: NodeItem) {

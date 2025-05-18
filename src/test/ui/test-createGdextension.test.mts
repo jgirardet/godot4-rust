@@ -1,43 +1,16 @@
 import path from "path";
-import {
-  BottomBarPanel,
-  InputBox,
-  ModalDialog,
-  OutputView,
-  VSBrowser,
-  WebDriver,
-  Workbench,
-} from "vscode-extension-tester";
-import {
-  addGodotProjectPathSetting,
-  cloneGrudotDirTemp,
-  fileExistsAsync,
-  initTest,
-} from "../testutils.js";
-import { existsSync, readFileSync, unlink, unlinkSync } from "fs";
+import { ModalDialog } from "vscode-extension-tester";
+import { fileExistsAsync, initTest } from "../testutils.js";
+import { existsSync, readFileSync, unlinkSync } from "fs";
 import assert from "assert";
 
 describe("create gdextension file", () => {
-  let browser: VSBrowser;
-  let driver: WebDriver;
-  let wb: Workbench;
-  let rootPath: string;
-  let inp: InputBox;
-  let bottomBar: BottomBarPanel;
-  let outputView: OutputView;
-
-  let godotDir: string;
   let crateName: string;
   let gdextension: string;
 
-  beforeEach(async () => {
-    [rootPath, browser, driver, wb, bottomBar, outputView] = await initTest();
-  });
 
-  const init = async () => {
-    godotDir = cloneGrudotDirTemp();
-    console.log(`Godotdir Temp: ${godotDir}`);
-    addGodotProjectPathSetting(rootPath, godotDir);
+  it("test .gdextension is created and accurate", async () => {
+    const { wb, rootPath, godotDir, driver } = await initTest();
     await wb.executeCommand("godot4-rust.createGdextension");
     crateName = "proJet_un-Deux";
     gdextension = path.join(godotDir, `${crateName}.gdextension`);
@@ -45,12 +18,7 @@ describe("create gdextension file", () => {
       await fileExistsAsync(gdextension, driver),
       "File should be created"
     );
-  };
-
-  it("test .gdextension is created and accurate", async () => {
-    await init();
     let content = readFileSync(gdextension).toString("utf-8");
-    console.log(content);
     assert.equal(
       content,
       `[configuration]
@@ -74,7 +42,10 @@ macos.release.arm64 =    "res://../XXXXXX/target/release/libproJet_un_Deux.dylib
   });
 
   it("test .gdextension is create another if exists", async () => {
-    await init();
+    const { wb, godotDir, driver } = await initTest();
+    await wb.executeCommand("godot4-rust.createGdextension");
+    crateName = "proJet_un-Deux";
+    gdextension = path.join(godotDir, `${crateName}.gdextension`);
     await wb.executeCommand("godot4-rust.createGdextension");
     let newFile = `new_${crateName}.gdextension`;
     await driver.sleep(1000);
@@ -86,7 +57,10 @@ macos.release.arm64 =    "res://../XXXXXX/target/release/libproJet_un_Deux.dylib
   });
 
   it("test .gdextension overwrite if exists", async () => {
-    await init();
+    const { wb, godotDir, driver } = await initTest();
+    await wb.executeCommand("godot4-rust.createGdextension");
+    crateName = "proJet_un-Deux";
+    gdextension = path.join(godotDir, `${crateName}.gdextension`);
     await wb.executeCommand("godot4-rust.createGdextension");
     await driver.sleep(1000);
     const dialog = new ModalDialog();

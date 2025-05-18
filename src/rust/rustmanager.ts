@@ -4,6 +4,7 @@ import {
   Uri,
   workspace,
   RelativePattern,
+  window,
 } from "vscode";
 import { FullPathFile, Name } from "../types";
 import { GodotModule, RustParsed } from "./types";
@@ -49,6 +50,32 @@ export class RustManager {
     return [...this.modules.values()].find((p) => p.path === filepath);
   }
 
+  // only match on persisted files.
+  async TryGodoClassInEditor(): Promise<GodotModule | undefined> {
+    if (window.activeTextEditor) {
+      return;
+    }
+    const { document } = window.activeTextEditor!;
+    if (document.isUntitled || !document.fileName.endsWith(".rs")) {
+      return;
+    }
+    if (document.isDirty) {
+      await document.save();
+    }
+
+    return await this.tryGodotClass(document.uri);
+  }
+
+  async tryGodotClass(f: Uri): Promise<GodotModule | undefined> {
+    let parser = await RustParser.file(f.fsPath);
+    if (parser.isGodotModule) {
+      let cls = parser.findGodotClass();
+      if (cls) {
+        return cls.className, { path: f.fsPath, ...cls };
+      }
+    }
+  }
+
   async reload() {
     let ws = workspace.workspaceFolders?.at(0);
     if (!ws) {
@@ -58,12 +85,9 @@ export class RustManager {
     for (const f of await workspace.findFiles(
       new RelativePattern(ws, "src/**/*.rs")
     )) {
-      let parser = await RustParser.file(f.fsPath);
-      if (parser.isGodotModule) {
-        let cls = parser.findGodotClass();
-        if (cls) {
-          this.modules.set(cls.className, { path: f.fsPath, ...cls });
-        }
+      let gc = await this.tryGodotClass(f);
+      if (gc) {
+        this.modules.set(gc.className, gc);
       }
     }
   }

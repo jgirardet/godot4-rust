@@ -9,7 +9,7 @@ import { FullPathDir, FullPathFile, Name } from "./types";
 import { globSync } from "glob";
 
 export const getGodotProjectFile = (): FullPathFile => {
-  const godotfp = getConfigValue(GODOT_PROJECT_FILEPATH_KEY);
+  const godotfp = getConfigValue<string>(GODOT_PROJECT_FILEPATH_KEY);
   if (godotfp === undefined || godotfp.length === 0 || !existsSync(godotfp)) {
     window.showErrorMessage(
       "Godot Project is not set or incorrect. Use Ctrl+Maj+P => <Set Godot Project> to select .godot project file"
