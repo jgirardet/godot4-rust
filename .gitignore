@@ -9,4 +9,3 @@ scalazard/
 **/.godot/
 **/*.import
 src/godotClasses.ts
-.wdio-vscode-service/
