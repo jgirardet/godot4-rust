@@ -3,6 +3,11 @@ import Rust from "tree-sitter-rust";
 import { RustParsed } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
 import { godotModuleQuery } from "../constantes";
+import {
+  getBoolean,
+  getStringAttribute,
+  getStringAttributeUnsafe,
+} from "../tree/parseutils";
 
 export class RustParser extends TreeSitterParser {
   get lang(): Parser.Language {
@@ -27,9 +32,9 @@ export class RustParser extends TreeSitterParser {
     }
 
     return {
-      className: this._getStringUnsafe("className", captures),
-      baseClass: this._getString("baseClass", captures),
-      init: this._getString("init", captures) ? true : false,
+      className: getStringAttributeUnsafe("className", captures, this.tree),
+      baseClass: getStringAttribute("baseClass", captures, this.tree),
+      init: getBoolean("init", captures),
     };
   }
   //

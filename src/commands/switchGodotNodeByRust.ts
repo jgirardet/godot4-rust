@@ -6,14 +6,14 @@ import { selectTscn } from "../ui/select";
 import { GodotManager } from "../panel/godotManager";
 
 export const switchGodotNodeByrust = async (
-  manager: GodotManager,
+  {rust, treeData, godotDir}: GodotManager,
   nodeItem?: NodeItem
 ) => {
   logger.info("Starting Change type");
   if (!nodeItem) {
     const tscn = await selectTscn(
-      Array.from(manager.treeData.data.keys()),
-      manager.godotDir,
+      Array.from(treeData.data.keys()),
+      godotDir,
       {
         canPickMany: false,
         title: "Please select Scene file where to change Root Node's Type",
@@ -23,7 +23,7 @@ export const switchGodotNodeByrust = async (
       logger.info("Aborting");
       return;
     }
-    nodeItem = manager.treeData.data.get(tscn);
+    nodeItem = treeData.data.get(tscn);
     if (!nodeItem) {
       return;
     }
@@ -34,9 +34,9 @@ export const switchGodotNodeByrust = async (
     logger.warn("Only root Nodes can be switched in Scenes");
     return;
   }
-  await manager.rust.reload();
+  await rust.reload();
 
-  let gc = await manager.rust.TryGodoClassInEditor();
+  let gc = await rust.TryGodoClassInEditor();
   if (gc) {
     nodeItem.rustModule = gc;
   } else {
@@ -46,7 +46,7 @@ export const switchGodotNodeByrust = async (
   }
 
   let attr = nodeItem.node.type!; // always ok with root
-  const tscn = nodeItem.tscn!.toAbs(manager.godotDir);
+  const tscn = nodeItem.tscn!.toAbs(godotDir);
   let res = [];
   let counter = 0;
 
@@ -61,7 +61,7 @@ export const switchGodotNodeByrust = async (
       // double check, abort if not sure
       if (slice === `"${nodeItem.type}"`) {
         console.log("meme type");
-        line = start + `"${nodeItem.rustModule!.className}"` + end; //mieux cracher que faire faux
+        line = start + `"${nodeItem.rustModule!.className.value}"` + end; //mieux cracher que faire faux
       } else {
         throw new Error(
           "There was a error, Godot Scene file has't been edited"

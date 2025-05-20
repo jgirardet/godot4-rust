@@ -1,14 +1,12 @@
+import { BooleanAttribute, StringAttribute } from "../tree/types";
 import { FullPathFile } from "../types";
 
 export interface RustParsed {
-  className: string;
+  className: StringAttribute;
   init: boolean;
-  baseClass?: string;
+  baseClass?: StringAttribute;
 }
 
-export interface GodotModule {
-  className: string;
-  init: boolean;
-  baseClass?: string;
+export interface GodotModule extends RustParsed {
   path: FullPathFile;
 }

@@ -121,7 +121,7 @@ export class NodeItem extends TreeItem {
     root.tscn = scene.tscnpath;
     if (rustStruct) {
       root.iconPath = NodeItem.getGodotRustIconUri();
-      root.tooltip = rustStruct.className;
+      root.tooltip = rustStruct.className.value;
       root.rustModule = rustStruct;
       root.contextValue = root.contextValue += "-rust";
     } else if (!(root.type in GODOT_STRUCTS)) {

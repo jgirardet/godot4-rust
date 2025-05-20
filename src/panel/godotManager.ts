@@ -109,7 +109,7 @@ export class GodotManager {
       return;
     }
     const file = editor?.document.fileName;
-    let godotClass = this.rust.getByPath(file)?.className;
+    let godotClass = this.rust.getByPath(file)?.className.value;
     if (!godotClass) {
       return;
     }
@@ -144,7 +144,7 @@ export class GodotManager {
   }
 
   async newGodotClass(nodeItem?: NodeItem) {
-    nodeItem = await newGodotClass(this.treeData, nodeItem);
+    nodeItem = await newGodotClass(this, nodeItem);
     if (getConfigValue<boolean>(AUTO_REPLACE_TSCN_KEY)) {
       await commands.executeCommand("godot4-rust.replaceBaseClass", nodeItem);
     }

@@ -1,5 +1,6 @@
 import { Point } from "tree-sitter";
 import { GodotScene } from "./godotScene";
+import { Attribute, StringAttribute } from "../tree/types";
 
 export type Uid = string;
 export type ResPath = string;
@@ -24,13 +25,7 @@ export interface Node {
   instance?: ExtResourceAttribute;
 }
 
-export interface Attribute<T> {
-  value: T;
-  startPosition: Point;
-  endPosition: Point;
-}
-
-export type StringAttribute = Attribute<string>;
-export type ExtResourceAttribute = Attribute<ExtResource>;
 
 export type GodotRes = GodotScene;
+
+export type ExtResourceAttribute = Attribute<ExtResource>;

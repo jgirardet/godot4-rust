@@ -5,6 +5,7 @@ Prochain en cours :
 _ code action rename
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
+- switch undo /redo 
 
 
 

@@ -4,11 +4,11 @@ import Parser, { Query, QueryCapture } from "tree-sitter";
 import {
   ExtResource,
   Node,
-  StringAttribute,
   ExtResourceAttribute,
   GDScene,
 } from "./types";
 import { ExtResourcesQuery, NodesQuery, UidQuery } from "../constantes";
+import { StringAttribute } from "../tree/types";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
@@ -75,7 +75,7 @@ export class TscnParser extends TreeSitterParser {
     return this.nodes;
   }
 
-  //
+
   /// Warning: use only if key always is in capture
   _getStringAttributeUnsafe(
     key: string,

@@ -52,27 +52,27 @@ export class RustManager {
 
   async update(gm: GodotModule, remove = false) {
     if (remove) {
-      this.modules.delete(gm.className);
+      this.modules.delete(gm.className.value);
       this.rustFilesChanged.fire();
     } else {
       // creation ou modification
-      const stored = this.modules.get(gm.className);
+      const stored = this.modules.get(gm.className.value);
       if (!stored) {
         let byTscn = this.getByPath(gm.path);
         if (byTscn) {
           //a rename cas: different name but same file
-          this.modules.delete(byTscn.className);
-          this.modules.set(gm.className, gm);
+          this.modules.delete(byTscn.className.value);
+          this.modules.set(gm.className.value, gm);
           this.rustFilesChanged.fire();
         } else {
           // nouvel class + nouveau fichier
-          this.modules.set(gm.className, gm);
+          this.modules.set(gm.className.value, gm);
           this.rustFilesChanged.fire();
         }
       } else {
         if (gm !== stored) {
           // même class mais changement du reste, on update simple
-          this.modules.set(gm.className, gm);
+          this.modules.set(gm.className.value, gm);
           this.rustFilesChanged.fire();
         }
       }
@@ -127,7 +127,7 @@ export class RustManager {
     )) {
       let gc = await this.tryGodotClass(f);
       if (gc) {
-        this.modules.set(gc.className, gc);
+        this.modules.set(gc.className.value, gc);
       }
     }
   }

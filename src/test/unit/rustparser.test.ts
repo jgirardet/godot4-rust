@@ -20,12 +20,10 @@ struct NotSoGodo
 struct GodotStruct;
 `);
 
-      let res = rp.findGodotClass();
-      expect(res).toEqual({
-        className: "GodotStruct",
-        init: true,
-        baseClass: "CharacterBody2D",
-      });
+      let res = rp.findGodotClass()!;
+      expect(res.className.value).toEqual("GodotStruct");
+      expect(res.baseClass!.value).toEqual("CharacterBody2D");
+      expect(res.init).toBeTruthy();
     });
     it("parse is no 'baseclass'", function () {
       let rp = new RustParser(`
@@ -33,12 +31,10 @@ struct GodotStruct;
 struct GodotStruct;
 `);
 
-      let res = rp.findGodotClass();
-      expect(res).toEqual({
-        className: "GodotStruct",
-        init: false,
-        baseClass: undefined
-      });
+      let res = rp.findGodotClass()!;
+      expect(res.className.value).toEqual("GodotStruct");
+      expect(res.baseClass!.value).toEqual("undefined");
+      expect(res.init).toBeFalsy();
     });
     it("get only the first one", function () {
       let rp = new RustParser(`
@@ -49,12 +45,10 @@ struct GodotStruct;
 struct GodotStruct2;
 `);
 
-      let res = rp.findGodotClass();
-      expect(res).toEqual({
-        className: "GodotStruct",
-        init: false,
-        baseClass: undefined
-      });
+      let res = rp.findGodotClass()!;
+      expect(res.className.value).toEqual("GodotStruct");
+      expect(res.baseClass!.value).toEqual("undefined");
+      expect(res.init).toBeFalsy();
     });
   });
   describe("isGodotModule", () => {

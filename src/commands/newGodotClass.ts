@@ -17,11 +17,10 @@ import { selectNodes, selectTscn } from "../ui/select";
 import { QuickPickItem } from "vscode";
 import { NodeItem } from "../panel/nodeItem";
 import { applyCodeActionNamed } from "../rust/utils";
-import { TscnTreeProvider } from "../panel/tscnTreeData";
-import { GODOT_STRUCTS } from "../godotClasses";
+import { GodotManager } from "../panel/godotManager";
 
 export const newGodotClass = async (
-  treeData: TscnTreeProvider,
+  { treeData, rust }: GodotManager,
   nodeItem?: NodeItem
 ): Promise<NodeItem | undefined> => {
   if (nodeItem && !nodeItem.isRoot) {
@@ -71,10 +70,15 @@ export const newGodotClass = async (
   let newFile;
   if (persistFile === "Yes") {
     newFile = await persist(selectedTscn, snippet);
-    if (newFile === undefined) {
+    if (!newFile) {
       return;
     }
     editor = await vscode.window.showTextDocument(newFile);
+    const rustStruct = await rust.tryGodotClass(newFile);
+    if (rustStruct) {
+      nodeItem.rustModule = rustStruct;
+      return nodeItem;
+    }
   } else {
     editor = vscode.window.activeTextEditor;
     if (editor === undefined) {
@@ -82,24 +86,6 @@ export const newGodotClass = async (
     }
     await editor.insertSnippet(new vscode.SnippetString(snippet));
   }
-
-  if (newFile) {
-    nodeItem.rustModule = {
-      className: nodeItem.name,
-      baseClass: GODOT_STRUCTS[nodeItem.type as keyof typeof GODOT_STRUCTS],
-      init: true,
-      path: newFile.fsPath,
-    };
-  }
-  return nodeItem;
-  // to fix
-  //
-  // await insertRustMod(
-  //   editor,
-  //   path.basename(editor.document.fileName).replace(".rs", "")
-  // );
-  // await vscode.commands.executeCommand("editor.action.formatDocument");
-  // vscode.window.showTextDocument(editor.document);
 };
 
 const prepicked = ["ready", "process"];
