@@ -1,5 +1,5 @@
 import path from "path";
-import { DISPLAY_NAME, GodotSettings, NAME } from "../constantes";
+import { DISPLAY_NAME, GodotSettings, NAME } from "../../constantes";
 import * as fs from "fs";
 import * as os from "os";
 import { glob } from "glob";
@@ -8,64 +8,22 @@ import {
   InputBox,
   OutputView,
   SideBarView,
+  TreeItem,
   ViewSection,
   VSBrowser,
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
 import { existsSync } from "fs";
-import { readUtf8Sync } from "../utils";
-
-export const cloneDirToTemp = (dirpath: string): string => {
-  let tmp = fs.mkdtempSync(path.join(os.tmpdir(), "grudot"));
-  fs.cpSync(dirpath, tmp, { recursive: true });
-  return tmp;
-};
-
-export const cloneGrudotDirTemp = (dirpath?: string): string => {
-  dirpath = dirpath ?? "assets/GodotProject";
-  let tmp = fs.mkdtempSync(path.join(os.tmpdir(), "grudotproject"));
-  fs.cpSync(dirpath, tmp, { recursive: true });
-  return tmp;
-};
-
-export const addGodotProjectPathSetting = (
-  projectPath: string,
-  godotProjectDir: string
-) => {
-  let dotvscode = path.resolve(projectPath, ".vscode");
-  godotProjectDir = godotProjectDir ?? path.resolve("assets/GodotProject");
-  let godotProject = path.join(godotProjectDir, "project.godot");
-  if (!fs.existsSync(dotvscode)) {
-    fs.mkdirSync(dotvscode);
-  }
-  let setting = {
-    "godot4-rust.godotProjectFilePath": godotProject,
-  };
-  fs.writeFileSync(
-    path.resolve(projectPath, ".vscode/settings.json"),
-    JSON.stringify(setting)
-  );
-};
-
-export const getSettings = (filepath: string): GodotSettings | undefined => {
-  if (fs.existsSync(filepath)) {
-    let settings: GodotSettings = JSON.parse(
-      fs.readFileSync(filepath, {
-        encoding: "utf-8",
-      })
-    );
-    return settings;
-  }
-  return undefined;
-};
+import { readUtf8Sync } from "../../utils";
+import { addGodotProjectPathSetting, cloneDirToTemp } from "../common";
 
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
   godotbase: string = "assets/GodotProject"
 ): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
-  let godotDir = cloneGrudotDirTemp(godotbase);
+  let godotDir = cloneDirToTemp(godotbase);
   addGodotProjectPathSetting(rootPath, godotDir);
   console.log(`rootPath: ${rootPath}`);
   console.log(`godotPath: ${godotDir}`);
@@ -167,15 +125,23 @@ export const initPanel = async (rootPath: string, driver: WebDriver) => {
   return panel;
 };
 
-export const asset = (filename: string): string => {
-  return path.resolve(__filename, "../../../assets/", filename);
-};
-
-export const setConfig = (rootPath: string, key: string, value: any) => {
-  let setPath = path.resolve(rootPath, ".vscode/settings.json");
-  let settings = JSON.parse(readUtf8Sync(setPath));
-  Object.assign(settings, { [`${NAME}.${key}` as keyof Object]: value });
-  fs.writeFileSync(setPath, JSON.stringify(settings), { encoding: "utf-8" });
+export const pickItem = async (
+  item: number | string,
+  panel?: ViewSection
+): Promise<TreeItem | undefined> => {
+  panel =
+    panel || (await new SideBarView().getContent().getSection(DISPLAY_NAME));
+  let items: TreeItem[] = (await panel.getVisibleItems()) as TreeItem[];
+  if (typeof item === "number") {
+    return items[0];
+  } else {
+    for (const i of items) {
+      if ((await i.getLabel()) === item) {
+        return i;
+      }
+    }
+  }
+  return;
 };
 
 export interface InitTest {

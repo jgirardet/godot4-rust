@@ -2,7 +2,8 @@
 
 
 Prochain en cours :
-- rust file changed
+- command switch
+_ code action rename
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 
@@ -44,4 +45,6 @@ features du panel non testable:
 
 - context sur child:
     - insertOnready: mais pas sur root
+
+- rust changed
     

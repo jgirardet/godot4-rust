@@ -62,7 +62,11 @@ export class GodotManager {
       registerGCommand("replaceBaseClass", this.replaceBaseClass.bind(this)),
 
       // connect signals
-      window.onDidChangeActiveTextEditor(this.reveal.bind(this))
+      window.onDidChangeActiveTextEditor(this.reveal.bind(this)),
+      this.rust.onRustFilesChanged(async () => {
+        logger.info("Rust content changed, reloading panel");
+        this.reload();
+      })
     );
 
     this.rust
@@ -147,6 +151,7 @@ export class GodotManager {
   }
 
   async replaceBaseClass(nodeItem?: NodeItem) {
+    logger.info("Starting Change type")
     if (!nodeItem?.isRoot) {
       logger.warn("Only root Nodes can be switched in Scenes");
       return;
@@ -166,7 +171,8 @@ export class GodotManager {
 
     try {
       await switchGodotNodeByrust(nodeItem, this.godotDir);
-    } catch (e: any) {
+      logger.info("Change Type complete")
+  } catch (e: any) {
       await this.reload();
       throw e;
     }

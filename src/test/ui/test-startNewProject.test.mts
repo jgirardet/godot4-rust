@@ -1,7 +1,7 @@
 import assert from "assert";
 import path, { join, resolve } from "path";
 import { InputBox } from "vscode-extension-tester";
-import { fileExistsAsync, initTest, selectPath } from "../testutils.js";
+import { fileExistsAsync, initTest, selectPath } from "./ui-testutils.js";
 import { mkdirSync, readFileSync } from "fs";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils.js";

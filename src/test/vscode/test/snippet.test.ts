@@ -1,4 +1,3 @@
-import { assert } from "console";
 import { GodotPath } from "../../../godot/godotPath";
 import { GodotScene } from "../../../godot/godotScene";
 import { NodeItem } from "../../../panel/nodeItem";
@@ -9,9 +8,7 @@ import {
   onready_snippet,
 } from "../../../snippets";
 import { expect } from "earl";
-import { Point } from "tree-sitter";
 import path, { basename, resolve } from "path";
-import { Node } from "../../../godot/types";
 import { mkdtempSync, writeFileSync } from "fs";
 import { switchGodotNodeByrust } from "../../../commands/switchGodotNodeByRust";
 import { readUtf8Sync } from "../../../utils";

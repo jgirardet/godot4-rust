@@ -3,7 +3,7 @@ import path from "path";
 import { GodotScene } from "../../godot/godotScene";
 import { GodotPath, gp } from "../../godot/godotPath";
 import { GodotProjectLoader } from "../../godot/godotProjectLoader";
-import { cloneGrudotDirTemp } from "../testutils";
+import { cloneDirToTemp } from "../common";
 
 const godotdir = path.resolve("assets/depedencies");
 const dep = (file: string): string => path.join(godotdir, file);
@@ -110,7 +110,7 @@ describe("delete item", () => {
     expect(gm.scenes).toEqual(bm.scenes);
   });
   it("test on change delete path", async () => {
-    let godotdir = cloneGrudotDirTemp();
+    let godotdir = cloneDirToTemp("assets/GodotProject");
     let gm = new GodotProjectLoader(path.join(godotdir, "project.godot"));
     await gm.load();
     let main = "Scenes/Main/main.tscn";

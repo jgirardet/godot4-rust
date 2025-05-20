@@ -2,10 +2,11 @@ import assert from "assert";
 import path from "path";
 import * as fs from "fs";
 import { InputBox, TextEditor } from "vscode-extension-tester";
-import { asset, initTest, multiSelect, setConfig } from "../testutils.js";
+import { initTest, multiSelect } from "./ui-testutils.js";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils.js";
 import { AUTO_REPLACE_TSCN_KEY } from "../../constantes.js";
+import { setConfig } from "../common.js";
 
 describe("addNewGodot class Command", () => {
   let inp: InputBox;
@@ -68,7 +69,7 @@ describe("addNewGodot class Command", () => {
     // no autoswitch of godotclass in tscn
     expect(resp).toEqual(
       readUtf8Sync(
-        asset("GodotProject/Scenes/Main/LevelButton/level_button.tscn")
+        "assets/GodotProject/Scenes/Main/LevelButton/level_button.tscn"
       )
     );
   });

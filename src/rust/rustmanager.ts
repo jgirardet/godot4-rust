@@ -5,10 +5,13 @@ import {
   workspace,
   RelativePattern,
   window,
+  EventEmitter,
+  Event,
 } from "vscode";
 import { FullPathFile, Name } from "../types";
 import { GodotModule, RustParsed } from "./types";
 import { RustParser } from "./parser";
+import { existsSync } from "fs";
 
 export type RustFiles = Map<FullPathFile, RustParsed>;
 
@@ -16,31 +19,65 @@ export class RustManager {
   modules: Map<Name, GodotModule> = new Map();
   readonly watcher: FileSystemWatcher;
 
-  // rustFilesChanged = new EventEmitter<RustFiles>();
-  // rustFilesChangedEvent: Event<RustFiles>;
+  rustFilesChanged = new EventEmitter<RustFiles | void>();
+  onRustFilesChanged: Event<RustFiles | void> = this.rustFilesChanged.event;
 
   constructor(context: ExtensionContext) {
     context.subscriptions.push(
       (this.watcher = workspace.createFileSystemWatcher("**/*.rs"))
     );
-    // this.rustFilesChangedEvent = this.rustFilesChanged.event;
 
     this.reload().then(() =>
-      context.subscriptions
-        .push
-        // this.watcher.onDidChange(this.onFileChanged.bind(this)),
-        // this.watcher.onDidCreate(this.onFileChanged.bind(this)),
-        // this.watcher.onDidDelete(this.onFileChanged.bind(this))
-        ()
+      context.subscriptions.push(
+        this.watcher.onDidChange(this.onFileChanged.bind(this)),
+        this.watcher.onDidCreate(this.onFileChanged.bind(this)),
+        this.watcher.onDidDelete(this.onFileDeleted.bind(this))
+      )
     );
   }
 
-  // async onFileChanged(u: Uri) {
-  //   if (await this._parse(u.fsPath)) {
-  //     this.rustFilesChanged.fire(this.files);
-  //   }
-  // }
-  async onFileDeleted(u: Uri) {}
+  async onFileChanged(u: Uri) {
+    let gm = await this.tryGodotClass(u);
+    if (gm) {
+      return this.update(gm);
+    }
+  }
+
+  async onFileDeleted(u: Uri) {
+    let deleted = this.getByPath(u.fsPath);
+    if (deleted) {
+      return this.update(deleted, true);
+    }
+  }
+
+  async update(gm: GodotModule, remove = false) {
+    if (remove) {
+      this.modules.delete(gm.className);
+      this.rustFilesChanged.fire();
+    } else {
+      // creation ou modification
+      const stored = this.modules.get(gm.className);
+      if (!stored) {
+        let byTscn = this.getByPath(gm.path);
+        if (byTscn) {
+          //a rename cas: different name but same file
+          this.modules.delete(byTscn.className);
+          this.modules.set(gm.className, gm);
+          this.rustFilesChanged.fire();
+        } else {
+          // nouvel class + nouveau fichier
+          this.modules.set(gm.className, gm);
+          this.rustFilesChanged.fire();
+        }
+      } else {
+        if (gm !== stored) {
+          // même class mais changement du reste, on update simple
+          this.modules.set(gm.className, gm);
+          this.rustFilesChanged.fire();
+        }
+      }
+    }
+  }
 
   isRustStruct(godotType: string): boolean {
     return godotType in this.modules;
@@ -52,10 +89,10 @@ export class RustManager {
 
   // only match on persisted files.
   async TryGodoClassInEditor(): Promise<GodotModule | undefined> {
-    if (window.activeTextEditor) {
+    if (!window.activeTextEditor) {
       return;
     }
-    const { document } = window.activeTextEditor!;
+    const { document } = window.activeTextEditor;
     if (document.isUntitled || !document.fileName.endsWith(".rs")) {
       return;
     }
@@ -67,6 +104,9 @@ export class RustManager {
   }
 
   async tryGodotClass(f: Uri): Promise<GodotModule | undefined> {
+    if (!existsSync(f.fsPath)) {
+      return;
+    }
     let parser = await RustParser.file(f.fsPath);
     if (parser.isGodotModule) {
       let cls = parser.findGodotClass();

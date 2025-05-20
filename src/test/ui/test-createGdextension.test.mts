@@ -1,13 +1,12 @@
 import path from "path";
 import { ModalDialog } from "vscode-extension-tester";
-import { fileExistsAsync, initTest } from "../testutils.js";
+import { fileExistsAsync, initTest } from "./ui-testutils.js";
 import { existsSync, readFileSync, unlinkSync } from "fs";
 import assert from "assert";
 
 describe("create gdextension file", () => {
   let crateName: string;
   let gdextension: string;
-
 
   it("test .gdextension is created and accurate", async () => {
     const { wb, rootPath, godotDir, driver } = await initTest();
