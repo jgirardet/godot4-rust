@@ -19,6 +19,9 @@
     "workspaceContains:*/Cargo.toml"
   ],
   "main": "./out/extension.js",
+  "enabledApiProposals": [
+    "treeViewActiveItem"
+  ],
   "contributes": {
     "views": {
       "explorer": [
@@ -70,12 +73,6 @@
       }
     ],
     "menus": {
-      "commandPalette": [
-        {
-          "command": "godot4-rust.replaceBaseClass",
-          "when": "false"
-        }
-      ],
       "view/title": [
         {
           "command": "godot4-rust.refresh",
@@ -129,7 +126,7 @@
     "vscode-test": "node out/test/vscode/runTests.js",
     "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
-    "ui-testone": "extest run-tests './out/test/ui/test-panel*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions",
+    "ui-testone": "extest run-tests './out/test/ui/test-*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",

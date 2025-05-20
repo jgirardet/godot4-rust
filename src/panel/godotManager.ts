@@ -151,28 +151,10 @@ export class GodotManager {
   }
 
   async replaceBaseClass(nodeItem?: NodeItem) {
-    logger.info("Starting Change type")
-    if (!nodeItem?.isRoot) {
-      logger.warn("Only root Nodes can be switched in Scenes");
-      return;
-    }
-    await this.rust.reload();
-
-    if (!nodeItem.isRustStruct) {
-      let gc = await this.rust.TryGodoClassInEditor();
-      if (gc) {
-        nodeItem.rustModule = gc;
-      } else {
-        throw new Error(
-          "Need valid peristed godotclass module. Can't modify Tscn file"
-        );
-      }
-    }
-
     try {
-      await switchGodotNodeByrust(nodeItem, this.godotDir);
-      logger.info("Change Type complete")
-  } catch (e: any) {
+      await switchGodotNodeByrust(this, nodeItem);
+      logger.info("Change Type complete");
+    } catch (e: any) {
       await this.reload();
       throw e;
     }

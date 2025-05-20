@@ -31,20 +31,6 @@
 			]
 		},
 		{
-			"name": "VSCODE Test",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"outputCapture": "console",
-			// "args": [
-			// 	"--extensionDevelopmentPath=${workspaceFolder}",
-			// 	"--extensionTestsPath=${workspaceFolder}/out/test/vscode/index"
-			// ],
-			"outFiles": [
-				"${workspaceFolder}/out/test/vscode/run.js"
-			]
-		},
-		{
 			"name": "MochaLaunch",
 			"type": "node",
 			"cwd": "${workspaceFolder}",

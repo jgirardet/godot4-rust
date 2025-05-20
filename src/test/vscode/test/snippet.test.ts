@@ -8,11 +8,6 @@ import {
   onready_snippet,
 } from "../../../snippets";
 import { expect } from "earl";
-import path, { basename, resolve } from "path";
-import { mkdtempSync, writeFileSync } from "fs";
-import { switchGodotNodeByrust } from "../../../commands/switchGodotNodeByRust";
-import { readUtf8Sync } from "../../../utils";
-import { tmpdir } from "os";
 import { validateCrateName } from "../../../commands/startNewGodotExtension";
 
 suite("test snippets", () => {
@@ -47,6 +42,7 @@ suite("test snippets", () => {
     ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<HttpRequest>>,');
   });
   test("test edge declclass, on ready, no godot type", () => {
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     expect(
       onready_snippet(fakeRootNodeItem("Bla", "RustStruct")).join("\n")
     ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<RustStruct>>,');
@@ -76,24 +72,32 @@ const fakeRootNodeItem = (nam: string, typ: string = "Node"): NodeItem => {
   );
 };
 
-suite("Test switch godot Class", () => {
-  test("should switcher", async () => {
-    let tmp = mkdtempSync(path.join(tmpdir(), "testswitchgrudot"));
-    let tscn = resolve(tmp, "bla.tscn");
-    let content = '\n\nO1"Rien"etautres\n\n';
-    writeFileSync(tscn, content);
-    let nodeItem = fakeRootNodeItem("Nom", "Rien");
-    nodeItem.rustModule = {
-      className: "RustClass",
-      path: basename(tscn),
-      init: true,
-    };
-    const res = await switchGodotNodeByrust(nodeItem, tmp);
-    expect(readUtf8Sync(resolve(tmp, tscn))).toEqual(
-      '\n\nO1"RustClass"etautres\n\n'
-    );
-  });
-});
+// suite("Test switch godot Class", () => {
+//   test("should switcher", async () => {
+//     // let tmp = mkdtempSync(path.join(tmpdir(), "testswitchgrudot"));
+//     // let tscn = resolve(tmp, "bla.tscn");
+//     // let content = '\n\nO1"Rien"etautres\n\n';
+//     // writeFileSync(tscn, content);
+//     // let nodeItem = fakeRootNodeItem("Nom", "Rien");
+//     // nodeItem.rustModule = {
+//     //   className: "RustClass",
+//     //   path: basename(tscn),
+//     //   init: true,
+//     // };
+
+//     let ext = extensions.getExtension("jgirardet.godot4-rust")!;
+//     let manager = ext.exports as GodotManager;
+
+//     // console.log(manager.rust.modules);
+//     // await sleep(3000);
+//     // selectPath()
+//     window.
+//     const res = await switchGodotNodeByrust(manager, nodeItem);
+//     // expect(readUtf8Sync(resolve(tmp, tscn))).toEqual(
+//     //   '\n\nO1"RustClass"etautres\n\n'
+//     // );
+//   });
+// });
 
 suite("Test start new project", () => {
   test("validata crate", () => {

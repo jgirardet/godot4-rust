@@ -1,17 +1,16 @@
-import { TreeItem, WebDriver } from "vscode-extension-tester";
+import { InputBox, TreeItem, WebDriver } from "vscode-extension-tester";
 import { initTest, pickItem } from "./ui-testutils.js";
 import { expect } from "earl";
 import { join } from "path";
 import { readUtf8Sync } from "../../utils.js";
 import { rmSync, writeFileSync } from "fs";
 
-describe("Testing pan", () => {
-  it("test panel load", async () => {
-    const { rootPath, driver, panel, godotDir } = await initTest(
+describe("Test Panel", () => {
+  it("global test panel", async () => {
+    const { rootPath, driver, panel, godotDir, browser, wb } = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );
-
     let visibleItems: TreeItem[] =
       (await panel.getVisibleItems()) as TreeItem[];
 
@@ -47,17 +46,17 @@ describe("Testing pan", () => {
 
     // delete
     rmSync(child1);
-    await waitToolTipToBe("Error: type is missing", driver);
+    await waitToolTipToBe("Child1", "Error: type is missing", driver);
 
     // Add
     writeFileSync(child1, backup);
-    await waitToolTipToBe("Child1Struct", driver);
+    await waitToolTipToBe("Child1", "Child1Struct", driver);
 
     // Modify className
     writeFileSync(child1, backup.replaceAll("Child1Struct", "Autre1Struct"));
-    await waitToolTipToBe("Error: type is missing", driver);
+    await waitToolTipToBe("Child1", "Error: type is missing", driver);
     writeFileSync(child1, backup.replaceAll("Autre1Struct", "Child1Sruct"));
-    await waitToolTipToBe("Child1Struct", driver);
+    await waitToolTipToBe("Child1", "Child1Struct", driver);
 
     //------------------------- Modify Godo -------------------------//
 
@@ -68,14 +67,14 @@ describe("Testing pan", () => {
       child1tscn,
       backup.replace('type="Child1Struct"', 'type="Sprite2D"')
     );
-    await waitDescriptionToBe("Sprite2D", driver);
+    await waitDescriptionToBe("Child1", "Sprite2D", driver);
     writeFileSync(
       child1tscn,
       backup.replace('type="Child1Struct"', 'type="Other"')
     );
-    await waitDescriptionToBe("Other", driver);
+    await waitDescriptionToBe("Child1", "Other", driver);
     writeFileSync(child1tscn, backup);
-    await waitDescriptionToBe("Child1Struct", driver);
+    await waitDescriptionToBe("Child1", "Child1Struct", driver);
 
     // remove file in godot
     rmSync(child1tscn);
@@ -94,22 +93,45 @@ describe("Testing pan", () => {
       2000,
       "Child 1 should be back"
     );
+
+    //------------------------- Switch class -------------------------//
+
+    await browser.openResources(join(rootPath, "src/other.rs"));
+    let child2 = (await pickItem("Child2"))!;
+    await child2.select();
+    await wb.executeCommand("Change Type GodotClass");
+    let inp = await InputBox.create();
+    await inp.selectQuickPick("child_2.tscn");
+    await waitDescriptionToBe("Child2", "Other", driver);
+
+    const notif = (await wb.getNotifications())![0];
+    expect(await notif.getMessage()).toEqual(
+      "Godot Scene File has been updated"
+    );
   });
 });
 
-const waitToolTipToBe = async (value: string, driver: WebDriver) => {
-  let was = await (await pickItem("Child1"))!.getTooltip();
+const waitToolTipToBe = async (
+  item: string,
+  value: string,
+  driver: WebDriver
+) => {
+  let was = await (await pickItem(item))!.getTooltip();
   await driver.wait(
-    async () => (await (await pickItem("Child1"))!.getTooltip()) === value,
+    async () => (await (await pickItem(item))!.getTooltip()) === value,
     2000,
     `Expect error: Tooltip should be changed to: "${value}" but was "${was}"`
   );
 };
 
-const waitDescriptionToBe = async (value: string, driver: WebDriver) => {
-  let was = await (await pickItem("Child1"))!.getTooltip();
+const waitDescriptionToBe = async (
+  item: string,
+  value: string,
+  driver: WebDriver
+) => {
+  let was = await (await pickItem(item))!.getTooltip();
   await driver.wait(
-    async () => (await (await pickItem("Child1"))!.getDescription()) === value,
+    async () => (await (await pickItem(item))!.getDescription()) === value,
     2000,
     `Expect error: Description should be changed to: "${value}" but was "${was}"`
   );

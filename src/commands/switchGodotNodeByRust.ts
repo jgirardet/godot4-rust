@@ -1,15 +1,52 @@
 import { open, writeFile } from "fs/promises";
 import { NodeItem } from "../panel/nodeItem";
-import { FullPathDir } from "../types";
 import { window } from "vscode";
 import { logger } from "../log";
+import { selectTscn } from "../ui/select";
+import { GodotManager } from "../panel/godotManager";
 
 export const switchGodotNodeByrust = async (
-  nodeItem: NodeItem,
-  godotDir: FullPathDir
+  manager: GodotManager,
+  nodeItem?: NodeItem
 ) => {
+  logger.info("Starting Change type");
+  if (!nodeItem) {
+    const tscn = await selectTscn(
+      Array.from(manager.treeData.data.keys()),
+      manager.godotDir,
+      {
+        canPickMany: false,
+        title: "Please select Scene file where to change Root Node's Type",
+      }
+    );
+    if (!tscn) {
+      logger.info("Aborting");
+      return;
+    }
+    nodeItem = manager.treeData.data.get(tscn);
+    if (!nodeItem) {
+      return;
+    }
+  }
+
+  if (!nodeItem?.isRoot) {
+    // should not happen since limited by when context
+    logger.warn("Only root Nodes can be switched in Scenes");
+    return;
+  }
+  await manager.rust.reload();
+
+  let gc = await manager.rust.TryGodoClassInEditor();
+  if (gc) {
+    nodeItem.rustModule = gc;
+  } else {
+    throw new Error(
+      "Need valid peristed godotclass module. Can't modify Tscn file"
+    );
+  }
+
   let attr = nodeItem.node.type!; // always ok with root
-  const tscn = nodeItem.tscn!.toAbs(godotDir);
+  const tscn = nodeItem.tscn!.toAbs(manager.godotDir);
   let res = [];
   let counter = 0;
 

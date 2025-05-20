@@ -36,7 +36,6 @@ export const setConfig = (rootPath: string, key: string, value: any) => {
   writeFileSync(setPath, JSON.stringify(settings), { encoding: "utf-8" });
 };
 
-
 interface SetupTestArgs {
   dirRust: string;
   dirGodot: string;
@@ -65,6 +64,10 @@ export const setupTest = ({
 
   return { rustPath, godotPath, settings, settingsPath, godotProject };
 };
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export interface SetupTest {
   rustPath: string;
