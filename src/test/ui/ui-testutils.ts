@@ -8,6 +8,7 @@ import {
   InputBox,
   OutputView,
   SideBarView,
+  TreeItem,
   ViewSection,
   VSBrowser,
   WebDriver,
@@ -122,6 +123,25 @@ export const initPanel = async (rootPath: string, driver: WebDriver) => {
     5000
   );
   return panel;
+};
+
+export const pickItem = async (
+  item: number | string,
+  panel?: ViewSection
+): Promise<TreeItem | undefined> => {
+  panel =
+    panel || (await new SideBarView().getContent().getSection(DISPLAY_NAME));
+  let items: TreeItem[] = (await panel.getVisibleItems()) as TreeItem[];
+  if (typeof item === "number") {
+    return items[0];
+  } else {
+    for (const i of items) {
+      if ((await i.getLabel()) === item) {
+        return i;
+      }
+    }
+  }
+  return;
 };
 
 export interface InitTest {

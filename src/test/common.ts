@@ -1,9 +1,8 @@
 import { cpSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
-import { join, resolve } from "path";
+import { isAbsolute, join, resolve } from "path";
 import { readUtf8Sync } from "../utils";
 import { NAME } from "../constantes";
-import { FullPathDir } from "../types";
 
 export const addGodotProjectPathSetting = (
   projectPath: string,
@@ -37,7 +36,6 @@ export const setConfig = (rootPath: string, key: string, value: any) => {
   writeFileSync(setPath, JSON.stringify(settings), { encoding: "utf-8" });
 };
 
-export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface SetupTestArgs {
   dirRust: string;
@@ -49,6 +47,12 @@ export const setupTest = ({
   dirGodot,
   setGodotPath = true,
 }: SetupTestArgs): SetupTest => {
+  if (!isAbsolute(dirRust)) {
+    dirRust = resolve(__filename, "../../../assets", dirRust);
+  }
+  if (!isAbsolute(dirGodot)) {
+    dirGodot = resolve(__filename, "../../../assets", dirGodot);
+  }
   let rustPath = cloneDirToTemp(dirRust);
   let godotPath = cloneDirToTemp(dirGodot);
   let godotProject = join(godotPath, "project.godot");
