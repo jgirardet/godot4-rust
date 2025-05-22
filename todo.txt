@@ -1,4 +1,10 @@
 
+bug parser :
+- not attribut (parenthses)
+
+
+parsing: ceck struct wihtout field
+
 
 
 Prochain en cours :

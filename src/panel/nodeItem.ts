@@ -69,6 +69,16 @@ export class NodeItem extends TreeItem {
     return this.node.parent?.value ?? "";
   }
 
+  get rootNode(): NodeItem {
+    let parent;
+    while (true) {
+      parent = this.parent;
+      if (parent?.isRoot) {
+        return parent;
+      }
+    }
+  }
+
   get type(): string {
     return (
       this.instanceType ||
