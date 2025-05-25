@@ -1,16 +1,14 @@
 
-bug parser :
-- test parse various attribute
-
-
-
 
 
 Prochain en cours :
+- inserton ready depuis panel
 _ code action rename
 - drag and drop
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 - switch undo /redo 
+-class renaming /doublon
+- documentation
 
 
 
@@ -43,11 +41,6 @@ doc:
 - panel
 - add godot class
 
-
-Rust parser  todo :
-Attribute: 
-    - fn call, method call
-    
 
 
 features du panel non testable: 
