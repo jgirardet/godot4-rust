@@ -50,7 +50,6 @@ macos.release.arm64 =    "res://../XXXXXX/target/release/libproJet_un_Deux.dylib
     await driver.sleep(1000);
     const dialog = new ModalDialog();
     await dialog.pushButton(`Name the new one ${newFile}`);
-    console.log(newFile);
     const fp = path.join(godotDir, newFile);
     assert(await fileExistsAsync(fp, driver), "new sould be created");
   });

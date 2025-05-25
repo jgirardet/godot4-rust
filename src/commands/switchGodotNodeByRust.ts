@@ -6,19 +6,15 @@ import { selectTscn } from "../ui/select";
 import { GodotManager } from "../panel/godotManager";
 
 export const switchGodotNodeByrust = async (
-  {rust, treeData, godotDir}: GodotManager,
+  { rust, treeData, godotDir }: GodotManager,
   nodeItem?: NodeItem
 ) => {
   logger.info("Starting Change type");
   if (!nodeItem) {
-    const tscn = await selectTscn(
-      Array.from(treeData.data.keys()),
-      godotDir,
-      {
-        canPickMany: false,
-        title: "Please select Scene file where to change Root Node's Type",
-      }
-    );
+    const tscn = await selectTscn(Array.from(treeData.data.keys()), godotDir, {
+      canPickMany: false,
+      title: "Please select Scene file where to change Root Node's Type",
+    });
     if (!tscn) {
       logger.info("Aborting");
       return;
@@ -36,7 +32,7 @@ export const switchGodotNodeByrust = async (
   }
   await rust.reload();
 
-  let gc = await rust.TryGodoClassInEditor();
+  let gc = await rust.TryStoredGodoClassInEditor();
   if (gc) {
     nodeItem.rustModule = gc;
   } else {
@@ -51,17 +47,16 @@ export const switchGodotNodeByrust = async (
   let counter = 0;
 
   for await (let line of (await open(tscn)).readLines()) {
-    if (counter === attr.startPosition.row) {
-      let start = line.slice(0, attr.startPosition.column);
-      let end = line.slice(attr.endPosition.column);
+    if (counter === attr.range.startPosition.row) {
+      let start = line.slice(0, attr.range.startPosition.column);
+      let end = line.slice(attr.range.endPosition.column);
       let slice = line.slice(
-        attr.startPosition.column,
-        attr.endPosition.column
+        attr.range.startPosition.column,
+        attr.range.endPosition.column
       );
       // double check, abort if not sure
       if (slice === `"${nodeItem.type}"`) {
-        console.log("meme type");
-        line = start + `"${nodeItem.rustModule!.className.value}"` + end; //mieux cracher que faire faux
+        line = start + `"${nodeItem.rustModule!.className}"` + end; //mieux cracher que faire faux
       } else {
         throw new Error(
           "There was a error, Godot Scene file has't been edited"

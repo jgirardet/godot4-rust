@@ -1,6 +1,5 @@
-import { Point } from "tree-sitter";
 import { GodotScene } from "./godotScene";
-import { Attribute, StringAttribute } from "../tree/types";
+import { ValueRanged, StringRanged, Ranged } from "../tree/types";
 
 export type Uid = string;
 export type ResPath = string;
@@ -12,20 +11,28 @@ export interface GDScene {
 }
 
 export interface ExtResource {
-  type: StringAttribute;
-  uid: StringAttribute;
-  path: StringAttribute;
-  id: StringAttribute;
+  type: StringRanged;
+  uid: StringRanged;
+  path: StringRanged;
+  id: StringRanged;
 }
 
-export interface Node {
-  name: StringAttribute;
-  type?: StringAttribute;
-  parent?: StringAttribute;
+export interface Node extends Ranged {
+  name: StringRanged;
+  type?: StringRanged;
+  parent?: StringRanged;
   instance?: ExtResourceAttribute;
 }
 
-
 export type GodotRes = GodotScene;
 
-export type ExtResourceAttribute = Attribute<ExtResource>;
+export type ExtResourceAttribute = ValueRanged<ExtResource>;
+
+export enum GodotKinds {
+  Gdscene,
+  ExtResource,
+  ExtResourceAttribute,
+  Node,
+  Literal,
+  Identifier,
+}

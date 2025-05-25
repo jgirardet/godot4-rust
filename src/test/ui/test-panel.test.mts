@@ -79,7 +79,6 @@ describe("Test Panel", () => {
     // remove file in godot
     rmSync(child1tscn);
     await driver.sleep(300);
-    console.log(await pickItem("Child1"));
     await driver.wait(
       async () => (await pickItem("Child1")) === undefined,
       2000,

@@ -1,9 +1,8 @@
 
 bug parser :
-- not attribut (parenthses)
+- test parse various attribute
 
 
-parsing: ceck struct wihtout field
 
 
 
@@ -43,6 +42,12 @@ configaration  à ajouter:
 doc:
 - panel
 - add godot class
+
+
+Rust parser  todo :
+Attribute: 
+    - fn call, method call
+    
 
 
 features du panel non testable: 

@@ -6,9 +6,11 @@ import {
   Node,
   ExtResourceAttribute,
   GDScene,
+  GodotKinds,
 } from "./types";
 import { ExtResourcesQuery, NodesQuery, UidQuery } from "../constantes";
-import { StringAttribute } from "../tree/types";
+import { StringRanged } from "../tree/types";
+import { getRange, mergeCaptures } from "../tree/parseutils";
 
 export class TscnParser extends TreeSitterParser {
   extResources: ExtResource[] = [];
@@ -54,7 +56,7 @@ export class TscnParser extends TreeSitterParser {
 
     // if matched, then are always not null then Unsafe is ok
     for (const z of q.matches(this.rootNode)) {
-      let node: Node = {
+      let node = {
         name: this._getStringAttributeUnsafe("name", z.captures),
       };
 
@@ -69,36 +71,53 @@ export class TscnParser extends TreeSitterParser {
       if (instance) {
         Object.assign(node, { instance: instance });
       }
+      let wholeRange = mergeCaptures(z.captures);
+      Object.assign(node, {
+        // range: getRange(this.rootNode),
+        range: {
+          startIndex: wholeRange.startIndex - 1,
+          endIndex: wholeRange.endIndex + 2,
+          startPosition: { ...wholeRange.startPosition, column: 0 },
+          endPosition: {
+            ...wholeRange.endPosition,
+            column: wholeRange.endPosition.column + 2,
+          },
+        } as Parser.Range,
 
-      this.nodes.push(node);
+        kind: GodotKinds.Node,
+      });
+
+      this.nodes.push(node as Node);
     }
     return this.nodes;
   }
-
 
   /// Warning: use only if key always is in capture
   _getStringAttributeUnsafe(
     key: string,
     captures: QueryCapture[]
-  ): StringAttribute {
+  ): StringRanged {
     const node = captures.find((a) => a.name === key)!.node;
     return {
-      startPosition: node.startPosition,
-      endPosition: node.endPosition,
-
-      value: this.tree.getText(node).replaceAll('"', ""),
+      range: getRange(node),
+      kind: GodotKinds.Literal,
+      value: node.text.replaceAll('"', ""),
     };
   }
 
   _getStringAttribute(
     key: string,
     captures: QueryCapture[]
-  ): StringAttribute | undefined {
-    let res = this._getAttribute<StringAttribute>(key, captures);
+  ): StringRanged | undefined {
+    let res = this._getAttribute<StringRanged>(key, captures);
     if (!res) {
       return;
     }
-    return { ...res, value: res.value.replaceAll('"', "") };
+    return {
+      ...res,
+      kind: GodotKinds.Literal,
+      value: res.value.replaceAll('"', ""),
+    };
   }
 
   /// Get a an instance, probably always a packedScene
@@ -110,10 +129,7 @@ export class TscnParser extends TreeSitterParser {
     if (!instance) {
       return;
     }
-    let constructor = this._getAttribute<StringAttribute>(
-      "constructor",
-      captures
-    ); // if instance => constructor and resUid always non null
+    let constructor = this._getAttribute<StringRanged>("constructor", captures); // if instance => constructor and resUid always non null
     if (!constructor || constructor.value !== "ExtResource") {
       return; // we don't support other cases, are there ?
     }
@@ -125,8 +141,8 @@ export class TscnParser extends TreeSitterParser {
     let attribute = instance.node.parent!; // always ok
     return {
       value: extRes,
-      startPosition: attribute.startPosition,
-      endPosition: attribute.endPosition,
+      range: getRange(attribute),
+      kind: GodotKinds.ExtResourceAttribute, //fix
     };
   }
 
@@ -136,8 +152,7 @@ export class TscnParser extends TreeSitterParser {
       return;
     }
     return {
-      startPosition: node.startPosition,
-      endPosition: node.endPosition,
+      range: getRange(node),
 
       value: this.tree.getText(node),
     } as T;

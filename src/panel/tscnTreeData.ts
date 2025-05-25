@@ -48,7 +48,7 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
             let serchedStruct = rust.modules.get(p.instanceType);
             if (serchedStruct) {
               p.iconPath = NodeItem.getGodotRustIconUri();
-              p.tooltip = serchedStruct.baseClass?.value;
+              p.tooltip = serchedStruct.baseClass;
             } else {
               if (p.type in GODOT_STRUCTS) {
                 p.tooltip = rootNodeItem.tooltip;

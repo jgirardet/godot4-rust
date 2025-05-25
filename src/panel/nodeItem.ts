@@ -2,13 +2,13 @@ import { GodotPath } from "../godot/godotPath";
 import { Node } from "../godot/types";
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
 import { GodotScene } from "../godot/godotScene";
-import { GodotModule, RustParsed } from "../rust/types";
 import { GODOT_STRUCTS } from "../godotClasses";
+import { StoredGodotClass } from "../rust/godoClass";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
   private _instanceType?: string;
-  rustModule?: GodotModule;
+  rustModule?: StoredGodotClass;
   collapsibleState = TreeItemCollapsibleState.Expanded; // Expanded makes alignemnt better
 
   tscn?: GodotPath;
@@ -21,7 +21,7 @@ export class NodeItem extends TreeItem {
 
     this.label = {
       label: node.name.value,
-      highlights: [], //[[0, node.name.value.length]],
+      highlights: [],
     };
     this.parent = parent;
     this.description = this.type;
@@ -124,14 +124,17 @@ export class NodeItem extends TreeItem {
     return parents.get(".")!.children;
   }
 
-  static createRoot(scene: GodotScene, rustStruct?: GodotModule): NodeItem {
+  static createRoot(
+    scene: GodotScene,
+    rustStruct?: StoredGodotClass
+  ): NodeItem {
     let root = new NodeItem(scene.rootNode);
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
     root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
     if (rustStruct) {
       root.iconPath = NodeItem.getGodotRustIconUri();
-      root.tooltip = rustStruct.className.value;
+      root.tooltip = rustStruct.className;
       root.rustModule = rustStruct;
       root.contextValue = root.contextValue += "-rust";
     } else if (!(root.type in GODOT_STRUCTS)) {

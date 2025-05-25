@@ -21,4 +21,3 @@ const loadFileQueries = (file: string) =>
 export const ExtResourcesQuery = loadFileQueries("resources.scm");
 export const NodesQuery = loadFileQueries("nodes.scm");
 export const UidQuery = loadFileQueries("uid.scm");
-export const godotModuleQuery = loadFileQueries("godotModule.scm");

@@ -1,10 +1,13 @@
-import { Point } from "tree-sitter";
+import { Range } from "tree-sitter";
 
-export interface Attribute<T> {
-  value: T;
-  startPosition: Point;
-  endPosition: Point;
+export type Rangeable = string | boolean | number | Ranged | {};
+
+export interface Ranged {
+  range: Range;
 }
 
-export type StringAttribute = Attribute<string>;
-export type BooleanAttribute = Attribute<Boolean>;
+export interface ValueRanged<T extends Rangeable> extends Ranged {
+  value: T;
+}
+
+export interface StringRanged extends ValueRanged<string> {}

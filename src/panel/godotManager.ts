@@ -109,7 +109,7 @@ export class GodotManager {
       return;
     }
     const file = editor?.document.fileName;
-    let godotClass = this.rust.getByPath(file)?.className.value;
+    let godotClass = this.rust.getByPath(file)?.className;
     if (!godotClass) {
       return;
     }
@@ -132,7 +132,7 @@ export class GodotManager {
         return;
       }
       nodeItem = Array.from(this.treeData.data, ([_, v]) => v).find(
-        (v) => v.rustModule?.path === doc.fileName
+        (v) => v.rustModule?.file === doc.fileName
       );
       if (!nodeItem) {
         return;
