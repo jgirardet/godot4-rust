@@ -83,8 +83,6 @@ export class TscnParser extends TreeSitterParser {
             column: wholeRange.endPosition.column + 2,
           },
         } as Parser.Range,
-
-        kind: GodotKinds.Node,
       });
 
       this.nodes.push(node as Node);
@@ -100,7 +98,6 @@ export class TscnParser extends TreeSitterParser {
     const node = captures.find((a) => a.name === key)!.node;
     return {
       range: getRange(node),
-      kind: GodotKinds.Literal,
       value: node.text.replaceAll('"', ""),
     };
   }
@@ -115,7 +112,6 @@ export class TscnParser extends TreeSitterParser {
     }
     return {
       ...res,
-      kind: GodotKinds.Literal,
       value: res.value.replaceAll('"', ""),
     };
   }
@@ -142,7 +138,6 @@ export class TscnParser extends TreeSitterParser {
     return {
       value: extRes,
       range: getRange(attribute),
-      kind: GodotKinds.ExtResourceAttribute, //fix
     };
   }
 
