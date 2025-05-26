@@ -65,17 +65,27 @@ export class NodeItem extends TreeItem {
     return this.node.name.value;
   }
 
-  get path(): string {
+  get basePath(): string {
     return this.node.parent?.value ?? "";
   }
 
+  get fullPath(): string {
+    return (this.basePath === "." ? "" : this.basePath + "/") + this.name;
+  }
+
   get rootNode(): NodeItem {
-    let parent;
+    if (this.isRoot) {
+      return this;
+    }
+    let parent = this.parent;
     while (true) {
-      parent = this.parent;
       if (parent?.isRoot) {
         return parent;
       }
+      if (!parent) {
+        throw new Error("Can't find root node");
+      }
+      parent = parent?.parent;
     }
   }
 
@@ -169,13 +179,6 @@ export class NodeItem extends TreeItem {
     );
   }
 }
-
-const revealChildren = (children: NodeItem[]) => {
-  for (const c of children) {
-    c.collapsibleState = TreeItemCollapsibleState.Expanded;
-    revealChildren(c.children);
-  }
-};
 
 const getFlatChildren = (children: NodeItem[], acc: NodeItem[]) => {
   for (const c of children) {

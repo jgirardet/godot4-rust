@@ -20,7 +20,7 @@ import { getConfigValue, registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
 import { RustManager } from "../rust/rustmanager";
 import { TscnTreeProvider } from "./tscnTreeData";
-import { insertOnready } from "../commands/insertOnready";
+import { insertOnReady } from "../commands/insertOnready";
 import { newGodotClass } from "../commands/newGodotClass";
 import { switchGodotNodeByrust } from "../commands/switchGodotNodeByRust";
 
@@ -104,43 +104,21 @@ export class GodotManager {
   }
 
   async reveal(editor?: TextEditor) {
-    editor = window.activeTextEditor;
-    if (!editor) {
-      return;
-    }
-    const file = editor?.document.fileName;
-    let godotClass = this.rust.getByPath(file)?.className;
-    if (!godotClass) {
-      return;
-    }
-    for (const [k, v] of this.treeData.data.entries()) {
-      if (v.type === godotClass) {
-        return this._reveal(v);
-      }
-    }
-
-    if (!editor) {
-      // aka manual launch
-      logger.info("No corresponding Godot Scene found");
+    let nodeItem = this.getActiveNodeItem(editor);
+    if (nodeItem) {
+      logger.info(`Revealing ${nodeItem.name} with type ${nodeItem.type}`);
+      await this.treeView.reveal(nodeItem, {
+        expand: true,
+        focus: true, // good scroll position
+      });
     }
   }
 
   async insertOnReady(nodeItem?: NodeItem) {
-    if (!nodeItem) {
-      let doc = window.activeTextEditor?.document;
-      if (!doc) {
-        return;
-      }
-      nodeItem = Array.from(this.treeData.data, ([_, v]) => v).find(
-        (v) => v.rustModule?.file === doc.fileName
-      );
-      if (!nodeItem) {
-        return;
-      }
+    nodeItem = nodeItem || this.getActiveNodeItem();
+    if (nodeItem) {
+      await insertOnReady(this, nodeItem);
     }
-
-    logger.info(`Insert OnReady: Using ${nodeItem}`);
-    await insertOnready(nodeItem);
   }
 
   async newGodotClass(nodeItem?: NodeItem) {
@@ -160,11 +138,14 @@ export class GodotManager {
     }
   }
 
-  async _reveal(node: NodeItem) {
-    logger.info(`Revealing ${node.name} with type ${node.type}`);
-    await this.treeView.reveal(node, {
-      expand: true,
-      focus: true, // good scroll position
-    });
+  getActiveNodeItem(editor?: TextEditor): NodeItem | undefined {
+    editor = editor || window.activeTextEditor;
+    let doc = editor?.document;
+    if (!doc) {
+      return;
+    }
+    return Array.from(this.treeData.data, ([_, v]) => v).find(
+      (v) => v.rustModule?.file === doc.fileName
+    );
   }
 }

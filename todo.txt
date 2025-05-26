@@ -3,13 +3,15 @@
 - fixier pub ou pub crate pour new godot class
 
 Prochain en cours :
-- inserton ready depuis panel
 _ code action rename
-- drag and drop
+- onready with non init/
+- preload
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 - switch undo /redo 
 -class renaming /doublon
 - documentation
+- check attribute godot path
+_ import après insert onready
 
 
 

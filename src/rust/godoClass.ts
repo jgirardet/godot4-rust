@@ -51,6 +51,10 @@ export class GodotClass implements Attributable {
     return this.struct.field(name);
   }
 
+  get fields(): Field[] {
+    return this.struct.value.fields;
+  }
+
   fieldAttributeArgValue(
     field: string,
     attribute: string,
