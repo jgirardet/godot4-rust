@@ -5,7 +5,7 @@ import {
   RelativePattern,
   TextEditor,
   TreeView,
-  TreeViewExpansionEvent,
+  TreeViewSelectionChangeEvent,
   Uri,
   window,
   workspace,
@@ -16,7 +16,11 @@ import { FullPathDir, FullPathFile } from "../types";
 import { AUTO_REPLACE_TSCN_KEY, NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { logger } from "../log";
-import { getConfigValue, registerGCommand } from "../vscodeUtils";
+import {
+  getConfigValue,
+  rangeToVsRange,
+  registerGCommand,
+} from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
 import { RustManager } from "../rust/rustmanager";
 import { TscnTreeProvider } from "./tscnTreeData";
@@ -44,7 +48,7 @@ export class GodotManager {
         treeDataProvider: this.treeData,
       })),
       // this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
-      this.treeView.onDidExpandElement(this.onChangeSelection.bind(this)),
+      this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
       //
       // watcher
       (this.watcher = workspace.createFileSystemWatcher(
@@ -84,7 +88,20 @@ export class GodotManager {
     return getGodotProjectDir(this.godotProjectFile);
   }
 
-  async onChangeSelection(e: TreeViewExpansionEvent<NodeItem>) {}
+  async onChangeSelection(e: TreeViewSelectionChangeEvent<NodeItem>) {
+    const nodeItem = e.selection.at(0);
+    if (nodeItem) {
+      if (nodeItem.isRoot) {
+        if (nodeItem.isRustStruct) {
+          const editor = await window.showTextDocument(
+            Uri.file(nodeItem.rustModule!.file), // checked with isRustStruct
+            { preview: false }
+          );
+          editor.revealRange(rangeToVsRange(nodeItem.rustModule!.struct.range));
+        }
+      }
+    }
+  }
 
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);

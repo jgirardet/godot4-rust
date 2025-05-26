@@ -1,11 +1,14 @@
+import { Point, Range } from "tree-sitter";
 import { NAME } from "./constantes";
 import { logger } from "./log";
 import {
   commands,
   Disposable,
+  Position,
   window,
   workspace,
   WorkspaceConfiguration,
+  Range as VsRange,
 } from "vscode";
 
 export const getProjectConfig = (): WorkspaceConfiguration => {
@@ -39,3 +42,15 @@ export const registerGCommand = (
     }
   );
 };
+
+//
+export function pointToPosition(point: Point): Position {
+  return new Position(point.row + 1, point.column + 1);
+}
+
+export function rangeToVsRange(range: Range): VsRange {
+  return new VsRange(
+    pointToPosition(range.startPosition),
+    pointToPosition(range.endPosition)
+  );
+}

@@ -36,6 +36,14 @@ describe("Test Panel", () => {
     const children = await aa.getChildren();
     expect(await children.at(1)?.getLabel()).toEqual(await aab.getLabel());
 
+    //------------------------- interact -------------------------//
+
+    await visibleItems[0].click();
+    driver.wait(async () => {
+      (await wb.getEditorView().getOpenEditorTitles()).at(0) === "Child1.rs";
+    });
+    await wb.getEditorView().closeAllEditors();
+
     //------------------------- Modify Rust -------------------------//
 
     expect(await (await pickItem("Child1"))!.getDescription()).toEqual(
