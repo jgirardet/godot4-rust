@@ -16,7 +16,8 @@ describe("TSCN Parser", () => {
       path.resolve("assets/GodotProject/Scenes/Main/main.tscn")
     );
     p.getExtResources();
-    expect(p.getNodes()).toEqual(nodes);
+    let rs = p.getNodes();
+    expect(rs).toEqual(nodes);
   });
   it("tscn gscene", async () => {
     let p = await TscnParser.file(
@@ -46,8 +47,8 @@ const extRes = [
   {
     type: {
       range: {
-        startIndex: 79,
-        endIndex: 90,
+        startIndex: 81,
+        endIndex: 92,
         startPosition: {
           row: 2,
           column: 19,
@@ -57,13 +58,12 @@ const extRes = [
           column: 30,
         },
       },
-
       value: "Texture2D",
     },
     uid: {
       range: {
-        startIndex: 95,
-        endIndex: 116,
+        startIndex: 97,
+        endIndex: 118,
         startPosition: {
           row: 2,
           column: 35,
@@ -73,13 +73,12 @@ const extRes = [
           column: 56,
         },
       },
-
       value: "uid://dycv01s4vud8g",
     },
     id: {
       range: {
-        startIndex: 149,
-        endIndex: 158,
+        startIndex: 151,
+        endIndex: 160,
         startPosition: {
           row: 2,
           column: 89,
@@ -89,13 +88,12 @@ const extRes = [
           column: 98,
         },
       },
-
       value: "1_lixft",
     },
     path: {
       range: {
-        startIndex: 122,
-        endIndex: 145,
+        startIndex: 124,
+        endIndex: 147,
         startPosition: {
           row: 2,
           column: 62,
@@ -105,15 +103,14 @@ const extRes = [
           column: 85,
         },
       },
-
       value: "res://assets/Gray.png",
     },
   },
   {
     type: {
       range: {
-        startIndex: 179,
-        endIndex: 194,
+        startIndex: 182,
+        endIndex: 197,
         startPosition: {
           row: 3,
           column: 19,
@@ -123,13 +120,12 @@ const extRes = [
           column: 34,
         },
       },
-
       value: "LabelSettings",
     },
     uid: {
       range: {
-        startIndex: 199,
-        endIndex: 220,
+        startIndex: 202,
+        endIndex: 223,
         startPosition: {
           row: 3,
           column: 39,
@@ -139,13 +135,12 @@ const extRes = [
           column: 60,
         },
       },
-
       value: "uid://b0kponm3gbkqq",
     },
     id: {
       range: {
-        startIndex: 266,
-        endIndex: 275,
+        startIndex: 269,
+        endIndex: 278,
         startPosition: {
           row: 3,
           column: 106,
@@ -155,13 +150,12 @@ const extRes = [
           column: 115,
         },
       },
-
       value: "2_qw60k",
     },
     path: {
       range: {
-        startIndex: 226,
-        endIndex: 262,
+        startIndex: 229,
+        endIndex: 265,
         startPosition: {
           row: 3,
           column: 66,
@@ -171,15 +165,14 @@ const extRes = [
           column: 102,
         },
       },
-
       value: "res://Resources/MainTitleFont.tres",
     },
   },
   {
     type: {
       range: {
-        startIndex: 296,
-        endIndex: 309,
+        startIndex: 300,
+        endIndex: 313,
         startPosition: {
           row: 4,
           column: 19,
@@ -189,13 +182,12 @@ const extRes = [
           column: 32,
         },
       },
-
       value: "PackedScene",
     },
     uid: {
       range: {
-        startIndex: 314,
-        endIndex: 334,
+        startIndex: 318,
+        endIndex: 338,
         startPosition: {
           row: 4,
           column: 37,
@@ -205,13 +197,12 @@ const extRes = [
           column: 57,
         },
       },
-
       value: "uid://jt3wvha7tsv3",
     },
     id: {
       range: {
-        startIndex: 393,
-        endIndex: 402,
+        startIndex: 397,
+        endIndex: 406,
         startPosition: {
           row: 4,
           column: 116,
@@ -221,13 +212,12 @@ const extRes = [
           column: 125,
         },
       },
-
       value: "3_qw60k",
     },
     path: {
       range: {
-        startIndex: 340,
-        endIndex: 389,
+        startIndex: 344,
+        endIndex: 393,
         startPosition: {
           row: 4,
           column: 63,
@@ -237,18 +227,16 @@ const extRes = [
           column: 112,
         },
       },
-
       value: "res://Scenes/Main/LevelButton/level_button.tscn",
     },
   },
 ];
-
 const nodes = [
   {
     name: {
       range: {
-        startIndex: 480,
-        endIndex: 486,
+        startIndex: 487,
+        endIndex: 493,
         startPosition: {
           row: 7,
           column: 11,
@@ -258,13 +246,12 @@ const nodes = [
           column: 17,
         },
       },
-
       value: "Main",
     },
     type: {
       range: {
-        startIndex: 492,
-        endIndex: 503,
+        startIndex: 499,
+        endIndex: 510,
         startPosition: {
           row: 7,
           column: 23,
@@ -277,23 +264,23 @@ const nodes = [
       value: "MainScene",
     },
     range: {
-      startIndex: 469,
-      endIndex: 505,
+      startIndex: 476,
+      endIndex: 613,
       startPosition: {
         row: 7,
         column: 0,
       },
       endPosition: {
-        row: 7,
-        column: 36,
+        row: 12,
+        column: 17,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 614,
-        endIndex: 627,
+        startIndex: 628,
+        endIndex: 641,
         startPosition: {
           row: 14,
           column: 11,
@@ -303,13 +290,12 @@ const nodes = [
           column: 24,
         },
       },
-
       value: "TextureRect",
     },
     type: {
       range: {
-        startIndex: 633,
-        endIndex: 646,
+        startIndex: 647,
+        endIndex: 660,
         startPosition: {
           row: 14,
           column: 30,
@@ -323,8 +309,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 654,
-        endIndex: 657,
+        startIndex: 668,
+        endIndex: 671,
         startPosition: {
           row: 14,
           column: 51,
@@ -337,23 +323,23 @@ const nodes = [
       value: ".",
     },
     range: {
-      startIndex: 603,
-      endIndex: 659,
+      startIndex: 617,
+      endIndex: 843,
       startPosition: {
         row: 14,
         column: 0,
       },
       endPosition: {
-        row: 14,
-        column: 56,
+        row: 22,
+        column: 16,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 834,
-        endIndex: 838,
+        startIndex: 858,
+        endIndex: 862,
         startPosition: {
           row: 24,
           column: 11,
@@ -363,13 +349,12 @@ const nodes = [
           column: 15,
         },
       },
-
       value: "MC",
     },
     type: {
       range: {
-        startIndex: 844,
-        endIndex: 861,
+        startIndex: 868,
+        endIndex: 885,
         startPosition: {
           row: 24,
           column: 21,
@@ -383,8 +368,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 869,
-        endIndex: 872,
+        startIndex: 893,
+        endIndex: 896,
         startPosition: {
           row: 24,
           column: 46,
@@ -397,23 +382,23 @@ const nodes = [
       value: ".",
     },
     range: {
-      startIndex: 823,
-      endIndex: 874,
+      startIndex: 847,
+      endIndex: 1190,
       startPosition: {
         row: 24,
         column: 0,
       },
       endPosition: {
-        row: 24,
-        column: 51,
+        row: 34,
+        column: 43,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 1169,
-        endIndex: 1173,
+        startIndex: 1205,
+        endIndex: 1209,
         startPosition: {
           row: 36,
           column: 11,
@@ -423,13 +408,12 @@ const nodes = [
           column: 15,
         },
       },
-
       value: "VB",
     },
     type: {
       range: {
-        startIndex: 1179,
-        endIndex: 1194,
+        startIndex: 1215,
+        endIndex: 1230,
         startPosition: {
           row: 36,
           column: 21,
@@ -443,8 +427,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 1202,
-        endIndex: 1206,
+        startIndex: 1238,
+        endIndex: 1242,
         startPosition: {
           row: 36,
           column: 44,
@@ -457,23 +441,23 @@ const nodes = [
       value: "MC",
     },
     range: {
-      startIndex: 1158,
-      endIndex: 1208,
+      startIndex: 1194,
+      endIndex: 1260,
       startPosition: {
         row: 36,
         column: 0,
       },
       endPosition: {
-        row: 36,
-        column: 50,
+        row: 37,
+        column: 15,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 1236,
-        endIndex: 1243,
+        startIndex: 1275,
+        endIndex: 1282,
         startPosition: {
           row: 39,
           column: 11,
@@ -483,13 +467,12 @@ const nodes = [
           column: 18,
         },
       },
-
       value: "Label",
     },
     type: {
       range: {
-        startIndex: 1249,
-        endIndex: 1256,
+        startIndex: 1288,
+        endIndex: 1295,
         startPosition: {
           row: 39,
           column: 24,
@@ -503,8 +486,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 1264,
-        endIndex: 1271,
+        startIndex: 1303,
+        endIndex: 1310,
         startPosition: {
           row: 39,
           column: 39,
@@ -517,23 +500,23 @@ const nodes = [
       value: "MC/VB",
     },
     range: {
-      startIndex: 1225,
-      endIndex: 1273,
+      startIndex: 1264,
+      endIndex: 1440,
       startPosition: {
         row: 39,
         column: 0,
       },
       endPosition: {
-        row: 39,
-        column: 48,
+        row: 44,
+        column: 22,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 1409,
-        endIndex: 1415,
+        startIndex: 1455,
+        endIndex: 1461,
         startPosition: {
           row: 46,
           column: 11,
@@ -543,13 +526,12 @@ const nodes = [
           column: 17,
         },
       },
-
       value: "Grid",
     },
     type: {
       range: {
-        startIndex: 1421,
-        endIndex: 1436,
+        startIndex: 1467,
+        endIndex: 1482,
         startPosition: {
           row: 46,
           column: 23,
@@ -563,8 +545,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 1444,
-        endIndex: 1451,
+        startIndex: 1490,
+        endIndex: 1497,
         startPosition: {
           row: 46,
           column: 46,
@@ -577,23 +559,23 @@ const nodes = [
       value: "MC/VB",
     },
     range: {
-      startIndex: 1398,
-      endIndex: 1453,
+      startIndex: 1444,
+      endIndex: 1553,
       startPosition: {
         row: 46,
         column: 0,
       },
       endPosition: {
-        row: 46,
-        column: 55,
+        row: 49,
+        column: 11,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 1517,
-        endIndex: 1522,
+        startIndex: 1568,
+        endIndex: 1573,
         startPosition: {
           row: 51,
           column: 11,
@@ -603,13 +585,12 @@ const nodes = [
           column: 16,
         },
       },
-
       value: "Lev",
     },
     parent: {
       range: {
-        startIndex: 1530,
-        endIndex: 1533,
+        startIndex: 1581,
+        endIndex: 1584,
         startPosition: {
           row: 51,
           column: 24,
@@ -625,8 +606,8 @@ const nodes = [
       value: {
         type: {
           range: {
-            startIndex: 296,
-            endIndex: 309,
+            startIndex: 300,
+            endIndex: 313,
             startPosition: {
               row: 4,
               column: 19,
@@ -636,13 +617,12 @@ const nodes = [
               column: 32,
             },
           },
-
           value: "PackedScene",
         },
         uid: {
           range: {
-            startIndex: 314,
-            endIndex: 334,
+            startIndex: 318,
+            endIndex: 338,
             startPosition: {
               row: 4,
               column: 37,
@@ -652,13 +632,12 @@ const nodes = [
               column: 57,
             },
           },
-
           value: "uid://jt3wvha7tsv3",
         },
         id: {
           range: {
-            startIndex: 393,
-            endIndex: 402,
+            startIndex: 397,
+            endIndex: 406,
             startPosition: {
               row: 4,
               column: 116,
@@ -668,13 +647,12 @@ const nodes = [
               column: 125,
             },
           },
-
           value: "3_qw60k",
         },
         path: {
           range: {
-            startIndex: 340,
-            endIndex: 389,
+            startIndex: 344,
+            endIndex: 393,
             startPosition: {
               row: 4,
               column: 63,
@@ -684,13 +662,12 @@ const nodes = [
               column: 112,
             },
           },
-
           value: "res://Scenes/Main/LevelButton/level_button.tscn",
         },
       },
       range: {
-        startIndex: 1534,
-        endIndex: 1565,
+        startIndex: 1585,
+        endIndex: 1616,
         startPosition: {
           row: 51,
           column: 28,
@@ -702,23 +679,23 @@ const nodes = [
       },
     },
     range: {
-      startIndex: 1506,
-      endIndex: 1566,
+      startIndex: 1557,
+      endIndex: 1677,
       startPosition: {
         row: 51,
         column: 0,
       },
       endPosition: {
-        row: 51,
-        column: 60,
+        row: 54,
+        column: 20,
       },
     },
   },
   {
     name: {
       range: {
-        startIndex: 1636,
-        endIndex: 1643,
+        startIndex: 1692,
+        endIndex: 1699,
         startPosition: {
           row: 56,
           column: 11,
@@ -728,13 +705,12 @@ const nodes = [
           column: 18,
         },
       },
-
       value: "Level",
     },
     type: {
       range: {
-        startIndex: 1649,
-        endIndex: 1656,
+        startIndex: 1705,
+        endIndex: 1712,
         startPosition: {
           row: 56,
           column: 24,
@@ -748,8 +724,8 @@ const nodes = [
     },
     parent: {
       range: {
-        startIndex: 1664,
-        endIndex: 1667,
+        startIndex: 1720,
+        endIndex: 1723,
         startPosition: {
           row: 56,
           column: 39,
@@ -762,15 +738,15 @@ const nodes = [
       value: ".",
     },
     range: {
-      startIndex: 1625,
-      endIndex: 1669,
+      startIndex: 1681,
+      endIndex: 1724,
       startPosition: {
         row: 56,
         column: 0,
       },
       endPosition: {
         row: 56,
-        column: 44,
+        column: 43,
       },
     },
   },

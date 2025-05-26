@@ -71,18 +71,9 @@ export class TscnParser extends TreeSitterParser {
       if (instance) {
         Object.assign(node, { instance: instance });
       }
-      let wholeRange = mergeCaptures(z.captures);
       Object.assign(node, {
         // range: getRange(this.rootNode),
-        range: {
-          startIndex: wholeRange.startIndex - 1,
-          endIndex: wholeRange.endIndex + 2,
-          startPosition: { ...wholeRange.startPosition, column: 0 },
-          endPosition: {
-            ...wholeRange.endPosition,
-            column: wholeRange.endPosition.column + 2,
-          },
-        } as Parser.Range,
+        range: getRange(z.captures[0].node),
       });
 
       this.nodes.push(node as Node);
