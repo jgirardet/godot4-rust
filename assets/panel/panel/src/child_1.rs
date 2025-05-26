@@ -7,10 +7,6 @@ use godot::{
 #[class(base=Node2D,init)]
 pub struct Child1Struct {
     base: Base<Node2D>,
-    #[init(node = "AChild1/AAChild1")]
-    a_a_child_1: OnReady<Gd<Camera2D>>,
-    #[init(node = "AChild1/AAChild1/AAAChild1")]
-    a_a_a_child_1: OnReady<Gd<Sprite2D>>,
 }
 
 #[godot_api]

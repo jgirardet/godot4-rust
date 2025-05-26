@@ -1,43 +1,45 @@
-import * as vscode from "vscode";
 import { onready_snippet } from "../snippets";
 import { logger } from "../log";
-import { selectNode, selectNodes, selectTscn } from "../ui/select";
-import {
-  getGodotProjectDir,
-  getGodotProjectFile,
-  listTscnFiles,
-} from "../godotProject";
-import { TscnParser } from "../godot/parser";
-import path from "path";
-import { Node } from "../godot/types";
+import { selectNode } from "../ui/select";
+import { NodeItem } from "../panel/nodeItem";
+import { commands, SnippetString, window } from "vscode";
 
-export const insertOnready = async () => {
-  let gpf = getGodotProjectFile();
-  let gpd = getGodotProjectDir(gpf);
-  const tscnFiles = listTscnFiles(gpf);
-  const tscn = await selectTscn(tscnFiles, gpd);
-  if (!tscn) {
-    return;
+export const insertOnready = async (node: NodeItem) => {
+  let nodePicked;
+  if (node.isRoot) {
+    nodePicked = await selectNode(node);
+    if (!nodePicked) {
+      return;
+    }
+  } else {
+    nodePicked = node;
   }
-
-  let nodes = (await TscnParser.file(path.resolve(tscn))).parse().nodes;
-
-  const nodePicked = (await selectNode(nodes)) as Node | undefined;
-  if (!nodePicked) {
-    return;
-  }
-  logger.info(`Node selected: \"${nodePicked.parent?.value}\"`);
+  logger.info(`Node selected: \"${nodePicked.name}\"`);
   let onreadsnip = onready_snippet(nodePicked);
 
   if (
-    !vscode.window.activeTextEditor?.document.lineAt(
-      vscode.window.activeTextEditor.selection.active
+    !window.activeTextEditor?.document.lineAt(
+      window.activeTextEditor.selection.active
     ).isEmptyOrWhitespace
   ) {
-    await vscode.commands.executeCommand("editor.action.insertLineAfter");
+    await commands.executeCommand("editor.action.insertLineAfter");
   }
 
-  vscode.window.activeTextEditor?.insertSnippet(
-    new vscode.SnippetString(onreadsnip.join("\n"))
+  window.activeTextEditor?.insertSnippet(
+    new SnippetString(onreadsnip.join("\n"))
   );
 };
+
+// async function insertOnReady2(nodeItem: NodeItem, manager: GodotManager) {
+//   let rootNode = nodeItem.rootNode;
+//   let editorPath = window.activeTextEditor?.document.fileName;
+//   if (!editorPath) {
+//     throw new Error("No editor opened");
+//   }
+//   let rustModule = manager.rust.getByPath(editorPath);
+//   if (!rustModule) {
+//     throw new Error("Active not know as Godot Rust module");
+//   }
+
+//   // il faut parser fields pour les toper et les modifiers éventeielel
+// }

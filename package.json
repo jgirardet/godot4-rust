@@ -19,6 +19,9 @@
     "workspaceContains:*/Cargo.toml"
   ],
   "main": "./out/extension.js",
+  "enabledApiProposals": [
+    "treeViewActiveItem"
+  ],
   "contributes": {
     "views": {
       "explorer": [
@@ -62,6 +65,11 @@
         "command": "godot4-rust.refresh",
         "title": "Godot4-Rust: Refresh panel",
         "enablement": "godot4-rust.project_set"
+      },
+      {
+        "command": "godot4-rust.replaceBaseClass",
+        "title": "Godot4-Rust: Change Type with GodotClass in active Editor",
+        "enablement": "godot4-rust.project_set"
       }
     ],
     "menus": {
@@ -76,6 +84,14 @@
         {
           "when": "view == godot4-rust && viewItem =~ /^root$/",
           "command": "godot4-rust.newGodotClass"
+        },
+        {
+          "when": "view == godot4-rust && viewItem =~ /^root/ && editorIsOpen",
+          "command": "godot4-rust.replaceBaseClass"
+        },
+        {
+          "when": "view == godot4-rust && viewItem =~ /^child$/",
+          "command": "godot4-rust.insertOnReady"
         }
       ]
     },
@@ -86,6 +102,11 @@
           "description": "The path to .godot project file",
           "type": "string",
           "default": null
+        },
+        "godot4-rust.autoReplaceInTscn": {
+          "description": "Auto replace Root Godot Node by Rust Godoclass after a new godotclass is generated",
+          "type": "boolean",
+          "default": false
         }
       }
     }
@@ -98,11 +119,14 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
+    "compileScripts": "tsc -p scripts/tsconfig.json",
+    "buildGodotClasses": "node scripts/out/buildGodotClasses.js",
     "clearTmp": "node ./out/test/testutils.js",
     "unit-test": "mocha out/test/unit",
+    "vscode-test": "node out/test/vscode/runTests.js",
     "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
-    "ui-testone": "extest run-tests './out/test/ui/testCHANGE*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
+    "ui-testone": "extest run-tests --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",
@@ -116,6 +140,7 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
+    "cheerio": "^1.0.0",
     "earl": "^1.3.0",
     "eslint": "^9.25.1",
     "mitata": "^1.0.34",

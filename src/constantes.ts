@@ -4,6 +4,7 @@ import path from "path";
 export const NAME = "godot4-rust";
 export const DISPLAY_NAME = "Godot4 Rust";
 export const GODOT_PROJECT_FILEPATH_KEY = "godotProjectFilePath";
+export const AUTO_REPLACE_TSCN_KEY = "autoReplaceInTscn";
 
 export interface GodotSettings {
   "godot4-rust.godotProjectFilePath": string;
@@ -20,4 +21,3 @@ const loadFileQueries = (file: string) =>
 export const ExtResourcesQuery = loadFileQueries("resources.scm");
 export const NodesQuery = loadFileQueries("nodes.scm");
 export const UidQuery = loadFileQueries("uid.scm");
-export const godotModuleQuery = loadFileQueries("godotModule.scm");

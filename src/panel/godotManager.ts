@@ -1,33 +1,28 @@
 import {
   commands,
-  Event,
-  EventEmitter,
   ExtensionContext,
   FileSystemWatcher,
-  ProviderResult,
   RelativePattern,
   TextEditor,
-  TreeDataProvider,
-  TreeItem,
   TreeView,
   TreeViewExpansionEvent,
-  TreeViewSelectionChangeEvent,
   Uri,
   window,
   workspace,
 } from "vscode";
+
 import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
-import { NAME } from "../constantes";
+import { AUTO_REPLACE_TSCN_KEY, NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
-import { GodotScene } from "../godot/godotScene";
 import { logger } from "../log";
-import { registerGCommand } from "../vscodeUtils";
+import { getConfigValue, registerGCommand } from "../vscodeUtils";
 import { getGodotProjectDir } from "../utils";
-import { RustFiles, RustManager } from "../rust/rustmanager";
-import { GodotPath } from "../godot/godotPath";
-import path from "path";
+import { RustManager } from "../rust/rustmanager";
 import { TscnTreeProvider } from "./tscnTreeData";
+import { insertOnready } from "../commands/insertOnready";
+import { newGodotClass } from "../commands/newGodotClass";
+import { switchGodotNodeByrust } from "../commands/switchGodotNodeByRust";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -62,9 +57,16 @@ export class GodotManager {
       // commands
       registerGCommand(`reveal`, this.reveal.bind(this)),
       registerGCommand(`refresh`, this.reload.bind(this)),
+      registerGCommand("insertOnReady", this.insertOnReady.bind(this)),
+      registerGCommand("newGodotClass", this.newGodotClass.bind(this)),
+      registerGCommand("replaceBaseClass", this.replaceBaseClass.bind(this)),
 
       // connect signals
-      window.onDidChangeActiveTextEditor(this.reveal.bind(this))
+      window.onDidChangeActiveTextEditor(this.reveal.bind(this)),
+      this.rust.onRustFilesChanged(async () => {
+        logger.info("Rust content changed, reloading panel");
+        this.reload();
+      })
     );
 
     this.rust
@@ -72,6 +74,7 @@ export class GodotManager {
       .then(this.reload.bind(this))
       .then(() =>
         commands.executeCommand("godot4-rust.resetViewLocation").then(() => {
+          commands.executeCommand("godot4-rust.reveal");
           logger.info("Godot Manager Loaded");
         })
       );
@@ -94,7 +97,6 @@ export class GodotManager {
     const scenes = await this.loader.onChange(file.fsPath, true);
     this.treeData.updateData(scenes, this.rust);
   }
-
 
   async reload() {
     const scenes = await this.loader.reload();
@@ -123,10 +125,39 @@ export class GodotManager {
     }
   }
 
-  async collapseAll() {
-    return commands.executeCommand(
-      `workbench.actions.treeView.${NAME}.collapseAll`
-    );
+  async insertOnReady(nodeItem?: NodeItem) {
+    if (!nodeItem) {
+      let doc = window.activeTextEditor?.document;
+      if (!doc) {
+        return;
+      }
+      nodeItem = Array.from(this.treeData.data, ([_, v]) => v).find(
+        (v) => v.rustModule?.file === doc.fileName
+      );
+      if (!nodeItem) {
+        return;
+      }
+    }
+
+    logger.info(`Insert OnReady: Using ${nodeItem}`);
+    await insertOnready(nodeItem);
+  }
+
+  async newGodotClass(nodeItem?: NodeItem) {
+    nodeItem = await newGodotClass(this, nodeItem);
+    if (getConfigValue<boolean>(AUTO_REPLACE_TSCN_KEY)) {
+      await commands.executeCommand("godot4-rust.replaceBaseClass", nodeItem);
+    }
+  }
+
+  async replaceBaseClass(nodeItem?: NodeItem) {
+    try {
+      await switchGodotNodeByrust(this, nodeItem);
+      logger.info("Change Type complete");
+    } catch (e: any) {
+      await this.reload();
+      throw e;
+    }
   }
 
   async _reveal(node: NodeItem) {

@@ -1,7 +1,7 @@
 import { QuickPickItem, QuickPickOptions, window } from "vscode";
 import { FullPathDir, FullPathFile } from "../types";
 import { logger } from "../log";
-import { Node } from "../godot/types";
+import { NodeItem } from "../panel/nodeItem";
 
 export const selectTscn = async (
   tscnFiles: FullPathFile[],
@@ -32,12 +32,12 @@ export const selectTscn = async (
 };
 
 export const selectNode = async (
-  nodes: Node[],
+  node: NodeItem,
   options?: QuickPickOptions
-): Promise<Node | undefined> => {
-  const picks = nodes.slice(1).map((n) => new NodeQuickPickItem(n));
+): Promise<NodeItem | undefined> => {
+  const picks = node.flatChildren.map((n) => new NodeQuickPickItem(n));
   const selected = await window.showQuickPick(picks, {
-    title: `Nodes of ${nodes[0].name.value}`,
+    title: `Nodes of ${node.label}`,
     ...options,
   });
   if (selected === undefined) {
@@ -49,12 +49,12 @@ export const selectNode = async (
 };
 
 export const selectNodes = async (
-  nodes: Node[],
+  node: NodeItem,
   options?: QuickPickOptions
-): Promise<Node[] | undefined> => {
-  const picks = nodes.slice(1).map((n) => new NodeQuickPickItem(n));
+): Promise<NodeItem[] | undefined> => {
+  const picks = node.flatChildren.map((n) => new NodeQuickPickItem(n));
   const selected = (await window.showQuickPick(picks, {
-    title: `Nodes of ${nodes[0].name}`,
+    title: `Nodes of ${node.name}`,
     canPickMany: true,
     ...options,
   })) as NodeQuickPickItem[] | undefined;
@@ -68,13 +68,12 @@ export const selectNodes = async (
 
 class NodeQuickPickItem implements QuickPickItem {
   label: string;
-  node: Node;
-  constructor(node: Node) {
+  node: NodeItem;
+  constructor(node: NodeItem) {
     this.node = node;
-    let nb_sub = node.parent?.value.split("/").length || 0;
+    let nb_sub = node.path.split("/").length || 0;
     this.label = `${"-".repeat(nb_sub * 4)}> ${
-      (node.parent?.value === "." ? "" : node.parent?.value + "/") +
-      node.name.value
-    }  (${node.type?.value})`;
+      (node.path === "." ? "" : node.parent?.name + "/") + node.name
+    }  (${node.description})`;
   }
 }

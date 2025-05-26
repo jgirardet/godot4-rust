@@ -6,13 +6,14 @@ import {
   ProviderResult,
 } from "vscode";
 import { NodeItem } from "./nodeItem";
-import { FullPathDir } from "../types";
+import { FullPathDir, FullPathFile } from "../types";
 import { GodotScene } from "../godot/godotScene";
 import { RustManager } from "../rust/rustmanager";
 import { GodotPath } from "../godot/godotPath";
+import { GODOT_STRUCTS } from "../godotClasses";
 
 export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
-  data: Map<string, NodeItem> = new Map();
+  data: Map<FullPathFile, NodeItem> = new Map();
 
   treeChanged = new EventEmitter<
     void | NodeItem | NodeItem[] | null | undefined
@@ -46,11 +47,15 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
             p.instanceType = rootNodeItem.type;
             let serchedStruct = rust.modules.get(p.instanceType);
             if (serchedStruct) {
-              p.iconPath = NodeItem.getGodotRustIcon();
+              p.iconPath = NodeItem.getGodotRustIconUri();
               p.tooltip = serchedStruct.baseClass;
             } else {
-              p.tooltip = rootNodeItem.tooltip;
-              p.iconPath = rootNodeItem.iconPath;
+              if (p.type in GODOT_STRUCTS) {
+                p.tooltip = rootNodeItem.tooltip;
+                p.iconPath = rootNodeItem.iconPath;
+              } else {
+                p.setMissing();
+              }
             }
           }
         }

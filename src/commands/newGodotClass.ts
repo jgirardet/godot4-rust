@@ -9,24 +9,21 @@ import {
   onready_snippet,
 } from "../snippets";
 import { logger } from "../log";
-import { GODOT_CLASSES } from "../godot/godotClasses";
 import path from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
-import {
-  getGodotProjectDir,
-  getGodotProjectFile,
-  listTscnFiles,
-} from "../godotProject";
+import { getGodotProjectDir, getGodotProjectFile } from "../godotProject";
 import { selectNodes, selectTscn } from "../ui/select";
-import { TscnParser } from "../godot/parser";
 import { QuickPickItem } from "vscode";
-import { Node } from "../godot/types";
 import { NodeItem } from "../panel/nodeItem";
 import { applyCodeActionNamed } from "../rust/utils";
+import { GodotManager } from "../panel/godotManager";
 
-export const newGodotClass = async (item?: NodeItem) => {
-  if (item && !item.isRoot) {
+export const newGodotClass = async (
+  { treeData, rust }: GodotManager,
+  nodeItem?: NodeItem
+): Promise<NodeItem | undefined> => {
+  if (nodeItem && !nodeItem.isRoot) {
     logger.warn("Only root nodes can be derived, aborting");
     return;
   }
@@ -40,16 +37,20 @@ export const newGodotClass = async (item?: NodeItem) => {
 
   let gpf = getGodotProjectFile();
   let gpd = getGodotProjectDir(gpf);
-  let selectedTscn = item?.tscn?.toAbs(gpd);
+  let selectedTscn = nodeItem?.tscn?.toAbs(gpd);
   if (!selectedTscn) {
-    const tscnFiles = listTscnFiles(gpf);
+    const tscnFiles = [...treeData.data.keys()];
     selectedTscn = await selectTscn(tscnFiles, gpd);
     if (!selectedTscn) {
       return;
     }
+    nodeItem = treeData.data.get(selectedTscn);
   }
-
-  let nodes = (await TscnParser.file(path.resolve(selectedTscn))).parse().nodes;
+  if (!nodeItem) {
+    logger.error("No nodeItem found for new class, but should have...");
+    logger.info(treeData.data);
+    return;
+  }
 
   const methods = buildMethodsList();
   const pickedMethod = await pickMethods(methods);
@@ -57,21 +58,27 @@ export const newGodotClass = async (item?: NodeItem) => {
     logger.info("New Godot Class command: aborting");
     return;
   }
-  const pickedOnready = await pickOnReady(nodes);
+  const pickedOnready = await pickOnReady(nodeItem);
   if (pickedOnready === undefined) {
     logger.info("New Godot Class command: aborting");
     return;
   }
 
-  const snippet = build_snippet(nodes[0], pickedMethod, pickedOnready);
+  const snippet = build_snippet(nodeItem, pickedMethod, pickedOnready);
 
   let editor: vscode.TextEditor | undefined;
+  let newFile;
   if (persistFile === "Yes") {
-    let newFile = await persist(selectedTscn, snippet);
-    if (newFile === undefined) {
+    newFile = await persist(selectedTscn, snippet);
+    if (!newFile) {
       return;
     }
     editor = await vscode.window.showTextDocument(newFile);
+    const rustStruct = await rust.tryGodotClass(newFile);
+    if (rustStruct) {
+      nodeItem.rustModule = rustStruct;
+      return nodeItem;
+    }
   } else {
     editor = vscode.window.activeTextEditor;
     if (editor === undefined) {
@@ -79,13 +86,6 @@ export const newGodotClass = async (item?: NodeItem) => {
     }
     await editor.insertSnippet(new vscode.SnippetString(snippet));
   }
-
-  await insertRustMod(
-    editor,
-    path.basename(editor.document.fileName).replace(".rs", "")
-  );
-  await vscode.commands.executeCommand("editor.action.formatDocument");
-  vscode.window.showTextDocument(editor.document);
 };
 
 const prepicked = ["ready", "process"];
@@ -108,29 +108,30 @@ const pickMethods = async (
   return choices;
 };
 
-const pickOnReady = async (nodes: Node[]): Promise<Node[] | undefined> => {
-  let choices = (await selectNodes(nodes, {
+const pickOnReady = async (
+  nodeItem: NodeItem
+): Promise<NodeItem[] | undefined> => {
+  let choices = (await selectNodes(nodeItem, {
     canPickMany: true,
     title: "Select OnReady field to add",
-  })) as Node[] | undefined; // pick many
+  })) as NodeItem[] | undefined; // pick many
   logger.info(choices);
   return choices;
 };
 
 const build_snippet = (
-  rootNode: Node,
+  nodeItem: NodeItem,
   methods: NodeMethodQuickItem[],
-  onReadys: Node[]
+  onReadys: NodeItem[]
 ): string => {
   const onreadysImports = onReadys
-    .filter(
-      (p) => GODOT_CLASSES.includes(p.type?.value || "") // TODO:FIX p.instance?.value.type.value)
-    )
-    .map((p) => p.type?.value ?? ""); // FIX FIX
-  const cImports = classImports(rootNode, onreadysImports);
-  const decl_start = declGodotClassStart(rootNode);
+    .filter((p) => !p.isRustStruct)
+    .map((p) => p.type);
+
+  const cImports = classImports(nodeItem, onreadysImports);
+  const decl_start = declGodotClassStart(nodeItem);
   const decl_end = declGodotClassEnd();
-  const imp_start = implVirtualMethodsStart(rootNode);
+  const imp_start = implVirtualMethodsStart(nodeItem);
   const impl_end = implVirtualMethodsEnd();
 
   const virMethods = methods.map((x) => x.detail);

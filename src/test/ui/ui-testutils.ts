@@ -1,5 +1,5 @@
 import path from "path";
-import { GodotSettings } from "../constantes";
+import { DISPLAY_NAME, GodotSettings, NAME } from "../../constantes";
 import * as fs from "fs";
 import * as os from "os";
 import { glob } from "glob";
@@ -7,65 +7,26 @@ import {
   BottomBarPanel,
   InputBox,
   OutputView,
+  SideBarView,
+  TreeItem,
+  ViewSection,
   VSBrowser,
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
 import { existsSync } from "fs";
-
-export const cloneDirToTemp = (dirpath: string): string => {
-  let tmp = fs.mkdtempSync(path.join(os.tmpdir(), "grudot"));
-  fs.cpSync(dirpath, tmp, { recursive: true });
-  return tmp;
-};
-
-export const cloneGrudotDirTemp = (dirpath?: string): string => {
-  dirpath = dirpath ?? "assets/GodotProject";
-  let tmp = fs.mkdtempSync(path.join(os.tmpdir(), "grudotproject"));
-  fs.cpSync(dirpath, tmp, { recursive: true });
-  return tmp;
-};
-
-export const addGodotProjectPathSetting = (
-  projectPath: string,
-  godotProjectDir: string
-) => {
-  let dotvscode = path.resolve(projectPath, ".vscode");
-  godotProjectDir = godotProjectDir ?? path.resolve("assets/GodotProject");
-  let godotProject = path.join(godotProjectDir, "project.godot");
-  if (!fs.existsSync(dotvscode)) {
-    fs.mkdirSync(dotvscode);
-  }
-  console.log(`Using: ${dotvscode}`);
-  let setting = {
-    "godot4-rust.godotProjectFilePath": godotProject,
-  };
-  fs.writeFileSync(
-    path.resolve(projectPath, ".vscode/settings.json"),
-    JSON.stringify(setting)
-  );
-};
-
-export const getSettings = (filepath: string): GodotSettings | undefined => {
-  if (fs.existsSync(filepath)) {
-    let settings: GodotSettings = JSON.parse(
-      fs.readFileSync(filepath, {
-        encoding: "utf-8",
-      })
-    );
-    return settings;
-  }
-  return undefined;
-};
+import { readUtf8Sync } from "../../utils";
+import { addGodotProjectPathSetting, cloneDirToTemp } from "../common";
 
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
   godotbase: string = "assets/GodotProject"
-): Promise<
-  [string, VSBrowser, WebDriver, Workbench, BottomBarPanel, OutputView]
-> => {
+): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
-  addGodotProjectPathSetting(rootPath, cloneGrudotDirTemp(godotbase));
+  let godotDir = cloneDirToTemp(godotbase);
+  addGodotProjectPathSetting(rootPath, godotDir);
+  console.log(`rootPath: ${rootPath}`);
+  console.log(`godotPath: ${godotDir}`);
   let browser = VSBrowser.instance;
   await browser.openResources(rootPath);
   let driver = browser.driver;
@@ -82,7 +43,17 @@ export const initTest = async (
     }
   });
   await outputView.selectChannel("Godot4 Rust");
-  return [rootPath, browser, driver, wb, bottomBar, outputView];
+  let panel = await initPanel(rootPath, driver);
+  return {
+    rootPath,
+    browser,
+    driver,
+    wb,
+    bottomBar,
+    outputView,
+    godotDir,
+    panel,
+  };
 };
 
 export const multiSelect = async (
@@ -139,5 +110,49 @@ const clearTmp = async () => {
   }
   // fs.rmSync(".test-extensions", { recursive: true, force: true });
 };
+
+export const initPanel = async (rootPath: string, driver: WebDriver) => {
+  let explorer = await new SideBarView()
+    .getContent()
+    .getSection(path.basename(rootPath));
+  await explorer.collapse();
+  let panel = await new SideBarView().getContent().getSection(DISPLAY_NAME);
+  await panel.expand();
+  await driver.wait(
+    async () => (await panel.getVisibleItems()).length > 0,
+    5000
+  );
+  return panel;
+};
+
+export const pickItem = async (
+  item: number | string,
+  panel?: ViewSection
+): Promise<TreeItem | undefined> => {
+  panel =
+    panel || (await new SideBarView().getContent().getSection(DISPLAY_NAME));
+  let items: TreeItem[] = (await panel.getVisibleItems()) as TreeItem[];
+  if (typeof item === "number") {
+    return items[0];
+  } else {
+    for (const i of items) {
+      if ((await i.getLabel()) === item) {
+        return i;
+      }
+    }
+  }
+  return;
+};
+
+export interface InitTest {
+  rootPath: string;
+  browser: VSBrowser;
+  driver: WebDriver;
+  wb: Workbench;
+  bottomBar: BottomBarPanel;
+  outputView: OutputView;
+  godotDir: string;
+  panel: ViewSection;
+}
 
 clearTmp();

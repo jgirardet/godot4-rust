@@ -1,5 +1,6 @@
 import { toSnake } from "ts-case-convert";
-import { Node } from "./godot/types";
+import { NodeItem } from "./panel/nodeItem";
+import { GODOT_STRUCTS, GODOT_VIRTUAL_METHODS } from "./godotClasses";
 
 export {
   onready_snippet,
@@ -11,22 +12,23 @@ export {
   classImports,
 };
 
-const onready_snippet = (node: Node): string[] => {
+const onready_snippet = (nodeItem: NodeItem): string[] => {
   return [
-    `#[init(node = "${formatParentString(node)}")]`,
-    `${toSnake(node.name.value)}: OnReady<Gd<${node.type?.value}>>,`,
+    `#[init(node = "${formatParentString(nodeItem)}")]`,
+    `${toSnake(nodeItem.name)}: OnReady<Gd<${formatType(nodeItem)}>>,`,
   ];
 };
 
 const declGodotClassStart = (
-  node: Node,
+  nodeItem: NodeItem,
   withInit: boolean = true
 ): string[] => {
+  let struct = formatType(nodeItem);
   return [
     "#[derive(GodotClass)]",
-    `#[class(base=${node.type?.value}${withInit ? ",init" : ""})]`,
-    `struct ${node.name.value} {`,
-    `base: Base<${node.type?.value}>,`,
+    `#[class(base=${struct}${withInit ? ",init" : ""})]`,
+    `pub struct ${nodeItem.name} {`,
+    `base: Base<${struct}>,`,
   ];
 };
 
@@ -34,19 +36,27 @@ const declGodotClassEnd = (): string[] => {
   return ["}", "\n"];
 };
 
-const implVirtualMethodsStart = (node: Node): string[] => {
-  return [`#[godot_api]`, `impl I${node.type?.value} for ${node.name.value} {`];
+const implVirtualMethodsStart = (nodeItem: NodeItem): string[] => {
+  return [
+    `#[godot_api]`,
+    `impl ${
+      GODOT_VIRTUAL_METHODS[nodeItem.type as keyof typeof GODOT_VIRTUAL_METHODS]
+    } for ${nodeItem.name} {`,
+  ];
 };
 
 const implVirtualMethodsEnd = (): string[] => {
   return ["}"];
 };
 
-const classImports = (node: Node, otherClassesImports: string[]): string[] => {
-  let imports = new Set([node.type?.value, ...otherClassesImports]);
+const classImports = (
+  nodeItem: NodeItem,
+  otherClassesImports: string[]
+): string[] => {
+  let imports = new Set([formatType(nodeItem), ...otherClassesImports]);
   return [
-    `use godot::{classes::{${[...imports].join(",")},I${
-      node.type?.value
+    `use godot::{classes::{${[...imports].join(",")},${
+      GODOT_VIRTUAL_METHODS[nodeItem.type as keyof typeof GODOT_VIRTUAL_METHODS]
     }}, prelude::*,};\n`,
   ];
 };
@@ -78,9 +88,12 @@ const node_methods = {
   //   "fn get_configuration_warnings(&self) -> PackedStringArray {}",
 };
 
-function formatParentString(node: Node) {
+function formatParentString(node: NodeItem) {
+  return (node.path === "." ? "" : node.path + "/") + node.name;
+}
+
+function formatType(nodeItem: NodeItem) {
   return (
-    (node.parent?.value === "." ? "" : node.parent?.value + "/") +
-    node.name.value
+    GODOT_STRUCTS[nodeItem.type as keyof typeof GODOT_STRUCTS] || nodeItem.type
   );
 }

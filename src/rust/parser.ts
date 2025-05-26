@@ -1,10 +1,16 @@
-import Parser, { Query, QueryCapture, SyntaxNode } from "tree-sitter";
+import Parser, { SyntaxNode } from "tree-sitter";
 import Rust from "tree-sitter-rust";
-import { RustParsed } from "./types";
 import { TreeSitterParser } from "../tree/treeSitterParser";
-import { godotModuleQuery } from "../constantes";
+import { Struct } from "./nodable";
 
 export class RustParser extends TreeSitterParser {
+  _godotClass?: Struct;
+
+  constructor(source: string) {
+    super(source);
+    this._godotClass = findGodotStruct(this.rootNode);
+  }
+
   get lang(): Parser.Language {
     return Rust as Parser.Language;
   }
@@ -17,32 +23,18 @@ export class RustParser extends TreeSitterParser {
     return this.source.match(/^use godot(?:;|::.+| as .*)$/m) !== null;
   }
 
-  /// Find the First GodotClass in module
-  findGodotClass(): RustParsed | undefined {
-    let q = new Query(Rust as Parser.Language, godotModuleQuery);
-
-    let captures = q.matches(this.rootNode).at(0)?.captures;
-    if (!captures || captures.length === 0) {
-      return;
-    }
-
-    return {
-      className: this._getStringUnsafe("className", captures),
-      baseClass: this._getString("baseClass", captures),
-      init: this._getString("init", captures) ? true : false,
-    };
+  getGodotClass(): Struct | undefined {
+    return this._godotClass;
   }
-  //
-  /// Warning: use only if key always is in capture
-  _getStringUnsafe(key: string, captures: QueryCapture[]): string {
-    const node = captures.find((a) => a.name === key)!.node;
-    return this.tree.getText(node).replaceAll('"', "");
-  }
-
-  _getString(key: string, captures: QueryCapture[]): string | undefined {
-    const node = captures.find((a) => a.name === key)?.node;
-    if (node) {
-      return this.tree.getText(node).replaceAll('"', "");
+}
+/// Find the First GodotClass in module
+function findGodotStruct(parentNode: SyntaxNode): Struct | undefined {
+  for (const node of parentNode.children) {
+    if (node.type === "struct_item") {
+      let struct = Struct.fromNode(node);
+      if (struct.attribute("derive")?.argValue("GodotClass")) {
+        return struct;
+      }
     }
   }
 }

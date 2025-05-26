@@ -8,14 +8,12 @@ import {
   WorkspaceConfiguration,
 } from "vscode";
 
-export { getProjectConfig, getConfigValue };
-
-const getProjectConfig = (): WorkspaceConfiguration => {
+export const getProjectConfig = (): WorkspaceConfiguration => {
   return workspace.getConfiguration(NAME);
 };
 
-const getConfigValue = (key: string): string => {
-  let v = getProjectConfig().get<string>(key);
+export function getConfigValue<T>(key: string): T {
+  let v = getProjectConfig().get<T>(key);
   if (v === undefined) {
     throw new Error(`The config key ${key} is undefined`);
   } else if (v === null) {
@@ -23,7 +21,7 @@ const getConfigValue = (key: string): string => {
   } else {
     return v;
   }
-};
+}
 
 export const registerGCommand = (
   commandName: string,
