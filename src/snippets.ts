@@ -1,6 +1,6 @@
 import { toSnake } from "ts-case-convert";
 import { NodeItem } from "./panel/nodeItem";
-import { GODOT_STRUCTS, GODOT_VIRTUAL_METHODS } from "./godotClasses";
+import { GODOT_VIRTUAL_METHODS } from "./godotClasses";
 
 export {
   onready_snippet,
@@ -15,7 +15,7 @@ export {
 const onready_snippet = (nodeItem: NodeItem): string[] => {
   return [
     `#[init(node = "${nodeItem.fullPath}")]`,
-    `${toSnake(nodeItem.name)}: OnReady<Gd<${formatType(nodeItem)}>>,`,
+    `${toSnake(nodeItem.name)}: OnReady<Gd<${nodeItem.rustType}>>,`,
   ];
 };
 
@@ -23,7 +23,8 @@ const declGodotClassStart = (
   nodeItem: NodeItem,
   withInit: boolean = true
 ): string[] => {
-  let struct = formatType(nodeItem);
+  let struct = nodeItem.rustType;
+
   return [
     "#[derive(GodotClass)]",
     `#[class(base=${struct}${withInit ? ",init" : ""})]`,
@@ -53,7 +54,7 @@ const classImports = (
   nodeItem: NodeItem,
   otherClassesImports: string[]
 ): string[] => {
-  let imports = new Set([formatType(nodeItem), ...otherClassesImports]);
+  let imports = new Set([nodeItem.rustType, ...otherClassesImports]);
   return [
     `use godot::{classes::{${[...imports].join(",")},${
       GODOT_VIRTUAL_METHODS[nodeItem.type as keyof typeof GODOT_VIRTUAL_METHODS]
@@ -87,9 +88,3 @@ const node_methods = {
   // get_configuration_warnings:
   //   "fn get_configuration_warnings(&self) -> PackedStringArray {}",
 };
-
-function formatType(nodeItem: NodeItem) {
-  return (
-    GODOT_STRUCTS[nodeItem.type as keyof typeof GODOT_STRUCTS] || nodeItem.type
-  );
-}

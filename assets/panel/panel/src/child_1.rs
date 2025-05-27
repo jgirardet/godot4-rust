@@ -1,5 +1,5 @@
 use godot::{
-    classes::{Camera2D, INode2D, Node2D, Sprite2D},
+    classes::{INode2D, Node2D},
     prelude::*,
 };
 

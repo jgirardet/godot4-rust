@@ -174,11 +174,11 @@ const persist = async (
   return fileUri;
 };
 
-const insertRustMod = async (editor: vscode.TextEditor, filename: string) => {
-  logger.info(`Trying to update crate with mod ${filename}`);
-  await applyCodeActionNamed(editor, `Insert \`mod ${filename};\``);
-  logger.info("Insert mod complete");
-};
+// const insertRustMod = async (editor: vscode.TextEditor, filename: string) => {
+//   logger.info(`Trying to update crate with mod ${filename}`);
+//   await applyCodeActionNamed(editor, `Insert \`mod ${filename};\``);
+//   logger.info("Insert mod complete");
+// };
 
 class NodeMethodQuickItem implements QuickPickItem {
   label: string;

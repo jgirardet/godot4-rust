@@ -29,25 +29,50 @@ describe("InsertSnippet Command", () => {
   });
 
   it("tests rust tupe", async () => {
-    const { rootPath, browser, wb } = await initTest(
+    const { rootPath, browser, wb, driver } = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );
+
     let child1f = path.join(rootPath, "src/other.rs");
     await browser.openResources(child1f);
-
     let editor = new TextEditor();
-    await editor.setCursor(13, 20);
+
     await wb.executeCommand("godot4-rust.insertOnReady");
     inp = await InputBox.create();
     await inp.selectQuickPick(3);
-    let ligne1 = await editor.getTextAtLine(14);
-    let ligne2 = await editor.getTextAtLine(15);
 
+    await editor.save();
+    await driver.wait(async () => {
+      return (
+        (await editor.getTextAtLine(6)) === "use crate::child_1::Child1Struct;"
+      );
+    }, 3000);
+    
+  
+
+    await wb.executeCommand("godot4-rust.insertOnReady");
+    inp = await InputBox.create();
+    await inp.selectQuickPick(6);
+
+    // result
+    let ligne1 = await editor.getTextAtLine(18);//inverted/ we do not wait save
+    let ligne2 = await editor.getTextAtLine(19);
     expect(ligne1.trim()).toEqual(
       '#[init(node = "Other1/Other11/Other111/OneChild1")]'
     );
     expect(ligne2.trim()).toEqual("one_child_1: OnReady<Gd<Child1Struct>>,");
+
+    ligne1 = await editor.getTextAtLine(16);
+    ligne2 = await editor.getTextAtLine(17);
+    expect(ligne1.trim()).toEqual('#[init(node = "Other1/Child2")]');
+    expect(ligne2.trim()).toEqual("child_2: OnReady<Gd<HttpRequest>>,");
+    await driver.wait(async () => {
+      return (
+        (await editor.getTextAtLine(2)).trim() ===
+        "classes::{Camera2D, HttpRequest, INode2D, Node2D, Sprite2D},"
+      );
+    }, 3000);
     await editor.save();
   });
 });

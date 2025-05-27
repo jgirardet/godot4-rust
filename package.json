@@ -124,7 +124,9 @@
     "clearTmp": "node ./out/test/testutils.js",
     "unit-test": "mocha out/test/unit",
     "vscode-test": "node out/test/vscode/runTests.js",
-    "ui-setup": "extest setup-tests --code_version max --extensions_dir .test-extensions",
+    "ui-install-dep": "extest install-from-marketplace -e .test-extensions rust-lang.rust-analyzer",
+    "ui-setup-extest": "extest setup-tests --code_version max --extensions_dir .test-extensions",
+    "ui-setup": "npm run ui-setup-extest && npm run ui-install-dep",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions && npm run clearTmp",
     "ui-testone": "extest run-tests --code_version max --code_settings src/test/ui/settings.json --extensions_dir .test-extensions"
   },

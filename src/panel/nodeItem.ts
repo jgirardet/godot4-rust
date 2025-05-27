@@ -97,6 +97,9 @@ export class NodeItem extends TreeItem {
       "Unknow"
     );
   }
+  get rustType(): string {
+    return GODOT_STRUCTS[this.type as keyof typeof GODOT_STRUCTS] || this.type;
+  }
 
   getPackedSceneChildren(): NodeItem[] {
     let acc: NodeItem[] = [];

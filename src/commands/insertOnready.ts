@@ -2,8 +2,20 @@ import { onready_snippet } from "../snippets";
 import { logger } from "../log";
 import { selectNode } from "../ui/select";
 import { NodeItem } from "../panel/nodeItem";
-import { Selection, SnippetString, window } from "vscode";
+import {
+  CodeAction,
+  CodeActionKind,
+  commands,
+  extensions,
+  Position,
+  Selection,
+  SnippetString,
+  TextEditor,
+  Uri,
+  window,
+} from "vscode";
 import { GodotManager } from "../panel/godotManager";
+import { FullPathFile } from "../types";
 
 export async function insertOnReady(manager: GodotManager, nodeItem: NodeItem) {
   let nodePicked;
@@ -68,6 +80,64 @@ export async function insertOnReady(manager: GodotManager, nodeItem: NodeItem) {
       new SnippetString(preSnippet + onreadsnip.join("\n"))
     );
     await editor.document.save();
-    logger.info("On Ready added");
+
+    logger.info("OnReady snippet added");
+
+    // auto import, try to find the type then execute
+    if (extensions.getExtension("rust-lang.rust-analyzer")?.isActive) {
+      let typeAddedSelection = findRustTypeInSnippet(
+        editor,
+        line.lineNumber + onreadsnip.length,
+        nodePicked
+      );
+      if (typeAddedSelection) {
+        await tryAutoImport(typeAddedSelection, editorPath, nodePicked);
+        logger.info(`"${nodePicked.rustType}" imported`);
+      } else {
+        logger.warn("Can't execute auto import");
+      }
+    } else {
+      logger.warn("Rust Analyzer is not active, skipping autoimport");
+    }
+  }
+}
+
+function findRustTypeInSnippet(
+  editor: TextEditor,
+  line: number,
+  nodeItem: NodeItem
+): Selection | undefined {
+  let index =
+    editor.document.lineAt(line).text.search(`${nodeItem.rustType}`) + 1;
+  if (index) {
+    let position = new Position(line, index);
+    return new Selection(position, position);
+  }
+}
+
+async function tryAutoImport(
+  selection: Selection,
+  file: FullPathFile,
+  nodeItem: NodeItem
+) {
+  const actions = await commands.executeCommand<CodeAction[]>(
+    "vscode.executeCodeActionProvider",
+    Uri.file(file),
+    selection,
+    CodeActionKind.QuickFix.value
+  )!;
+  for (const action of actions) {
+    if (
+      action.title.match(
+        new RegExp(String.raw`Import \`.*${nodeItem.rustType}\``)
+      )
+    ) {
+      if (action.command) {
+        await commands.executeCommand(
+          action.command.command,
+          ...(action.command.arguments || [])
+        );
+      }
+    }
   }
 }

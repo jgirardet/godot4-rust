@@ -1,6 +1,8 @@
 Prochain en cours :
+- insert mod
 _ code action rename
-- onready with non init/
+- onready with non init: necessite parse "fn init"
+- parse "fn init"
 - preload
 _ resource_uri de node item pour tscn
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
