@@ -104,13 +104,6 @@ export const selectPath = async (fullpath: string) => {
   await input.confirm();
 };
 
-const clearTmp = async () => {
-  for (let d of await glob(`${os.tmpdir()}/grudot*`)) {
-    fs.rmSync(d, { recursive: true, force: true });
-  }
-  // fs.rmSync(".test-extensions", { recursive: true, force: true });
-};
-
 export const initPanel = async (rootPath: string, driver: WebDriver) => {
   let explorer = await new SideBarView()
     .getContent()
@@ -154,5 +147,3 @@ export interface InitTest {
   godotDir: string;
   panel: ViewSection;
 }
-
-clearTmp();
