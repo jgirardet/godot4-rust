@@ -14,12 +14,17 @@ export type DelimiterItem = "{" | "}" | "[" | "]" | "(" | ")";
 export type HasArgParam = string | number | boolean;
 
 export interface ArgValue {
-  get argValue(): NodableType | undefined;
+  get argValue(): NodableType;
+  get argValueItem(): NodableType;
   hasArg: (val: HasArgParam) => boolean;
 }
 
 export interface Name {
   get name(): string;
+}
+
+export interface Sized {
+  get length(): number;
 }
 
 export interface Attributable {
@@ -51,6 +56,10 @@ export class BooleanLiteral extends Nodable<boolean> implements ArgValue {
     return this.value;
   }
 
+  get argValueItem(): NodableType {
+    return this;
+  }
+
   hasArg(val: HasArgParam): boolean {
     return typeof val === "boolean" && val === this.value;
   }
@@ -64,8 +73,12 @@ export class BooleanLiteral extends Nodable<boolean> implements ArgValue {
 }
 
 export class CharLiteral extends Nodable<string> implements ArgValue {
-  get argValue(): NodableType | undefined {
+  get argValue(): NodableType {
     return this.value;
+  }
+
+  get argValueItem(): NodableType {
+    return this;
   }
 
   hasArg(val: HasArgParam): boolean {
@@ -92,6 +105,9 @@ export class Identifier extends Nodable<string> implements ArgValue, Name {
     return true;
   }
 
+  get argValueItem(): NodableType {
+    return this;
+  }
   hasArg(val: HasArgParam): boolean {
     return val === this.name;
   }
@@ -109,6 +125,10 @@ export class FloatLiteral extends Nodable<number> implements ArgValue {
     return this.value;
   }
 
+  get argValueItem(): NodableType {
+    return this;
+  }
+
   hasArg(val: HasArgParam): boolean {
     return this.value === val;
   }
@@ -122,6 +142,10 @@ export class IntegerLiteral extends Nodable<number> implements ArgValue {
     return this.value;
   }
 
+  get argValueItem(): NodableType {
+    return this;
+  }
+
   hasArg(val: HasArgParam): boolean {
     return this.value === val;
   }
@@ -130,6 +154,10 @@ export class IntegerLiteral extends Nodable<number> implements ArgValue {
 export class RawStringLiteral extends Nodable<string> implements ArgValue {
   get argValue(): string {
     return this.value;
+  }
+
+  get argValueItem(): NodableType {
+    return this;
   }
 
   hasArg(val: HasArgParam): boolean {
@@ -144,6 +172,10 @@ export class RawStringLiteral extends Nodable<string> implements ArgValue {
 export class StringLiteral extends Nodable<string> implements ArgValue {
   get argValue(): string {
     return this.value;
+  }
+
+  get argValueItem(): NodableType {
+    return this;
   }
 
   hasArg(val: HasArgParam): boolean {
@@ -178,6 +210,10 @@ export class AssignmentExp extends Nodable<Assignment> implements ArgValue {
     return this.value.rhs.value;
   }
 
+  get argValueItem(): NodableType {
+    return this.value.rhs;
+  }
+
   hasArg(val: HasArgParam): boolean {
     return val === this.value.lhs.name;
   }
@@ -190,13 +226,17 @@ type TokenTreeItem = {
   items: ArrayOfNodableArgValue;
 };
 
-export class TokenTree extends Nodable<TokenTreeItem> {
+export class TokenTree extends Nodable<TokenTreeItem> implements Sized {
   getArgValue(val: HasArgParam): NodableType | undefined {
     return this.getArg(val)?.argValue;
   }
 
   getArg(val: HasArgParam): (NodableType & ArgValue) | undefined {
     return this.value.items.find((x) => x.hasArg(val));
+  }
+
+  get length(): number {
+    return this.value.items.length;
   }
 
   static fromNode(node: SyntaxNode): TokenTree {
@@ -241,7 +281,7 @@ type AttributeItem = {
   args?: TokenTree;
 };
 
-export class Attribute extends Nodable<AttributeItem> implements Name {
+export class Attribute extends Nodable<AttributeItem> implements Name, Sized {
   static fromNode(node: SyntaxNode): Attribute {
     const identifier = node.firstNamedChild!.firstNamedChild!;
     const argsumentsNode = node.firstNamedChild?.childForFieldName("arguments");
@@ -265,6 +305,10 @@ export class Attribute extends Nodable<AttributeItem> implements Name {
 
   argValue(key: HasArgParam): NodableType | undefined {
     return this.value.args?.getArgValue(key);
+  }
+
+  get length(): number {
+    return this.value.args?.length || 0;
   }
 }
 

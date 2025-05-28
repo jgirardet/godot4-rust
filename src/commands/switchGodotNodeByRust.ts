@@ -32,7 +32,7 @@ export const switchGodotNodeByrust = async (
   }
   await rust.reload();
 
-  let gc = await rust.TryStoredGodoClassInEditor();
+  let gc = await rust.tryStoredGodoClassInEditor();
   if (gc) {
     nodeItem.rustModule = gc;
   } else {

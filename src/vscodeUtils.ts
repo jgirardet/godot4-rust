@@ -45,7 +45,7 @@ export const registerGCommand = (
 
 //
 export function pointToPosition(point: Point): Position {
-  return new Position(point.row + 1, point.column + 1);
+  return new Position(point.row, point.column);
 }
 
 export function rangeToVsRange(range: Range): VsRange {

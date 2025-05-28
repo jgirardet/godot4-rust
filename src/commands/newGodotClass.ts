@@ -84,14 +84,12 @@ export const newGodotClass = async (
 
     if (isRustanalyzerActive()) {
       logger.info("Trying to insert mod in lib.rs");
-      setTimeout(async (editor) => {
-        await tryExecuteCodeAction(
-          editor.selection,
-          editor.document.fileName,
-          CodeActionKind.QuickFix,
-          `^Insert \`mod ${basename(editor.document.fileName, ".rs")};\`$`
-        );
-      }, 1000);
+      await tryExecuteCodeAction(
+        editor.selection,
+        editor.document.fileName,
+        CodeActionKind.QuickFix,
+        `^Insert \`mod ${basename(editor.document.fileName, ".rs")};\`$`
+      );
     }
 
     const rustStruct = await rust.tryGodotClass(newFile);

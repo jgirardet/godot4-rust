@@ -86,7 +86,7 @@ export class RustManager {
   }
 
   // only match on persisted files.
-  async TryStoredGodoClassInEditor(): Promise<StoredGodotClass | undefined> {
+  async tryStoredGodoClassInEditor(): Promise<StoredGodotClass | undefined> {
     if (!window.activeTextEditor) {
       return;
     }

@@ -1,8 +1,12 @@
 import {
   commands,
+  DiagnosticCollection,
   ExtensionContext,
   FileSystemWatcher,
+  languages,
   RelativePattern,
+  TextDocument,
+  TextDocumentChangeEvent,
   TextEditor,
   TreeView,
   TreeViewSelectionChangeEvent,
@@ -27,6 +31,8 @@ import { TscnTreeProvider } from "./tscnTreeData";
 import { insertOnReady } from "../commands/insertOnready";
 import { newGodotClass } from "../commands/newGodotClass";
 import { switchGodotNodeByrust } from "../commands/switchGodotNodeByRust";
+import { checkForInvalidNodePath } from "../diagnostics/godotPathDiag";
+import { GodotClass } from "../rust/godoClass";
 
 export class GodotManager {
   treeView: TreeView<NodeItem>;
@@ -35,6 +41,7 @@ export class GodotManager {
   godotProjectFile: FullPathFile;
   loader: GodotProjectLoader;
   rust: RustManager;
+  diags: DiagnosticCollection;
 
   constructor(context: ExtensionContext, godotProjectFile: FullPathFile) {
     this.godotProjectFile = godotProjectFile;
@@ -65,12 +72,15 @@ export class GodotManager {
       registerGCommand("newGodotClass", this.newGodotClass.bind(this)),
       registerGCommand("replaceBaseClass", this.replaceBaseClass.bind(this)),
 
+      // diags
+      (this.diags = languages.createDiagnosticCollection(NAME)),
       // connect signals
-      window.onDidChangeActiveTextEditor(this.reveal.bind(this)),
+      window.onDidChangeActiveTextEditor(this.onActiveEditorChanged.bind(this)),
       this.rust.onRustFilesChanged(async () => {
-        logger.info("Rust content changed, reloading panel");
-        this.reload();
-      })
+        logger.debug("Rust content changed, reloading panel");
+        await this.reload();
+      }),
+      workspace.onDidChangeTextDocument(this.onTextContentChanged.bind(this))
     );
 
     this.rust
@@ -103,6 +113,17 @@ export class GodotManager {
     }
   }
 
+  async onActiveEditorChanged(editor?: TextEditor) {
+    if (editor?.document) {
+      await this.reveal(editor);
+      this._triggerCheckForInvalidNodePath(editor?.document);
+    }
+  }
+
+  async onTextContentChanged({ document }: TextDocumentChangeEvent) {
+    this._triggerCheckForInvalidNodePath(document);
+  }
+
   async onFileChanged(file: Uri) {
     logger.info(`${file.fsPath} modified, updating`);
     const scenes = await this.loader.onChange(file.fsPath);
@@ -121,7 +142,7 @@ export class GodotManager {
   }
 
   async reveal(editor?: TextEditor) {
-    let nodeItem = this.getActiveNodeItem(editor);
+    let nodeItem = this.getActiveNodeItem(editor?.document);
     if (nodeItem) {
       logger.info(`Revealing ${nodeItem.name} with type ${nodeItem.type}`);
       await this.treeView.reveal(nodeItem, {
@@ -155,14 +176,24 @@ export class GodotManager {
     }
   }
 
-  getActiveNodeItem(editor?: TextEditor): NodeItem | undefined {
-    editor = editor || window.activeTextEditor;
-    let doc = editor?.document;
-    if (!doc) {
+  getActiveNodeItem(document?: TextDocument): NodeItem | undefined {
+    document = document || window.activeTextEditor?.document;
+    if (!document) {
       return;
     }
     return Array.from(this.treeData.data, ([_, v]) => v).find(
-      (v) => v.rustModule?.file === doc.fileName
+      (v) => v.rustModule?.file === document.fileName
     );
+  }
+
+  _triggerCheckForInvalidNodePath(document: TextDocument) {
+    const nodeItem = this.getActiveNodeItem(document);
+    if (nodeItem) {
+      let liveStruct = GodotClass.fromString(document.getText());
+      this.diags.set(
+        document.uri,
+        checkForInvalidNodePath(nodeItem, liveStruct)
+      );
+    }
   }
 }
