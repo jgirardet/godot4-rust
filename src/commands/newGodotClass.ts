@@ -1,4 +1,3 @@
-import * as vscode from "vscode";
 import {
   classImports,
   declGodotClassEnd,
@@ -9,14 +8,22 @@ import {
   onready_snippet,
 } from "../snippets";
 import { logger } from "../log";
-import path from "path";
+import path, { basename } from "path";
 import { toSnake } from "ts-case-convert";
 import { getRustSrcDir } from "../cargo.js";
 import { getGodotProjectDir, getGodotProjectFile } from "../godotProject";
 import { selectNodes, selectTscn } from "../ui/select";
-import { QuickPickItem } from "vscode";
+import {
+  CodeActionKind,
+  QuickPickItem,
+  SnippetString,
+  TextEditor,
+  Uri,
+  window,
+  workspace,
+} from "vscode";
 import { NodeItem } from "../panel/nodeItem";
-import { applyCodeActionNamed } from "../rust/utils";
+import { isRustanalyzerActive, tryExecuteCodeAction } from "../rust/utils";
 import { GodotManager } from "../panel/godotManager";
 
 export const newGodotClass = async (
@@ -28,7 +35,7 @@ export const newGodotClass = async (
     return;
   }
 
-  let persistFile = await vscode.window.showQuickPick(["Yes", "No"], {
+  let persistFile = await window.showQuickPick(["Yes", "No"], {
     title: "Create new a new Rust module ?",
   });
   if (persistFile === undefined) {
@@ -66,25 +73,38 @@ export const newGodotClass = async (
 
   const snippet = build_snippet(nodeItem, pickedMethod, pickedOnready);
 
-  let editor: vscode.TextEditor | undefined;
+  let editor: TextEditor | undefined;
   let newFile;
   if (persistFile === "Yes") {
     newFile = await persist(selectedTscn, snippet);
     if (!newFile) {
       return;
     }
-    editor = await vscode.window.showTextDocument(newFile);
+    editor = await window.showTextDocument(newFile);
+
+    if (isRustanalyzerActive()) {
+      logger.info("Trying to insert mod in lib.rs");
+      setTimeout(async (editor) => {
+        await tryExecuteCodeAction(
+          editor.selection,
+          editor.document.fileName,
+          CodeActionKind.QuickFix,
+          `^Insert \`mod ${basename(editor.document.fileName, ".rs")};\`$`
+        );
+      }, 1000);
+    }
+
     const rustStruct = await rust.tryGodotClass(newFile);
     if (rustStruct) {
       nodeItem.rustModule = rustStruct;
       return nodeItem;
     }
   } else {
-    editor = vscode.window.activeTextEditor;
+    editor = window.activeTextEditor;
     if (editor === undefined) {
       return;
     }
-    await editor.insertSnippet(new vscode.SnippetString(snippet));
+    await editor.insertSnippet(new SnippetString(snippet));
   }
 };
 
@@ -101,7 +121,7 @@ const buildMethodsList = (): NodeMethodQuickItem[] => {
 const pickMethods = async (
   mets: NodeMethodQuickItem[]
 ): Promise<NodeMethodQuickItem[] | undefined> => {
-  let choices = await vscode.window.showQuickPick(mets, {
+  let choices = await window.showQuickPick(mets, {
     canPickMany: true,
     title: "Select method to add to class",
   });
@@ -153,13 +173,13 @@ const build_snippet = (
 const persist = async (
   selectedTscn: string,
   content: string
-): Promise<vscode.Uri | undefined> => {
+): Promise<Uri | undefined> => {
   let src = await getRustSrcDir();
   let newFileName = toSnake(
     path.basename(selectedTscn).replace(".tscn", ".rs")
   );
-  let fileUri = await vscode.window.showSaveDialog({
-    defaultUri: vscode.Uri.file(path.resolve(path.join(src, newFileName))),
+  let fileUri = await window.showSaveDialog({
+    defaultUri: Uri.file(path.resolve(path.join(src, newFileName))),
   });
   logger.info(`Using new file uri: ${fileUri}`);
   if (fileUri === undefined) {
@@ -169,16 +189,11 @@ const persist = async (
   let encoder = new TextEncoder();
   let encodedContent = encoder.encode(content);
 
-  await vscode.workspace.fs.writeFile(fileUri, encodedContent);
+  await workspace.fs.writeFile(fileUri, encodedContent);
   logger.info(`New rust module created: ${fileUri}`);
+
   return fileUri;
 };
-
-// const insertRustMod = async (editor: vscode.TextEditor, filename: string) => {
-//   logger.info(`Trying to update crate with mod ${filename}`);
-//   await applyCodeActionNamed(editor, `Insert \`mod ${filename};\``);
-//   logger.info("Insert mod complete");
-// };
 
 class NodeMethodQuickItem implements QuickPickItem {
   label: string;

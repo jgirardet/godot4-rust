@@ -1,26 +1,44 @@
-import { CodeAction, CodeActionKind, commands, Range, TextEditor, workspace } from "vscode";
+import {
+  CodeAction,
+  CodeActionKind,
+  commands,
+  extensions,
+  Range,
+  Selection,
+  TextEditor,
+  Uri,
+  workspace,
+} from "vscode";
+import { FullPathFile } from "../types";
 
-/// Apply the code titled at current cursor position
-export const applyCodeActionNamed = async (editor: TextEditor, title: string) => {
-  const { document, selection } = editor;
-  const range = selection.isEmpty
-    ? new Range(selection.start, selection.start)
-    : selection;
-
+export async function tryExecuteCodeAction(
+  selection: Selection,
+  file: FullPathFile,
+  kind: CodeActionKind,
+  matcher: string
+) {
   const actions = await commands.executeCommand<CodeAction[]>(
-    "executeCodeActionProvider",
-    document.uri,
-    range,
-    CodeActionKind.QuickFix.value
-  );
-
-  if (actions?.length) {
-    const action = actions.find((f) => f.title === title);
-    if (action === undefined) {
-      return;
-    }
-    if (action.edit) {
-      await workspace.applyEdit(action.edit);
+    "vscode.executeCodeActionProvider",
+    Uri.file(file),
+    selection,
+    kind.value
+  )!;
+  for (const action of actions) {
+    if (action.title.match(new RegExp(String.raw`${matcher}`))) {
+      if (action.command) {
+        await commands.executeCommand(
+          action.command.command,
+          ...(action.command.arguments || [])
+        );
+        return;
+      } else if (action.edit) {
+        await workspace.applyEdit(action.edit);
+        return;
+      }
     }
   }
-};
+}
+
+export function isRustanalyzerActive(): boolean {
+  return extensions.getExtension("rust-lang.rust-analyzer")?.isActive || false;
+}

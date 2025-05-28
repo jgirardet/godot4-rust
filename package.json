@@ -112,7 +112,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile && compileScripts",
+    "vscode:prepublish": "npm run compile && npm run compileScripts",
     "setup": "npm run cloneScal && npm run fixSelenium",
     "cloneScal": "git clone https://github.com/nicolasbize/Scalazard assets/scalazar",
     "fixSelenium": "sed -i '1s/^/import { WebSocket } from \\\"ws\\\";\\\n/' node_modules/@types/selenium-webdriver/bidi/index.d.ts",

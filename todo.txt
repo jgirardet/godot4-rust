@@ -1,5 +1,4 @@
 Prochain en cours :
-- insert mod
 _ code action rename
 - onready with non init: necessite parse "fn init"
 - parse "fn init"
@@ -44,6 +43,7 @@ doc:
 - add godot class
 - insert snippet at good place + panel
 - selection reveal
+- insertmod et auto import
 
 
 
@@ -53,6 +53,8 @@ features du panel non testable:
 
 - context sur child:
     - insertOnready: mais pas sur root
+
+- insert mod
 
 
     
