@@ -1,3 +1,6 @@
+bug:
+autoswitch failing add the end of newgodotclass
+
 Prochain en cours :
 _ code action rename
 - onready with non init: necessite parse "fn init"
