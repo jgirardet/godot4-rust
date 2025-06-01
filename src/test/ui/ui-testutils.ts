@@ -1,13 +1,11 @@
 import path from "path";
-import { DISPLAY_NAME, GodotSettings, NAME } from "../../constantes";
-import * as fs from "fs";
-import * as os from "os";
-import { glob } from "glob";
+import { DISPLAY_NAME } from "../../constantes";
 import {
   BottomBarPanel,
   InputBox,
   OutputView,
   SideBarView,
+  TextEditor,
   TreeItem,
   ViewSection,
   VSBrowser,
@@ -15,8 +13,8 @@ import {
   Workbench,
 } from "vscode-extension-tester";
 import { existsSync } from "fs";
-import { readUtf8Sync } from "../../utils";
 import { addGodotProjectPathSetting, cloneDirToTemp } from "../common";
+import { expect } from "earl";
 
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
@@ -136,6 +134,29 @@ export const pickItem = async (
   }
   return;
 };
+
+export async function matchTrimedLine(
+  editor: TextEditor,
+  line: number,
+  toMatch: string,
+  delay?: number,
+  errMsg?: number
+) {
+  await editor.wait();
+  let content: string;
+  let driver = editor.getDriver();
+  toMatch = toMatch.trim();
+  if (delay) {
+    await driver.wait(async () => {
+      content = (await editor.getTextAtLine(line)).trim();
+      console.log(`Trying ${content} >< ${toMatch}`);
+      return content === toMatch;
+    }, delay);
+  } else {
+    content = (await editor.getTextAtLine(line)).trim();
+    expect(content).toEqual(toMatch);
+  }
+}
 
 export interface InitTest {
   rootPath: string;
