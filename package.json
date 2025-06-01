@@ -115,16 +115,18 @@
   "watch": {
     "ui-vsix": {
       "patterns": [
-        "src",
-        "scripts"
+        "out",
+        "scripts/out"
       ],
-      "extensions": "ts,mts",
+      "extensions": "js,mjs",
       "runOnChangeOnly": false,
-      "quiet": false
+      "quiet": false,
+      "silent": false,
+      "ignore": "out/test",
+      "inherits": true
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "setup": "npm run cloneScal && npm run fixSelenium",
     "fnm": "fnm use 20",
     "watch_vsix": "npm-watch ui-vsix",
@@ -143,7 +145,7 @@
     "ui-setup": "npm run ui-setup-extest && npm run ui-install-dep",
     "ui-vsix": "extest install-vsix -e .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' -o src/test/ui/settings.json -e .test-extensions",
-    "ui-testone": "extest run-tests -o src/test/ui/settings.json -e .test-extensions"
+    "ui-testone": "extest run-tests -o src/test/ui/settings.json -e .test-extensions -f"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",

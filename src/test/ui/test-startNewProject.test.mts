@@ -5,6 +5,9 @@ import { fileExistsAsync, initTest, selectPath } from "./ui-testutils.js";
 import { mkdirSync, readFileSync } from "fs";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils.js";
+import * as toml from "smol-toml";
+import * as cheerio from "cheerio";
+import { request } from "https";
 
 describe("start new  project", () => {
   let inp: InputBox;
@@ -34,6 +37,13 @@ describe("start new  project", () => {
 
     // content of files
     const contenttoml = readUtf8Sync(join(newRustDir, "Cargo.toml"));
+    const gdexttoml = toml.parse(
+      await (
+        await fetch(
+          "https://raw.githubusercontent.com/godot-rust/gdext/refs/heads/master/godot/Cargo.toml"
+        )
+      ).text()
+    );
     expect(contenttoml).toEqual(
       `[package]
 name = "projet"
@@ -44,7 +54,7 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = "0.2.4"`
+godot = "${(gdexttoml.package as { version: "" }).version}"`
     );
 
     assert.equal(

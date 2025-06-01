@@ -98,6 +98,7 @@ describe("addNewGodot class Command", () => {
     let editor = new TextEditor();
     let content = await editor.getText();
     await editor.save();
+
     expect(content).toEqual(
       `use godot::{classes::{HttpRequest,Node2D,IHttpRequest}, prelude::*,};
 
@@ -116,9 +117,13 @@ fn ready(&mut self) {}
 fn process(&mut self, delta: f64) {}
 }`
     );
-    //
-    // no autoswitch of godotclass in tscn
-    let tscn = readUtf8Sync(path.resolve(godotDir, "child_2.tscn"));
-    expect(tscn).toMatchRegex(/node name=\"Child2\" type=\"Child2\"/);
+    await driver.wait(
+      () => {
+        let tscn = readUtf8Sync(path.resolve(godotDir, "child_2.tscn"));
+        return tscn.match(/node name=\"Child2\" type=\"Child2\"/) !== null;
+      },
+      2000,
+      "should have match to test class autoswitch"
+    );
   });
 });

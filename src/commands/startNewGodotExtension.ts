@@ -241,7 +241,6 @@ target/
         timeout: 2000,
         cwd: crateDir,
       });
-      logger.info(res);
     } catch (e: any) {
       logger.error(`git init failed with message:  ${e.message}`);
     }

@@ -133,7 +133,6 @@ const pickOnReady = async (
     canPickMany: true,
     title: "Select OnReady field to add",
   })) as NodeItem[] | undefined; // pick many
-  logger.info(choices);
   return choices;
 };
 
