@@ -19,4 +19,4 @@ offset_bottom = 8.0
 
 [node name="Node2D" type="Node2D" parent="Other1/Other11/Other111/OneChild1/TextEdit"]
 
-[node name="Child2" parent="Other1" instance=ExtResource("2_esrft")]
+[node name="Child22" parent="Other1" instance=ExtResource("2_esrft")]

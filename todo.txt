@@ -1,7 +1,7 @@
 bug:
-autoswitch failing add the end of newgodotclass
 
 Prochain en cours :
+- show packed scene as packed scene
 _ code action rename
 - onready with non init: necessite parse "fn init"
 - parse "fn init"

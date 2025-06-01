@@ -1,12 +1,12 @@
-import { InputBox, TextEditor } from "vscode-extension-tester";
-import { initTest } from "./ui-testutils.js";
+import { InputBox, TextEditor, TreeItem } from "vscode-extension-tester";
+import { initTest, matchTrimedLine, pickItem } from "./ui-testutils.js";
 import path from "path";
 import { expect } from "earl";
 
 describe("InsertSnippet Command", () => {
   let inp: InputBox;
 
-  it("tests one snippet is added to current file", async () => {
+  it("tests command alone", async () => {
     const { rootPath, browser, wb } = await initTest(
       "assets/panel/panel",
       "assets/panel"
@@ -28,8 +28,8 @@ describe("InsertSnippet Command", () => {
     await editor.save();
   });
 
-  it("tests rust tupe", async () => {
-    const { rootPath, browser, wb, driver } = await initTest(
+  it("test panel, godotType, rust godoclass, import type, import name correct", async () => {
+    const { rootPath, browser, wb, driver, panel } = await initTest(
       "assets/panel/panel",
       "assets/panel"
     );
@@ -38,41 +38,52 @@ describe("InsertSnippet Command", () => {
     await browser.openResources(child1f);
     let editor = new TextEditor();
 
-    await wb.executeCommand("godot4-rust.insertOnReady");
-    inp = await InputBox.create();
-    await inp.selectQuickPick(3);
+    // test simple node
+    let other1 = await pickItem("Other1", panel);
+    let menu = await other1?.openContextMenu();
+    await menu?.wait();
+    await menu?.click();
+    await matchTrimedLine(
+      editor,
+      2,
+      "classes::{Camera2D, CanvasLayer, INode2D, Node2D, Sprite2D},",
+      3000
+    );
+    await matchTrimedLine(editor, 14, '#[init(node = "Other1")]');
+    await matchTrimedLine(editor, 15, "other_1: OnReady<Gd<CanvasLayer>>,");
 
-    await editor.save();
-    await driver.wait(async () => {
-      return (
-        (await editor.getTextAtLine(6)) === "use crate::child_1::Child1Struct;"
-      );
-    }, 3000);
-    
-  
-
-    await wb.executeCommand("godot4-rust.insertOnReady");
-    inp = await InputBox.create();
-    await inp.selectQuickPick(6);
-
-    // result
-    let ligne1 = await editor.getTextAtLine(18);//inverted/ we do not wait save
-    let ligne2 = await editor.getTextAtLine(19);
-    expect(ligne1.trim()).toEqual(
+    // test RustStruct
+    let oneChild1 = await pickItem("OneChild1", panel);
+    menu = await oneChild1?.openContextMenu();
+    await menu?.wait();
+    await menu?.click();
+    await matchTrimedLine(editor, 6, "use crate::child_1::Child1Struct;", 3000);
+    await matchTrimedLine(
+      editor,
+      18,
       '#[init(node = "Other1/Other11/Other111/OneChild1")]'
     );
-    expect(ligne2.trim()).toEqual("one_child_1: OnReady<Gd<Child1Struct>>,");
+    await matchTrimedLine(
+      editor,
+      19,
+      "one_child_1: OnReady<Gd<Child1Struct>>,"
+    );
 
-    ligne1 = await editor.getTextAtLine(16);
-    ligne2 = await editor.getTextAtLine(17);
-    expect(ligne1.trim()).toEqual('#[init(node = "Other1/Child2")]');
-    expect(ligne2.trim()).toEqual("child_2: OnReady<Gd<HttpRequest>>,");
-    await driver.wait(async () => {
-      return (
-        (await editor.getTextAtLine(2)).trim() ===
-        "classes::{Camera2D, HttpRequest, INode2D, Node2D, Sprite2D},"
-      );
-    }, 3000);
+    // test packedscene + good classname (HTTP/http)
+    let child2 = await pickItem("Child22", panel);
+    menu = await child2?.openContextMenu();
+    await menu?.wait();
+    await menu?.click();
+    await matchTrimedLine(
+      editor,
+      2,
+      "classes::{Camera2D, CanvasLayer, HttpRequest, INode2D, Node2D, Sprite2D},",
+      3000
+    );
+    // ok in real testing be here it commes back in row, don't know why
+    await matchTrimedLine(editor, 18, '#[init(node = "Other1/Child22")]');
+    await matchTrimedLine(editor, 19, "child_22: OnReady<Gd<HttpRequest>>,");
+
     await editor.save();
   });
 });
