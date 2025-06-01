@@ -112,8 +112,22 @@
       }
     }
   },
+  "watch": {
+    "ui-vsix": {
+      "patterns": [
+        "src",
+        "scripts"
+      ],
+      "extensions": "ts,mts",
+      "runOnChangeOnly": false,
+      "quiet": false
+    }
+  },
   "scripts": {
+    "vscode:prepublish": "npm run compile",
     "setup": "npm run cloneScal && npm run fixSelenium",
+    "fnm": "fnm use 20",
+    "watch_vsix": "npm-watch ui-vsix",
     "cloneScal": "git clone https://github.com/nicolasbize/Scalazard assets/scalazar",
     "fixSelenium": "sed -i '1s/^/import { WebSocket } from \\\"ws\\\";\\\n/' node_modules/@types/selenium-webdriver/bidi/index.d.ts",
     "compile": "tsc -p ./",
@@ -147,6 +161,7 @@
     "earl": "^1.3.0",
     "eslint": "^9.25.1",
     "mitata": "^1.0.34",
+    "npm-watch": "^0.13.0",
     "typescript": "^5.8.3",
     "vscode-extension-tester": "^8.14.1"
   },

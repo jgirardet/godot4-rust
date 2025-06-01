@@ -14,7 +14,38 @@
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"dependsOn": [
+				"fnm node 20"
+			]
+		},
+		{
+			"label": "watch and rebuild vsix",
+			"type": "npm",
+			"script": "watch_vsix",
+			// "problemMatcher": "$tsc-watch",
+			"group": "build",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "never",
+			},
+			"dependsOn": [
+				"fnm node 20"
+			],
+		},
+		{
+			"label": "compile",
+			"script": "compile",
+			"type": "npm",
+			"dependsOn": [
+				"fnm node 20"
+			]
+		},
+		{
+			"label": "fnm node 20",
+			"script": "fnm",
+			"type": "npm",
+			"runOptions": {}
 		}
 	]
 }

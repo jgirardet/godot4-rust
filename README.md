@@ -48,6 +48,12 @@ This extension contributes the following settings:
 
 ## Known Issues
 
+
+##  Contribute
+
+- various way to run tests
+- fnm enforces node 20
+
 ## Release Notes
 
 ### 0.1.0
