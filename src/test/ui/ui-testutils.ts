@@ -140,18 +140,22 @@ export async function matchTrimedLine(
   line: number,
   toMatch: string,
   delay?: number,
-  errMsg?: number
+  errMsg?: string
 ) {
   await editor.wait();
   let content: string;
   let driver = editor.getDriver();
   toMatch = toMatch.trim();
   if (delay) {
-    await driver.wait(async () => {
-      content = (await editor.getTextAtLine(line)).trim();
-      console.log(`Trying ${content} >< ${toMatch}`);
-      return content === toMatch;
-    }, delay);
+    await driver.wait(
+      async () => {
+        content = (await editor.getTextAtLine(line)).trim();
+        // console.log(`Trying ${content} >< ${toMatch}`); // uncomment if needed
+        return content === toMatch;
+      },
+      delay,
+      errMsg
+    );
   } else {
     content = (await editor.getTextAtLine(line)).trim();
     expect(content).toEqual(toMatch);

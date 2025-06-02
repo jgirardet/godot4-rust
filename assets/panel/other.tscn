@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://hqe72x3rde5d"]
+[gd_scene load_steps=4 format=3 uid="uid://hqe72x3rde5d"]
 
 [ext_resource type="PackedScene" uid="uid://bkntn1rovgg28" path="res://child1.tscn" id="1_4clav"]
 [ext_resource type="PackedScene" uid="uid://de3up17wr31l0" path="res://child_2.tscn" id="2_esrft"]
+[ext_resource type="PackedScene" uid="uid://co8lwqttdijob" path="res://sub1/sub2/sub3/sub4/Subsub.tscn" id="4_mchre"]
 
 [node name="Other" type="Other"]
 
@@ -20,3 +21,17 @@ offset_bottom = 8.0
 [node name="Node2D" type="Node2D" parent="Other1/Other11/Other111/OneChild1/TextEdit"]
 
 [node name="Child22" parent="Other1" instance=ExtResource("2_esrft")]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Other1/Child22"]
+
+[node name="Camera2D" type="Camera2D" parent="Other1/Child22/AnimatedSprite2D"]
+
+[node name="Label" type="Label" parent="Other1/Child22/AnimatedSprite2D/Camera2D"]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Other1/Child22/AnimatedSprite2D"]
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Other1/Child22/AnimatedSprite2D"]
+
+[node name="Esubix" parent="Other1" instance=ExtResource("4_mchre")]

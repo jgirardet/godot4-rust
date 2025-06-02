@@ -37,25 +37,17 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
 
     // process packed scenes, afterwards
     for (const [k, v] of this.data.entries()) {
-      let packed = v.getPackedSceneChildren();
-      for (const p of packed) {
+      for (const p of v.packedSceneChildren) {
         let packedResPath = p.node.instance?.value.path.value;
         if (packedResPath) {
           let packedGPath = GodotPath.fromRes(packedResPath);
           let rootNodeItem = this.data.get(packedGPath.base);
           if (rootNodeItem) {
-            p.instanceType = rootNodeItem.type;
-            let serchedStruct = rust.modules.get(p.instanceType);
-            if (serchedStruct) {
-              p.iconPath = NodeItem.getGodotRustIconUri();
-              p.tooltip = serchedStruct.baseClass;
+            p.setInstanceType(rootNodeItem);
+            if (rust.modules.has(p.instanceType!) || p.type in GODOT_STRUCTS) {
+              p.setup();
             } else {
-              if (p.type in GODOT_STRUCTS) {
-                p.tooltip = rootNodeItem.tooltip;
-                p.iconPath = rootNodeItem.iconPath;
-              } else {
-                p.setMissing();
-              }
+              p.setMissing();
             }
           }
         }
@@ -77,7 +69,7 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
   ): Promise<NodeItem[] | null | undefined> {
     if (!element) {
       let roots = [...this.data.values()];
-      roots.sort((a, b) => (a.name > b.name ? 1 : -1));
+      roots.sort((a, b) => (a.tscn!.base > b.tscn!.base ? 1 : -1));
       return roots;
     } else {
       return element.children;

@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://co8lwqttdijob"]
+
+[node name="Esubix" type="CanvasModulate"]
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_right = 8.0
+offset_bottom = 8.0

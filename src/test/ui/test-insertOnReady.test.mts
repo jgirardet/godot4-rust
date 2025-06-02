@@ -47,7 +47,8 @@ describe("InsertSnippet Command", () => {
       editor,
       2,
       "classes::{Camera2D, CanvasLayer, INode2D, Node2D, Sprite2D},",
-      3000
+      3000,
+      "Can't find canvas layer import"
     );
     await matchTrimedLine(editor, 14, '#[init(node = "Other1")]');
     await matchTrimedLine(editor, 15, "other_1: OnReady<Gd<CanvasLayer>>,");
@@ -57,7 +58,13 @@ describe("InsertSnippet Command", () => {
     menu = await oneChild1?.openContextMenu();
     await menu?.wait();
     await menu?.click();
-    await matchTrimedLine(editor, 6, "use crate::child_1::Child1Struct;", 3000);
+    await matchTrimedLine(
+      editor,
+      6,
+      "use crate::child_1::Child1Struct;",
+      3000,
+      "can't find Child1struct import"
+    );
     await matchTrimedLine(
       editor,
       18,
@@ -78,7 +85,8 @@ describe("InsertSnippet Command", () => {
       editor,
       2,
       "classes::{Camera2D, CanvasLayer, HttpRequest, INode2D, Node2D, Sprite2D},",
-      3000
+      3000,
+      "Can't find HttpRequest import"
     );
     // ok in real testing be here it commes back in row, don't know why
     await matchTrimedLine(editor, 18, '#[init(node = "Other1/Child22")]');

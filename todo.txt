@@ -1,7 +1,11 @@
 bug:
 
 Prochain en cours :
-- show packed scene as packed scene
+
+
+
+- roadmap to V1
+
 _ code action rename
 - onready with non init: necessite parse "fn init"
 - parse "fn init"
@@ -9,10 +13,9 @@ _ code action rename
 _ resource_uri de node item pour tscn
 - lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
 - switch undo /redo 
--class renaming /doublon
+- class renaming /doublon
 - documentation
 - check attribute godot path
-_ import après insert onready
 
 
 
@@ -40,6 +43,7 @@ configaration  à ajouter:
 - workern
 - auto focus node
 - pub ou pub(crate) by default
+- tscnpath full or "..." in panel
 
 doc:
 - panel

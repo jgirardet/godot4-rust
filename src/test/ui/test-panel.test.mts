@@ -5,6 +5,8 @@ import { join } from "path";
 import { readUtf8Sync } from "../../utils.js";
 import { rmSync, writeFileSync } from "fs";
 
+const child1Label = "child1.tscn (Child1)";
+const child2Label = "child_2.tscn (Child2)";
 describe("Test Panel", () => {
   it("global test panel", async () => {
     const { rootPath, driver, panel, godotDir, browser, wb } = await initTest(
@@ -17,13 +19,25 @@ describe("Test Panel", () => {
     //------------------------- Base show -------------------------//
 
     // Affichage de base
-    expect(visibleItems.length).toEqual(4);
+    expect(visibleItems.length).toEqual(5);
     expect(
       await Promise.all(visibleItems.map((m, _, __) => m.getLabel()))
-    ).toEqual(["Child1", "Child2", "Main", "Other"]);
+    ).toEqual([
+      child1Label,
+      child2Label,
+      "main.tscn (Main)",
+      "other.tscn (Other)",
+      "Subsub.tscn (Esubix)",
+    ]);
     expect(
       await Promise.all(visibleItems.map((m, _, __) => m.getDescription()))
-    ).toEqual(["Child1Struct", "HTTPRequest", "Node2D", "Other"]);
+    ).toEqual([
+      "Child1Struct \u279c Node2D",
+      "HTTPRequest",
+      "Node2D",
+      "Other \u279c Node2D",
+      "CanvasModulate",
+    ]);
 
     // click
     await visibleItems[2].click();
@@ -46,25 +60,27 @@ describe("Test Panel", () => {
 
     //------------------------- Modify Rust -------------------------//
 
-    expect(await (await pickItem("Child1"))!.getDescription()).toEqual(
-      "Child1Struct"
+    expect(await (await pickItem(child1Label))!.getDescription()).toEqual(
+      "Child1Struct \u279c Node2D"
     );
     let child1 = join(rootPath, "src/child_1.rs");
     let backup = readUtf8Sync(child1);
 
     // delete
+    console.log("deleting");
     rmSync(child1);
-    await waitToolTipToBe("Child1", "Error: type is missing", driver);
+    await waitToolTipToBe("Child1", "Rust godot class missing", driver);
 
     // Add
+    console.log("adding");
     writeFileSync(child1, backup);
-    await waitToolTipToBe("Child1", "Child1Struct", driver);
+    await waitToolTipToBe(child1Label, "child1.tscn", driver);
 
     // Modify className
     writeFileSync(child1, backup.replaceAll("Child1Struct", "Autre1Struct"));
-    await waitToolTipToBe("Child1", "Error: type is missing", driver);
+    await waitToolTipToBe("Child1", "Rust godot class missing", driver);
     writeFileSync(child1, backup.replaceAll("Autre1Struct", "Child1Sruct"));
-    await waitToolTipToBe("Child1", "Child1Struct", driver);
+    await waitToolTipToBe(child1Label, "child1.tscn", driver);
 
     //------------------------- Modify Godo -------------------------//
 
@@ -75,20 +91,24 @@ describe("Test Panel", () => {
       child1tscn,
       backup.replace('type="Child1Struct"', 'type="Sprite2D"')
     );
-    await waitDescriptionToBe("Child1", "Sprite2D", driver);
+    await waitDescriptionToBe(child1Label, "Sprite2D", driver);
     writeFileSync(
       child1tscn,
       backup.replace('type="Child1Struct"', 'type="Other"')
     );
-    await waitDescriptionToBe("Child1", "Other", driver);
+    await waitDescriptionToBe(child1Label, "Other \u279C Node2D", driver);
     writeFileSync(child1tscn, backup);
-    await waitDescriptionToBe("Child1", "Child1Struct", driver);
+    await waitDescriptionToBe(
+      child1Label,
+      "Child1Struct \u279C Node2D",
+      driver
+    );
 
     // remove file in godot
     rmSync(child1tscn);
     await driver.sleep(300);
     await driver.wait(
-      async () => (await pickItem("Child1")) === undefined,
+      async () => (await pickItem(child1Label)) === undefined,
       2000,
       "Child 1 should be remove"
     );
@@ -96,7 +116,7 @@ describe("Test Panel", () => {
     // Add File in GODOT
     writeFileSync(child1tscn, backup);
     await driver.wait(
-      async () => await pickItem("Child1"),
+      async () => await pickItem(child1Label),
       2000,
       "Child 1 should be back"
     );
@@ -104,12 +124,12 @@ describe("Test Panel", () => {
     //------------------------- Switch class -------------------------//
 
     await browser.openResources(join(rootPath, "src/other.rs"));
-    let child2 = (await pickItem("Child2"))!;
+    let child2 = (await pickItem(child2Label))!;
     await child2.select();
     await wb.executeCommand("Change Type GodotClass");
     let inp = await InputBox.create();
     await inp.selectQuickPick("child_2.tscn");
-    await waitDescriptionToBe("Child2", "Other", driver);
+    await waitDescriptionToBe(child2Label, "Other \u279C Node2D", driver);
 
     const notif = (await wb.getNotifications())![0];
     expect(await notif.getMessage()).toEqual(
@@ -136,7 +156,7 @@ const waitDescriptionToBe = async (
   value: string,
   driver: WebDriver
 ) => {
-  let was = await (await pickItem(item))!.getTooltip();
+  let was = await (await pickItem(item))!.getDescription();
   await driver.wait(
     async () => (await (await pickItem(item))!.getDescription()) === value,
     2000,
