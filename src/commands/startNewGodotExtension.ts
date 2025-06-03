@@ -1,12 +1,13 @@
 import path from "path";
 import { logger } from "../log";
-import { commands, Uri, window } from "vscode";
+import { commands, ExtensionContext, Uri, window } from "vscode";
 import { selectGodotProject } from "./setGodotProject";
 import { FullPathDir, FullPathFile, Name } from "../types";
 import { getParsedGodotProject } from "../godotProject";
 import { kebabCase, pascalCase } from "string-ts";
 import { runCargoCommand } from "../cargo";
 import {
+  CHANGE_RA_CHECK_TO_BUILD,
   GODOT_PROJECT_FILEPATH_KEY,
   LAST_GODOT_CRATE_VERSION_AS_TOML,
   NAME,
@@ -15,8 +16,14 @@ import { mkdirSync, writeFileSync } from "fs";
 import { processCreateGdextension } from "./createGdextension";
 import { execSync } from "child_process";
 import findParentDir from "find-parent-dir";
+import { isRustanalyzerActive } from "../rust/utils";
+import { getConfigValue } from "../vscodeUtils";
+import {
+  overrideCommandContent,
+  raCheckCommand,
+} from "./setRustAnalyzer";
 
-export const startNewExtensionCommand = async () => {
+export const startNewExtensionCommand = async (context: ExtensionContext) => {
   logger.info("Starting new extension");
 
   const godotFileProject = await selectGodotProjectStep();
@@ -40,7 +47,7 @@ export const startNewExtensionCommand = async () => {
   }
 
   const gd = new NewGDExtension(godotFileProject, rustParentDir, crateName);
-  await gd.build();
+  await gd.build(context);
   commands.executeCommand("vscode.openFolder", Uri.file(gd.crateDir));
 };
 
@@ -80,7 +87,7 @@ class NewGDExtension {
     window.showQuickPick;
   }
 
-  build = async () => {
+  build = async (context: ExtensionContext) => {
     // create rust dir structur
     mkdirSync(path.join(this.crateDir, "src/"), { recursive: true });
 
@@ -98,11 +105,19 @@ class NewGDExtension {
 
     // create vscode settings
     mkdirSync(path.join(this.crateDir, ".vscode"), { recursive: true });
+    let settings = {
+      [`${NAME}.${GODOT_PROJECT_FILEPATH_KEY}`]: this._godotProjectFile,
+    };
+    if (
+      isRustanalyzerActive() ||
+      getConfigValue<boolean>(CHANGE_RA_CHECK_TO_BUILD)
+    ) {
+      // update RA from check to build
+      Object.assign(settings, { [raCheckCommand]: overrideCommandContent });
+    }
     writeFileSync(
       path.join(this.crateDir, ".vscode", "settings.json"),
-      JSON.stringify({
-        [`${NAME}.${GODOT_PROJECT_FILEPATH_KEY}`]: this._godotProjectFile,
-      })
+      JSON.stringify(settings)
     );
 
     // create gdextension
