@@ -9,6 +9,7 @@ export const NB_WORKERS_KEY = "nbWorkersToParseTscn";
 export const NEW_GODOT_CLASS_DEFAULT_VISIBILITY_KEY =
   "newGodotClassDefaultVisibility";
 export const NEW_GODOT_CLASS_AUTO_INSERT_MOD_KEY = "newGodotClassAutoInsertMod";
+export const CHANGE_RA_CHECK_TO_BUILD = "changeRustAnalyzerCheckCommandToBuild";
 
 export const LAST_GODOT_CRATE_VERSION_AS_TOML: string = 'godot = "0.2.4"';
 

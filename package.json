@@ -70,6 +70,11 @@
         "command": "godot4-rust.replaceBaseClass",
         "title": "Godot4-Rust: Change Type with GodotClass in active Editor",
         "enablement": "godot4-rust.project_set"
+      },
+      {
+        "command": "godot4-rust.setRACheckToBuild",
+        "title": "Godot4-Rust: Use `build` as Rust Analyzer check command",
+        "enablement": "godot4-rust.project_set"
       }
     ],
     "menus": {
@@ -107,6 +112,11 @@
           "description": "Auto replace Root Godot Node by Rust Godoclass after a new godotclass is generated",
           "type": "boolean",
           "default": false
+        },
+        "godot4-rust.changeRustAnalyzerCheckCommandToBuild": {
+          "description": "Make Rust Analyzer use 'build' instead of 'check' as check command to autobuild extension. True enables it for every new project",
+          "type": "boolean",
+          "default": true
         },
         "godot4-rust.nbWorkersToParseTscn": {
           "description": "Fixed Number of workers to parse tscn files. Should not be set in most cases",

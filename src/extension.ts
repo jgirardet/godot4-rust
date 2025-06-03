@@ -7,6 +7,7 @@ import { startNewExtensionCommand } from "./commands/startNewGodotExtension";
 import { getGodotProjectFile } from "./godotProject";
 import { GodotManager } from "./panel/godotManager";
 import { registerGCommand } from "./vscodeUtils";
+import { setRACheckToBuild } from "./commands/setRustAnalyzer";
 
 export async function activate(
   context: vscode.ExtensionContext
@@ -15,7 +16,10 @@ export async function activate(
 
   context.subscriptions.push(
     registerGCommand("setGodotProject", setGodotProjectCommand),
-    registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)
+    registerGCommand(
+      "startNewGDExtensionProject",
+      async () => await startNewExtensionCommand(context)
+    )
   );
 
   let godotProjectFile = getGodotProjectFile(); //throw if fails
@@ -27,7 +31,10 @@ export async function activate(
   let manager = new GodotManager(context, godotProjectFile);
 
   context.subscriptions.push(
-    registerGCommand("createGdextension", createGdextensionCommand)
+    registerGCommand("createGdextension", createGdextensionCommand),
+    registerGCommand("setRACheckToBuild", async () =>
+      setRACheckToBuild(context)
+    )
   );
 
   logger.info("Starting complete");

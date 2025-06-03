@@ -8,7 +8,6 @@ Prochain en cours :
     - autoreplace in tscn makes insertmod fail
     - after add newGodot class with auto switch: reload panel
     - documentation
-    - build.tsk pour le cargo build de fond : voir avec l'ext godot-rust
     - test real godot4rust project
     doc:
         - panel
