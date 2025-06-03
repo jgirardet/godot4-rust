@@ -17,11 +17,12 @@ import {
 
 import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
-import { AUTO_REPLACE_TSCN_KEY, NAME } from "../constantes";
+import { AUTO_REPLACE_TSCN_KEY, NAME, NB_WORKERS_KEY } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { logger } from "../log";
 import {
   getConfigValue,
+  getProjectConfig,
   rangeToVsRange,
   registerGCommand,
 } from "../vscodeUtils";
@@ -137,7 +138,8 @@ export class GodotManager {
   }
 
   async reload() {
-    const scenes = await this.loader.reload();
+    let nbWorkers = getProjectConfig().get<number>(NB_WORKERS_KEY);
+    const scenes = await this.loader.reload(nbWorkers);
     this.treeData.updateData(scenes, this.rust);
   }
 

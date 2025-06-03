@@ -5,63 +5,34 @@ Prochain en cours :
 
 
 - roadmap to V1
-
-_ code action rename
-- onready with non init: necessite parse "fn init"
-- parse "fn init"
-- preload
-_ resource_uri de node item pour tscn
-- lien ficher ouvert et panel et REVERSE (avec identificaiton de rust)
-- switch undo /redo 
-- class renaming /doublon
-- documentation
-- check attribute godot path
-
-
-
-
-features:
-- explorer
-    - explorer indicate some things (onready or others)
-    _ afficher + masque les path des fichiers
-- ajouter les groups dans godot parse
-_ parser les extResources image pour les affic-her en icone
-- build.tsk pour le cargo build de fond
-- insert rust mod
-
-
-code refactor
-- parser TSCN:
-    - un grand nombre de test de tscn différent pour tester plantage
-- godotprojectdir sans dep vscode
-    
-- 2 case converts
+    - autoreplace in tscn makes insertmod fail
+    - documentation
+    - build.tsk pour le cargo build de fond : voir avec l'ext godot-rust
+    - after add newGodot class with auto switch: reload panel
+    - test real godot4rust project
+    doc:
+        - panel
+        - add godot class
+        - insert snippet at good place + panel
+        - selection reveal
+        - insertmod et auto import
+        - all
+    tests: 
+        - panel:
+            root node: context (+new,+switch, -onready)
+            root node rust: context (-new, +switchn -onready)
+            others: context (-new, -nswitch, +onraeady if current doc)
 
 
 
-configaration  à ajouter: 
-- workern
-- auto focus node
-- pub ou pub(crate) by default
-- tscnpath full or "..." in panel
 
-doc:
-- panel
-- add godot class
-- insert snippet at good place + panel
-- selection reveal
-- insertmod et auto import
+- roadmap to v2
+    - onready with non init: necessite parse "fn init" +++
+    - code action rename ++
+    - ajouter les groups de nodeItem (parse, filter by) +/-
+    - parser tscn refactor ? +/-
+    - 2 case converts ++
 
 
-
-features du panel non testable: 
-- context sur root:
-    - new class mais pas si rusttype
-
-- context sur child:
-    - insertOnready: mais pas sur root
-
-- insert mod
-
-
-    
+- untestable:
+    - insert mod: maybe du to ra loading time

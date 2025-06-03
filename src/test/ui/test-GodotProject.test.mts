@@ -3,7 +3,6 @@ import path from "path";
 import * as fs from "fs";
 import { InputBox } from "vscode-extension-tester";
 import { initTest } from "./ui-testutils.js";
-import { GodotSettings } from "../../constantes.js";
 
 describe("UI Godot4-rust test suite", () => {
   it("Test Godot set project command add configs to workspace", async () => {
@@ -42,7 +41,7 @@ describe("UI Godot4-rust test suite", () => {
 
 export const getSettings = (filepath: string): GodotSettings | undefined => {
   if (fs.existsSync(filepath)) {
-    let settings: GodotSettings = JSON.parse(
+    let settings = JSON.parse(
       fs.readFileSync(filepath, {
         encoding: "utf-8",
       })
@@ -51,3 +50,7 @@ export const getSettings = (filepath: string): GodotSettings | undefined => {
   }
   return undefined;
 };
+
+interface GodotSettings {
+  "godot4-rust.godotProjectFilePath": string;
+}

@@ -25,6 +25,8 @@ import {
 import { NodeItem } from "../panel/nodeItem";
 import { isRustanalyzerActive, tryExecuteCodeAction } from "../rust/utils";
 import { GodotManager } from "../panel/godotManager";
+import { getConfigValue } from "../vscodeUtils";
+import { NEW_GODOT_CLASS_AUTO_INSERT_MOD_KEY } from "../constantes";
 
 export const newGodotClass = async (
   { treeData, rust }: GodotManager,
@@ -84,11 +86,15 @@ export const newGodotClass = async (
 
     if (isRustanalyzerActive()) {
       logger.info("Trying to insert mod in lib.rs");
+      let modType = getConfigValue<string>(NEW_GODOT_CLASS_AUTO_INSERT_MOD_KEY);
+      if (modType === "pub(crate) mod") {
+        modType = "pub\\(crate\\) mod";
+      }
       await tryExecuteCodeAction(
         editor.selection,
         editor.document.fileName,
         CodeActionKind.QuickFix,
-        `^Insert \`mod ${basename(editor.document.fileName, ".rs")};\`$`
+        `^Insert \`${modType} ${basename(editor.document.fileName, ".rs")};\`$`
       );
     }
 

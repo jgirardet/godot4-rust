@@ -33,10 +33,10 @@ export class GodotProjectLoader {
     return this._godotProjectFile;
   }
 
-  async reload(): Promise<Map<string, GodotScene>> {
+  async reload(nbWorker?: number): Promise<Map<string, GodotScene>> {
     this.scenes.clear();
     this.dependencies.clear();
-    return this.load();
+    return this.load(nbWorker);
   }
 
   async load(nbWorker?: number): Promise<Map<string, GodotScene>> {

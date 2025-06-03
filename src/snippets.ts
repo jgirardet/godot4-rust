@@ -1,6 +1,8 @@
 import { toSnake } from "ts-case-convert";
 import { NodeItem } from "./panel/nodeItem";
 import { GODOT_VIRTUAL_METHODS } from "./godotClasses";
+import { getConfigValue } from "./vscodeUtils";
+import { NEW_GODOT_CLASS_DEFAULT_VISIBILITY_KEY } from "./constantes";
 
 export {
   onready_snippet,
@@ -25,10 +27,12 @@ const declGodotClassStart = (
 ): string[] => {
   let struct = nodeItem.rustType;
 
+  const vis = getConfigValue(NEW_GODOT_CLASS_DEFAULT_VISIBILITY_KEY);
+
   return [
     "#[derive(GodotClass)]",
     `#[class(base=${struct}${withInit ? ",init" : ""})]`,
-    `pub struct ${nodeItem.name} {`,
+    `${vis} struct ${nodeItem.name} {`,
     `base: Base<${struct}>,`,
   ];
 };
