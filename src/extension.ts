@@ -14,7 +14,8 @@ export async function activate(
   logger.info(`Extension${NAME} activating`);
 
   context.subscriptions.push(
-    registerGCommand("setGodotProject", setGodotProjectCommand)
+    registerGCommand("setGodotProject", setGodotProjectCommand),
+    registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)
   );
 
   let godotProjectFile = getGodotProjectFile(); //throw if fails
@@ -26,8 +27,7 @@ export async function activate(
   let manager = new GodotManager(context, godotProjectFile);
 
   context.subscriptions.push(
-    registerGCommand("createGdextension", createGdextensionCommand),
-    registerGCommand("startNewGDExtensionProject", startNewExtensionCommand)
+    registerGCommand("createGdextension", createGdextensionCommand)
   );
 
   logger.info("Starting complete");

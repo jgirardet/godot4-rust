@@ -54,8 +54,7 @@
       },
       {
         "command": "godot4-rust.startNewGDExtensionProject",
-        "title": "Godot4-Rust: Start a new GDExtension project",
-        "enablement": "godot4-rust.project_set"
+        "title": "Godot4-Rust: Start a new GDExtension project"
       },
       {
         "command": "godot4-rust.reveal",
