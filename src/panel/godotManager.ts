@@ -164,7 +164,10 @@ export class GodotManager {
   async newGodotClass(nodeItem?: NodeItem) {
     nodeItem = await newGodotClass(this, nodeItem);
     if (getConfigValue<boolean>(AUTO_REPLACE_TSCN_KEY)) {
-      await commands.executeCommand("godot4-rust.replaceBaseClass", nodeItem);
+      // settimeout required to make "add  mod" work in newgodotclass"
+      setTimeout(async () => {
+        await commands.executeCommand("godot4-rust.replaceBaseClass", nodeItem);
+      });
     }
   }
 

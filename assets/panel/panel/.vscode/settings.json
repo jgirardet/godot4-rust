@@ -2,4 +2,13 @@
     "godot4-rust.godotProjectFilePath": "/home/jim/Rien/godot4-rust/assets/panel/project.godot",
     "godot4-rust.autoReplaceInTscn": false,
     "rust-analyzer.procMacro.enable": false,
+    "rust-analyzer.check.overrideCommand": [
+        "cargo",
+        "build",
+        "--quiet",
+        "--workspace",
+        "--message-format=json",
+        "--all-targets",
+        "--keep-going"
+    ],
 }
