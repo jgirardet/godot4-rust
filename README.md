@@ -53,6 +53,9 @@ via Right mouse click, context menu:
 ##### on child Nodes
 
 - [**Add `OnReady` as simple as in Godot**](#add-onready-as-simple-as-in-godot)
+  
+https://github.com/user-attachments/assets/414b2b24-9177-4bed-8c98-b75a78f8f88f
+
 
 #### Add `OnReady` as simple as in Godot
 
@@ -62,9 +65,8 @@ command: `godot4-rust.insertOnReady`
 
 ![insert on ready](doc/panel-insertonready.png)
 
-![inser](doc/panel-insertonready.mp4)
-
 https://github.com/user-attachments/assets/4a9904bf-6ff1-4570-8b82-b015ea439fd4
+
 
 #### Derive new rust module from existing Godot Scene
 
