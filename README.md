@@ -53,9 +53,8 @@ via Right mouse click, context menu:
 ##### on child Nodes
 
 - [**Add `OnReady` as simple as in Godot**](#add-onready-as-simple-as-in-godot)
-  
-https://github.com/user-attachments/assets/414b2b24-9177-4bed-8c98-b75a78f8f88f
 
+https://github.com/user-attachments/assets/414b2b24-9177-4bed-8c98-b75a78f8f88f
 
 #### Add `OnReady` as simple as in Godot
 
@@ -66,7 +65,6 @@ command: `godot4-rust.insertOnReady`
 ![insert on ready](doc/panel-insertonready.png)
 
 https://github.com/user-attachments/assets/4a9904bf-6ff1-4570-8b82-b015ea439fd4
-
 
 #### Derive new rust module from existing Godot Scene
 
@@ -104,7 +102,11 @@ Set worksapce settings so RA, uses build instead of check as check command. So y
 
 An error will be raised in panel if a godoclass or child scene is missing.
 
+![missing node](doc/panel-error.png)
+
 An error will be shown in code if node path doesn't exists for onready fields.
+
+![lint-error](doc/lint.png)
 
 #### Create .gdextension in your Godot Project
 
@@ -114,6 +116,8 @@ command: `godot4-rust.createGdextension`
 - Second: Run command **Godot4-Rust: Create a the .gdextension file in your project**, and that's it.
 
 By default `compatibility minimum` is set following the value of your godot.project file.
+
+![gdextension](doc/)
 
 #### Switch Godot class by Rust godot class
 
@@ -129,6 +133,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
+- Rust Analyzer is not mandatory but warmly suggested (autoimport, autobuild)
 - Only accept one godot class by rust module
 
 ## Contribute
