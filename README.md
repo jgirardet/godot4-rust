@@ -29,27 +29,24 @@ Godot4 Rust
 
 [**Less boilerplate and speed up your worflow**](#less-boiler-plate-and-speed-up-workflow)
 
-## Usage
-
 > [!IMPORTANT]
 > First you need to configure the linked Godot Project
+> Use dedicated command to set it (Ctrl+Maj+P => `Godot4-Rust: Set Godot Project`)
 
-command: `Godot4-Rust: Set Godot Project`
-
-Use dedicated command to set it (Ctrl+Maj+P => Godot4-Rust: set Godot Project)
-
-#### Scene's Panel
+### Scene's Panel
 
 Your scenes are shown with the following format:
 
 - godot base scene: Godot Icon, Scene pathe, (Rootnode), base type
 - rust godotclass based scene: `ferris` icon, Scene path, (RootNode name), GodotClass name -> baseclass
 
-##### actions
+Changing godotclass rust module in editor will revel it in panel.
+
+#### actions
 
 via Right mouse click, context menu:
 
-###### on Root Nodes
+##### on Root Nodes
 
 - [**`Easy quick Derive` new rust GodotClass from existing `Godot Scene`**](#derive-new-rust-module-from-existing-godot-scene)
   ![Derive godot scene](doc/newclass-panel.png)
@@ -57,13 +54,13 @@ via Right mouse click, context menu:
 - [**Switch Godot Node by you Rust GodoClass**](#switch-godot-class-by-rust-godot-class)
   ![Switch type](doc/changetype-panel.png)
 
-##### on child Nodes
+#### on child Nodes
 
 - [**Add `OnReady` as simple as in Godot**](#add-onready-as-simple-as-in-godot)
 
 https://github.com/user-attachments/assets/414b2b24-9177-4bed-8c98-b75a78f8f88f
 
-#### Add `OnReady` as simple as in Godot
+### Add `OnReady` as simple as in Godot
 
 command: `godot4-rust.insertOnReady`
 
@@ -73,7 +70,7 @@ command: `godot4-rust.insertOnReady`
 
 https://github.com/user-attachments/assets/4a9904bf-6ff1-4570-8b82-b015ea439fd4
 
-#### Derive new rust module from existing Godot Scene
+### Derive new rust module from existing Godot Scene
 
 command: `Godot4-Rust: Create a new GodotClass from Godot Scene`
 
@@ -86,9 +83,9 @@ command: `Godot4-Rust: Create a new GodotClass from Godot Scene`
 
 https://github.com/user-attachments/assets/af8f9d93-9528-4980-8b57-63ca8d41cbf7
 
-#### Less boiler plate and speed up workflow
+### Less boiler plate and speed up workflow
 
-##### Kickstart a new project
+#### Kickstart a new project
 
 command: `Start new godot rust project`.
 
@@ -99,13 +96,13 @@ command: `Start new godot rust project`.
   - workspace settings: godot project and [rust analyzer check command updated](#rust-analyzer-check-command-updated)
   - lib.rs with ExtensionLibrary
 
-##### Rust Analyzer Check Command updated
+#### Rust Analyzer Check Command updated
 
 command: `Godot4-Rust: Use 'build' as Rust Analyzer check command`
 
 Set worksapce settings so RA, uses build instead of check as check command. So your project is always compiled. Same parameters are given, only check is replaced by build
 
-#### Code Linter
+### Code Linter
 
 An error will be raised in panel if a godoclass or child scene is missing.
 
@@ -115,7 +112,7 @@ An error will be shown in code if node path doesn't exists for onready fields.
 
 ![lint-error](doc/lint.png)
 
-#### Create .gdextension in your Godot Project
+### Create .gdextension in your Godot Project
 
 command: `godot4-rust.createGdextension`
 
@@ -126,7 +123,7 @@ By default `compatibility minimum` is set following the value of your godot.proj
 
 ![gdextension](doc/)
 
-#### Switch Godot class by Rust godot class
+### Switch Godot class by Rust godot class
 
 command: `godot4-rust.replaceBaseClass`
 
@@ -137,6 +134,11 @@ In place modify your scene, to use godot class in active editor.
 This extension contributes the following settings:
 
 - `godot4-rust.godotProjectFilePath`: REQUIRED: selected the .godot project file. Use dedicated command to set it (Ctrl+Maj+P => Godot4-Rust: set Godot Project). It sets workspace only.
+- `godot4-rust.autoReplaceInTscn`: Auto replace Root Godot Node by Rust Godoclass after a new godotclass is generated. Default: false
+- `godot4-rust.changeRustAnalyzerCheckCommandToBuild`: Make Rust Analyzer use 'build' instead of 'check' as check command to autobuild extension. True enables it for every new project. Default: true
+- `godot4-rust.nbWorkersToParseTscn`: Fixed Number of workers to parse tscn files. Should not be set in most cases". Default: undefined
+- `godot4-rust.newGodotClassDefaultVisibility`:New Godot-class default visibility. Possible values: ", "pub", "pub(crate)", "pub(super)". Default: "pub"
+- `godot4-rust.newGodotClassAutoInsertMod`:How to insert (or not) `mod` in lib.rs or mod.rs (needs Rust-Analyzer) when adding new godot class", Possible values: "", "mod", "pub mod", "pub(crate) mod". Default": "mod"
 
 ## Known Issues
 

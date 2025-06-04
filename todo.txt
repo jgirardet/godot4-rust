@@ -7,17 +7,9 @@ Prochain en cours :
 - roadmap to V1
     - autoreplace in tscn makes insertmod fail
     - after add newGodot class with auto switch: reload panel
-    - documentation
     - test real godot4rust project
     - replace sed by node
     - alignment onready
-    doc:
-        - panel
-        - add godot class
-        - insert snippet at good place + panel
-        - selection reveal
-        - insertmod et auto import
-        - all
     tests: 
         - panel:
             root node: context (+new,+switch, -onready)
