@@ -54,7 +54,7 @@
       },
       {
         "command": "godot4-rust.startNewGDExtensionProject",
-        "title": "Godot4-Rust: Start a new GDExtension project"
+        "title": "Godot4-Rust: Start a new Godot Rust project"
       },
       {
         "command": "godot4-rust.reveal",
