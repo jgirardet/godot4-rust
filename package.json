@@ -178,7 +178,7 @@
     "vscode-test": "node out/test/vscode/runTests.js",
     "ui-install-dep": "extest install-from-marketplace -e .test-extensions rust-lang.rust-analyzer",
     "ui-setup-extest": "extest setup-tests -e .test-extensions",
-    "ui-setup": "npm run ui-setup-extest && npm run ui-install-dep",
+    "ui-setup": "npm run manage cleanUI && npm  run ui-setup-extest && npm run ui-install-dep",
     "ui-vsix": "extest install-vsix -e .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' -o src/test/ui/settings.json -e .test-extensions",
     "ui-testone": "extest run-tests -o src/test/ui/settings.json -e .test-extensions -f"

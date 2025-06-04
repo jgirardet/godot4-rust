@@ -20,7 +20,7 @@ function main() {
   } else if (command === "rmTmp") {
     rmDirGlob(`${tmpdir()}/grudot*`);
   } else if (command === "cleanUI") {
-    rmDirGlob([".test-extensions", "godot4-rust*.vsix", "out"]);
+    rmDirGlob([".test-extensions", "godot4-rust*.vsix"]);
     rmTmp();
   }
 }

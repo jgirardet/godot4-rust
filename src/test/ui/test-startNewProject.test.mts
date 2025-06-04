@@ -6,9 +6,6 @@ import { existsSync, mkdirSync, readFileSync } from "fs";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils.js";
 import * as toml from "smol-toml";
-import * as cheerio from "cheerio";
-import { request } from "https";
-import { setConfig } from "../common.js";
 
 describe("start new  project", () => {
   let inp: InputBox;

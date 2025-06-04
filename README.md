@@ -1,7 +1,7 @@
 <hr/>
 
 <h1 align="center">
-<img src="resources/godotIcons/godotrust/godot-ferris-16x16.svg "/>
+<img src="doc/ferris.png" width="16"/>
 Godot4 Rust VsCode Extension
 <img src="doc/vscode.png">
 </h1>
