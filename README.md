@@ -27,7 +27,7 @@ This extension aims to add a smoother experience using Rust with Godot
 
 [**Create .gdextension file**](#create-gdextension-in-your-godot-project)
 
-[**Less boilerplate and speed up your worflow**]
+[**Less boilerplate and speed up your worflow**](#less-boiler-plate-and-speed-up-workflow)
 
 ## Usage
 
