@@ -10,6 +10,7 @@ Prochain en cours :
     - documentation
     - test real godot4rust project
     - replace sed by node
+    - alignment onready
     doc:
         - panel
         - add godot class

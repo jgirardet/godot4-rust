@@ -37,7 +37,7 @@ export const selectNode = async (
 ): Promise<NodeItem | undefined> => {
   const picks = node.flatChildren.map((n) => new NodeQuickPickItem(n));
   const selected = await window.showQuickPick(picks, {
-    title: `Nodes of ${node.label}`,
+    title: `Nodes of ${node.name}`,
     ...options,
   });
   if (selected === undefined) {

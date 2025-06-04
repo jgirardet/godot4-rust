@@ -1,6 +1,6 @@
 # Godot4 Rust
 
-![Godot4-Rust]("doc/panel.png")
+![Godot4-Rust](./doc/panel.png)
 
 This extension aims to add a smoother experience using Rust with Godot
 
@@ -45,7 +45,10 @@ via Right mouse click, context menu:
 ###### on Root Nodes
 
 - [**`Easy quick Derive` new rust GodotClass from existing `Godot Scene`**](#derive-new-rust-module-from-existing-godot-scene)
+  ![Derive godot scene](doc/newclass-panel.png)
+
 - [**Switch Godot Node by you Rust GodoClass**](#switch-godot-class-by-rust-godot-class)
+  ![Switch type](doc/changetype-panel.png)
 
 ##### on child Nodes
 
@@ -56,6 +59,10 @@ via Right mouse click, context menu:
 command: `godot4-rust.insertOnReady`
 
 - Adds fields automagically with correct Type and name. Struct must be [`init`](https://godot-rust.github.io/docs/gdext/master/godot/register/derive.GodotClass.html#construction)
+
+![insert on ready](doc/panel-insertonready.png)
+
+![inser](doc/panel-insertonready.mp4)
 
 https://github.com/user-attachments/assets/4a9904bf-6ff1-4570-8b82-b015ea439fd4
 
@@ -123,6 +130,11 @@ This extension contributes the following settings:
 - Only accept one godot class by rust module
 
 ## Contribute
+
+## Thanks
+
+- rust godot team
+- godot-vscode extension for inspiration and icons
 
 ## Release Notes
 
