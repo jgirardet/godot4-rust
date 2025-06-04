@@ -9,7 +9,7 @@ Godot4 Rust
 
 ![Godot4-Rust](./doc/panel.png)
 
-This extension aims to add a smoother experience using Rust with Godot
+<p align="center">This extension aims to add a smoother experience using Rust with Godot</p>
 
 ## Features
 
