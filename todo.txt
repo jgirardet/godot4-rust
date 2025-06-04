@@ -9,6 +9,7 @@ Prochain en cours :
     - after add newGodot class with auto switch: reload panel
     - documentation
     - test real godot4rust project
+    - replace sed by node
     doc:
         - panel
         - add godot class

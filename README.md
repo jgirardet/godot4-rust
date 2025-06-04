@@ -1,5 +1,7 @@
 # Godot4 Rust
 
+![Godot4-Rust]("doc/panel.png")
+
 This extension aims to add a smoother experience using Rust with Godot
 
 ## Features
@@ -22,7 +24,10 @@ This extension aims to add a smoother experience using Rust with Godot
 
 ## Usage
 
-#### First you need to configure the linked Godot Project
+> [!IMPORTANT]
+> First you need to configure the linked Godot Project
+
+command: `Godot4-Rust: Set Godot Project`
 
 Use dedicated command to set it (Ctrl+Maj+P => Godot4-Rust: set Godot Project)
 
@@ -75,11 +80,10 @@ command: `Start new godot rust project`.
 
 - select project.godot file, crate name and path
 - you get:
-
-* New rust project
-* configured Cargo.toml for last version of godot-rust
-* workspace settings: godot project and [rust analyzer check command updated](#rust-analyzer-check-command-updated)
-* lib.rs with ExtensionLibrary
+  - New rust project
+  - configured Cargo.toml for last version of godot-rust
+  - workspace settings: godot project and [rust analyzer check command updated](#rust-analyzer-check-command-updated)
+  - lib.rs with ExtensionLibrary
 
 ##### Rust Analyzer Check Command updated
 
@@ -119,7 +123,6 @@ This extension contributes the following settings:
 - Only accept one godot class by rust module
 
 ## Contribute
-
 
 ## Release Notes
 
