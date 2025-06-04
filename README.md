@@ -1,4 +1,11 @@
-# Godot4 Rust
+<hr/>
+
+<h1 align="center">
+<img src="resources/godotIcons/godotrust/godot-ferris-16x16.svg "/>
+Godot4 Rust
+<img src="doc/vscode.png">
+</h1>
+<hr/>
 
 ![Godot4-Rust](./doc/panel.png)
 
