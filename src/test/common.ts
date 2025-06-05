@@ -7,7 +7,7 @@ import { NAME } from "../constantes";
 export const addGodotProjectPathSetting = (
   projectPath: string,
   godotProjectDir: string
-) => {
+): string => {
   let dotvscode = resolve(projectPath, ".vscode");
   godotProjectDir = godotProjectDir ?? resolve("assets/GodotProject");
   let godotProject = join(godotProjectDir, "project.godot");
@@ -17,10 +17,9 @@ export const addGodotProjectPathSetting = (
   let setting = {
     "godot4-rust.godotProjectFilePath": godotProject,
   };
-  writeFileSync(
-    resolve(projectPath, ".vscode/settings.json"),
-    JSON.stringify(setting)
-  );
+  let pp = resolve(projectPath, ".vscode/settings.json");
+  writeFileSync(pp, JSON.stringify(setting));
+  return pp;
 };
 
 export const cloneDirToTemp = (dirpath: string): string => {

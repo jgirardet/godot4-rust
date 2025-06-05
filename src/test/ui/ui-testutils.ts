@@ -12,9 +12,10 @@ import {
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
-import { existsSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { addGodotProjectPathSetting, cloneDirToTemp } from "../common";
 import { expect } from "earl";
+import { readUtf8Sync } from "../../utils";
 
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
@@ -22,7 +23,7 @@ export const initTest = async (
 ): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
   let godotDir = cloneDirToTemp(godotbase);
-  addGodotProjectPathSetting(rootPath, godotDir);
+  let settingsPath = addGodotProjectPathSetting(rootPath, godotDir);
   console.log(`rootPath: ${rootPath}`);
   console.log(`godotPath: ${godotDir}`);
   let browser = VSBrowser.instance;
@@ -51,6 +52,7 @@ export const initTest = async (
     outputView,
     godotDir,
     panel,
+    settingsPath,
   };
 };
 
@@ -162,6 +164,14 @@ export async function matchTrimedLine(
   }
 }
 
+function setSettings(settingsPath: string, key: string, value: any) {
+  let settings = JSON.parse(readUtf8Sync(settingsPath));
+  Object.assign(settings, {
+    [key]: value,
+  });
+  writeFileSync(settingsPath, JSON.stringify(settings));
+}
+
 export interface InitTest {
   rootPath: string;
   browser: VSBrowser;
@@ -171,4 +181,5 @@ export interface InitTest {
   outputView: OutputView;
   godotDir: string;
   panel: ViewSection;
+  settingsPath: string;
 }

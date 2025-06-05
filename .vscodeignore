@@ -17,3 +17,4 @@ assets
 test-extensions/
 scripts/
 godot4-rust*.vsix
+doc/

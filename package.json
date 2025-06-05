@@ -168,6 +168,7 @@
     "watch_vsix": "npm-watch ui-vsix",
     "cloneScal": "git clone https://github.com/nicolasbize/Scalazard assets/scalazar",
     "fixSelenium": "sed -i '1s/^/import { WebSocket } from \\\"ws\\\";\\\n/' node_modules/@types/selenium-webdriver/bidi/index.d.ts",
+    "ubuntufw": "sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",

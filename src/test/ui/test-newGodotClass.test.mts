@@ -2,10 +2,12 @@ import assert from "assert";
 import path from "path";
 import * as fs from "fs";
 import { InputBox, TextEditor } from "vscode-extension-tester";
-import { initTest, multiSelect } from "./ui-testutils.js";
+import { initTest, multiSelect, pickItem } from "./ui-testutils.js";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils.js";
-import { AUTO_REPLACE_TSCN_KEY } from "../../constantes.js";
+import {
+  AUTO_REPLACE_TSCN_KEY,
+} from "../../constantes.js";
 import { setConfig } from "../common.js";
 
 describe("addNewGodot class Command", () => {
@@ -74,17 +76,23 @@ describe("addNewGodot class Command", () => {
     );
   });
 
-  it("tests add correct Rust type >< godot type AND autoswitch", async () => {
-    const { driver, wb, godotDir, rootPath } = await initTest(
-      "assets/panel/panel",
-      "assets/panel"
-    );
+  it("panel newgodotClass, Rust type spell, autoswitch", async () => {
+    // setup
+    const { driver, wb, godotDir, rootPath, panel, settingsPath } =
+      await initTest("assets/panel/panel", "assets/panel");
     setConfig(rootPath, AUTO_REPLACE_TSCN_KEY, true);
-    await wb.executeCommand("godot4-rust.newGodotClass");
+    await panel.wait();
+    let item = await pickItem("child_2.tscn (Child2)", panel);
+    let menu = await item?.openContextMenu()!;
+
+    // test menu considering context
+    let items = await menu.getItems();
+    expect(items.length).toEqual(1);
+
+    // test newGodotClass from panel
+    await menu.select("Godot4-Rust: Create a new GodotClass from Godot Scene");
     inp = await InputBox.create();
     await inp.selectQuickPick("Yes");
-    inp = await InputBox.create();
-    await inp.selectQuickPick("child_2.tscn");
     inp = await InputBox.create();
     await inp.confirm();
     await multiSelect(inp, [0]);
@@ -99,6 +107,7 @@ describe("addNewGodot class Command", () => {
     let content = await editor.getText();
     await editor.save();
 
+    // test it's HttpRequest and not HTTPRequest
     expect(content).toEqual(
       `use godot::{classes::{HttpRequest,Node2D,IHttpRequest}, prelude::*,};
 
@@ -117,6 +126,8 @@ fn ready(&mut self) {}
 fn process(&mut self, delta: f64) {}
 }`
     );
+
+    //test autoswitch
     await driver.wait(
       () => {
         let tscn = readUtf8Sync(path.resolve(godotDir, "child_2.tscn"));
