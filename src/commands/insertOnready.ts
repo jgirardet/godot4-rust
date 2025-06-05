@@ -80,26 +80,28 @@ export async function insertOnReady(manager: GodotManager, nodeItem: NodeItem) {
     logger.info("OnReady snippet added");
 
     // auto import, try to find the type then execute
-    if (isRustanalyzerActive()) {
-      let typeAddedSelection = findRustTypeInSnippet(
-        editor,
-        line.lineNumber + onreadsnip.length,
-        nodePicked
-      );
-      if (typeAddedSelection) {
-        tryExecuteCodeAction(
-          typeAddedSelection,
-          editorPath,
-          CodeActionKind.QuickFix,
-          `^Import \`.*${nodePicked.rustType}\`$`
+    setTimeout(() => {
+      if (isRustanalyzerActive()) {
+        let typeAddedSelection = findRustTypeInSnippet(
+          editor,
+          line.lineNumber + onreadsnip.length,
+          nodePicked
         );
-        logger.info(`"${nodePicked.rustType}" imported`);
+        if (typeAddedSelection) {
+          tryExecuteCodeAction(
+            typeAddedSelection,
+            editorPath,
+            CodeActionKind.QuickFix,
+            `^Import \`.*${nodePicked.rustType}\`$`
+          );
+          logger.info(`"${nodePicked.rustType}" imported`);
+        } else {
+          logger.warn("Can't execute auto import");
+        }
       } else {
-        logger.warn("Can't execute auto import");
+        logger.warn("Rust Analyzer is not active, skipping autoimport");
       }
-    } else {
-      logger.warn("Rust Analyzer is not active, skipping autoimport");
-    }
+    });
   }
 }
 

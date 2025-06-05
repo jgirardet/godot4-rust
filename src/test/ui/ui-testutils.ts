@@ -5,6 +5,7 @@ import {
   InputBox,
   OutputView,
   SideBarView,
+  StatusBar,
   TextEditor,
   TreeItem,
   ViewSection,
@@ -16,6 +17,7 @@ import { existsSync, writeFileSync } from "fs";
 import { addGodotProjectPathSetting, cloneDirToTemp } from "../common";
 import { expect } from "earl";
 import { readUtf8Sync } from "../../utils";
+import { execSync } from "child_process";
 
 export const initTest = async (
   rustbase: string = "assets/noConfigProject",
@@ -23,9 +25,11 @@ export const initTest = async (
 ): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
   let godotDir = cloneDirToTemp(godotbase);
+
   let settingsPath = addGodotProjectPathSetting(rootPath, godotDir);
   console.log(`rootPath: ${rootPath}`);
   console.log(`godotPath: ${godotDir}`);
+  // execSync("cargo build", { cwd: rootPath });
   let browser = VSBrowser.instance;
   await browser.openResources(rootPath);
   let driver = browser.driver;
@@ -164,7 +168,7 @@ export async function matchTrimedLine(
   }
 }
 
-function setSettings(settingsPath: string, key: string, value: any) {
+export function setSettings(settingsPath: string, key: string, value: any) {
   let settings = JSON.parse(readUtf8Sync(settingsPath));
   Object.assign(settings, {
     [key]: value,
