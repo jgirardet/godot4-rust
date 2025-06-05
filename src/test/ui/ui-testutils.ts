@@ -23,6 +23,7 @@ export const initTest = async (
 ): Promise<InitTest> => {
   let rootPath = cloneDirToTemp(rustbase);
   let godotDir = cloneDirToTemp(godotbase);
+
   let settingsPath = addGodotProjectPathSetting(rootPath, godotDir);
   console.log(`rootPath: ${rootPath}`);
   console.log(`godotPath: ${godotDir}`);
@@ -164,7 +165,7 @@ export async function matchTrimedLine(
   }
 }
 
-function setSettings(settingsPath: string, key: string, value: any) {
+export function setSettings(settingsPath: string, key: string, value: any) {
   let settings = JSON.parse(readUtf8Sync(settingsPath));
   Object.assign(settings, {
     [key]: value,
