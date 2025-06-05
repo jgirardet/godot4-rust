@@ -1,9 +1,16 @@
-import { InputBox, TreeItem, WebDriver } from "vscode-extension-tester";
+import {
+  InputBox,
+  Menu,
+  MenuItem,
+  TreeItem,
+  WebDriver,
+} from "vscode-extension-tester";
 import { initTest, pickItem } from "./ui-testutils.js";
 import { expect } from "earl";
 import { join } from "path";
 import { readUtf8Sync } from "../../utils.js";
 import { rmSync, writeFileSync } from "fs";
+import { length } from "string-ts";
 
 const child1Label = "child1.tscn (Child1)";
 const child2Label = "child_2.tscn (Child2)";
@@ -49,6 +56,44 @@ describe("Test Panel", () => {
     expect(await aab.hasChildren()).toBeFalsy();
     const children = await aa.getChildren();
     expect(await children.at(1)?.getLabel()).toEqual(await aab.getLabel());
+
+    //------------------------- context -------------------------//
+    // godotclass
+    const getMenuItems = async (name: string): Promise<MenuItem[]> => {
+      let item = (await pickItem(name))!;
+      await item.click();
+      let menu = await item?.openContextMenu()!;
+      // await driver.sleep(5000);
+      await menu.wait();
+      let items = await menu.getItems();
+      return items;
+    };
+
+    let menuItems = await getMenuItems(child1Label);
+    expect(menuItems.length).toEqual(1);
+    expect(await menuItems[0].getLabel()).toEqual(
+      "Godot4-Rust: Change Type with GodotClass in active Editor"
+    );
+
+    // //godotscene
+    menuItems = await getMenuItems(child2Label);
+    expect(menuItems.length).toEqual(2);
+    expect(await menuItems[1].getLabel()).toEqual(
+      "Godot4-Rust: Create a new GodotClass from Godot Scene"
+    );
+    expect(await menuItems[0].getLabel()).toEqual(
+      "Godot4-Rust: Change Type with GodotClass in active Editor"
+    );
+    await driver.sleep(5000);
+    // // child nod
+
+    menuItems = await getMenuItems("AA");
+    expect(menuItems.length).toEqual(1);
+    expect(await menuItems[0].getLabel()).toEqual(
+      "Godot4-Rust: Insert OnReady field"
+    );
+
+    await pickItem(child1Label); //release
 
     //------------------------- interact -------------------------//
 

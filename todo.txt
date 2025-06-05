@@ -6,11 +6,6 @@ Prochain en cours :
 
 - roadmap to V1
     - test real godot4rust project
-    tests: 
-        - panel:
-            root node: context (+new,+switch, -onready)
-            root node rust: context (-new, +switchn -onready)
-            others: context (-new, -nswitch, +onraeady if current doc)
 
 
 
