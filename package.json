@@ -160,9 +160,16 @@
       "silent": false,
       "ignore": "out/test",
       "inherits": true
+    },
+    "regex": {
+      "patterns": [
+        "out"
+      ]
     }
   },
   "scripts": {
+    "watch_regex": "npm-watch regex",
+    "regex": "node out/regex.js",
     "setup": "npm run cloneScal && npm run fixSelenium",
     "fnm": "fnm use 20",
     "watch_vsix": "npm-watch ui-vsix",
@@ -182,7 +189,7 @@
     "ui-setup": "npm run manage cleanUI && npm  run ui-setup-extest && npm run ui-install-dep",
     "ui-vsix": "extest install-vsix -e .test-extensions",
     "ui-test": "extest run-tests './out/test/ui/*.test.mjs' -o src/test/ui/settings.json -e .test-extensions",
-    "ui-testone": "extest run-tests -o src/test/ui/settings.json -e .test-extensions -f"
+    "ui-testone": "extest run-tests  -o src/test/ui/settings.json -e .test-extensions -f './out/test/ui/test-rustanalyzer.test.mjs'"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",
@@ -200,6 +207,7 @@
     "earl": "^1.3.0",
     "eslint": "^9.25.1",
     "mitata": "^1.0.34",
+    "nodemon": "^3.1.10",
     "npm-watch": "^0.13.0",
     "typescript": "^5.8.3",
     "vscode-extension-tester": "^8.14.1"
