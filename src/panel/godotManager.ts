@@ -17,12 +17,11 @@ import {
 
 import { NodeItem } from "./nodeItem";
 import { FullPathDir, FullPathFile } from "../types";
-import { AUTO_REPLACE_TSCN_KEY, NAME, NB_WORKERS_KEY } from "../constantes";
+import { AUTO_REPLACE_TSCN_KEY, NAME } from "../constantes";
 import { GodotProjectLoader } from "../godot/godotProjectLoader";
 import { logger } from "../log";
 import {
   getConfigValue,
-  getProjectConfig,
   rangeToVsRange,
   registerGCommand,
 } from "../vscodeUtils";
@@ -55,7 +54,6 @@ export class GodotManager {
       (this.treeView = window.createTreeView(NAME, {
         treeDataProvider: this.treeData,
       })),
-      // this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
       this.treeView.onDidChangeSelection(this.onChangeSelection.bind(this)),
       //
       // watcher
@@ -138,8 +136,7 @@ export class GodotManager {
   }
 
   async reload() {
-    let nbWorkers = getProjectConfig().get<number>(NB_WORKERS_KEY);
-    const scenes = await this.loader.reload(nbWorkers);
+    const scenes = await this.loader.reload();
     this.treeData.updateData(scenes, this.rust);
   }
 

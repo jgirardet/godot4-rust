@@ -1,9 +1,10 @@
-import { open, writeFile } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { NodeItem } from "../panel/nodeItem";
 import { window } from "vscode";
 import { logger } from "../log";
 import { selectTscn } from "../ui/select";
 import { GodotManager } from "../panel/godotManager";
+import { readUtf8 } from "../utils";
 
 export const switchGodotNodeByrust = async (
   { rust, treeData, godotDir }: GodotManager,
@@ -41,32 +42,13 @@ export const switchGodotNodeByrust = async (
     );
   }
 
-  let attr = nodeItem.node.type!; // always ok with root
   const tscn = nodeItem.tscn!.toAbs(godotDir);
-  let res = [];
-  let counter = 0;
-
-  for await (let line of (await open(tscn)).readLines()) {
-    if (counter === attr.range.startPosition.row) {
-      let start = line.slice(0, attr.range.startPosition.column);
-      let end = line.slice(attr.range.endPosition.column);
-      let slice = line.slice(
-        attr.range.startPosition.column,
-        attr.range.endPosition.column
-      );
-      // double check, abort if not sure
-      if (slice === `"${nodeItem.type}"`) {
-        line = start + `"${nodeItem.rustModule!.className}"` + end; //mieux cracher que faire faux
-      } else {
-        throw new Error(
-          "There was a error, Godot Scene file has't been edited"
-        );
-      }
-    }
-    counter += 1;
-    res.push(line);
-  }
-  await writeFile(tscn, res.join("\n") + "\n", { encoding: "utf-8" });
+  const content = await readUtf8(tscn);
+  const newContent = content.replace(
+    `[node name="${nodeItem.name}" type="${nodeItem.type}"`,
+    `[node name="${nodeItem.name}" type="${nodeItem.rustModule!.className}"`
+  );
+  await writeFile(tscn, newContent, { encoding: "utf-8" });
   logger.info("Godot Scene File has been updated");
   window.showInformationMessage("Godot Scene File has been updated");
 };

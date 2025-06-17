@@ -1,38 +1,46 @@
-import { GodotScene } from "./godotScene";
-import { ValueRanged, StringRanged, Ranged } from "../tree/types";
-
 export type Uid = string;
 export type ResPath = string;
 
 export interface GDScene {
   uid: Uid;
   extResources: ExtResource[];
+  subResources: SubResource[];
+  rootNode: RootNode;
   nodes: Node[];
 }
 
-export interface ExtResource {
-  type: StringRanged;
-  uid: StringRanged;
-  path: StringRanged;
-  id: StringRanged;
+export interface ExtResource extends ResEntry {
+  kind: string;
+  type: string;
+  path: string;
+  id: string;
+  uid: Uid;
 }
 
-export interface Node extends Ranged {
-  name: StringRanged;
-  type?: StringRanged;
-  parent?: StringRanged;
-  instance?: ExtResourceAttribute;
+export interface SubResource extends ResEntry {
+  type: string;
+  id: string;
+}
+export interface RootNode extends Omit<Node, "parent"> {
+  type: string;
 }
 
-export type GodotRes = GodotScene;
+export interface Node extends Omit<ResEntry, "uid" | "path"> {
+  kind: string;
+  name: string;
+  parent: string;
+  resource?: ExtResource;
+}
 
-export type ExtResourceAttribute = ValueRanged<ExtResource>;
-
-export enum GodotKinds {
-  Gdscene,
-  ExtResource,
-  ExtResourceAttribute,
-  Node,
-  Literal,
-  Identifier,
+export interface ResEntry {
+  kind: string;
+  type?: string;
+  name?: string;
+  path?: string;
+  instance?: string;
+  uid?: string;
+  instance_placeholder?: string;
+  index?: string;
+  groups?: string;
+  id?: string;
 }

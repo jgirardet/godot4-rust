@@ -16,7 +16,7 @@ export {
 
 const onready_snippet = (nodeItem: NodeItem): string[] => {
   return [
-    `#[init(node = "${nodeItem.fullPath}")]`,
+    `#[init(node = "${nodeItem.fullParent}")]`,
     `${toSnake(nodeItem.name)}: OnReady<Gd<${nodeItem.rustType}>>,`,
   ];
 };

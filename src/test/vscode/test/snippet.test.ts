@@ -38,51 +38,54 @@ suite("test snippets", () => {
   });
   test("test edge declclass, on ready", () => {
     expect(
-      onready_snippet(fakeRootNodeItem("Bla", "HTTPRequest")).join("\n")
-    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<HttpRequest>>,');
+      onready_snippet(fakeNodeItem("Bla", "HTTPRequest")).join("\n")
+    ).toEqual('#[init(node = "Bla")]\nbla: OnReady<Gd<HttpRequest>>,');
   });
   test("test edge declclass, on ready, no godot type", () => {
     expect(
-      onready_snippet(fakeRootNodeItem("Bla", "RustStruct")).join("\n")
-    ).toEqual('#[init(node = "/Bla")]\nbla: OnReady<Gd<RustStruct>>,');
+      onready_snippet(fakeNodeItem("Bla", "RustStruct", true)).join("\n")
+    ).toEqual('#[init(node = "Bla")]\nbla: OnReady<Gd<RustStruct>>,');
   });
 });
 
 const fakeRootNodeItem = (nam: string, typ: string = "Node"): NodeItem => {
   return NodeItem.createRoot(
-    new GodotScene(new GodotPath("bla.tscn"), {
-      uid: "mlkml",
-      nodes: [
-        {
-          name: {
-            value: nam,
-            range: {
-              endPosition: { column: 2, row: 2 },
-              startPosition: { column: 2, row: 2 },
-              startIndex: 2,
-              endIndex: 4,
-            },
-          },
-          type: {
-            value: typ,
-            range: {
-              endPosition: { column: 8, row: 2 },
-              startPosition: { column: 2, row: 2 },
-              startIndex: 2,
-              endIndex: 4,
-            },
-          },
-          range: {
-            endIndex: 30,
-            startIndex: 234,
-            endPosition: { column: 2, row: 1 },
-            startPosition: { column: 1, row: 1 },
-          },
+    new GodotScene(
+      new GodotPath("bla.tscn"),
+
+      {
+        uid: "mlkml",
+        rootNode: {
+          kind: "node",
+          type: typ,
+          name: nam,
         },
-      ],
-      extResources: [],
-    })
+        nodes: [
+          {
+            name: nam,
+            type: typ,
+            kind: "node",
+            parent: nam,
+          },
+        ],
+        extResources: [],
+        subResources: [],
+      }
+    )
   );
+};
+
+const fakeNodeItem = (nam: string, typ: string, rust = false): NodeItem => {
+  let n = new NodeItem({
+    name: nam,
+    type: typ,
+    kind: "node",
+    parent: ".",
+  });
+  if (rust) {
+    n._rustInstanceStruct = typ;
+  }
+  return n;
 };
 
 suite("Test start new project", () => {

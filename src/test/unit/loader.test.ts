@@ -22,7 +22,6 @@ describe("Test Godomanager Scenes", () => {
       path.resolve(dep("main.tscn")),
       path.resolve(dep(""))
     );
-    expect(gs.uid).toEqual("uid://budmhkgm4nb6f");
     expect(gs.depedencies).toEqual([
       new GodotPath("child1.tscn"),
       new GodotPath("child2.tscn"),

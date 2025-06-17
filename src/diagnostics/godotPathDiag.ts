@@ -30,7 +30,7 @@ export function checkForInvalidNodePath(
         )
       );
     } else if (
-      !flatChildren.find((c) => c.fullPath === initNodeValueItem.value)
+      !flatChildren.find((c) => c.fullParent === initNodeValueItem.value)
     ) {
       diags.push(
         new Diagnostic(
@@ -40,7 +40,7 @@ export function checkForInvalidNodePath(
           }".
 Did you mean "${closest(
             initNodeValueItem.value,
-            flatChildren.map((x) => x.fullPath)
+            flatChildren.map((x) => x.fullParent)
           )}"`,
           DiagnosticSeverity.Error
         )

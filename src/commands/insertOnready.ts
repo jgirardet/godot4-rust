@@ -49,7 +49,7 @@ export async function insertOnReady(manager: GodotManager, nodeItem: NodeItem) {
   if (rustModule.hasDefaultInit) {
     if (
       rustModule.fields.find(
-        (f) => f.attribute("init")?.argValue("node") === nodePicked.fullPath
+        (f) => f.attribute("init")?.argValue("node") === nodePicked.fullParent
       )
     ) {
       throw new Error(`OnReadyAlready exists for ${nodePicked.name}`);

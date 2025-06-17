@@ -1,17 +1,9 @@
 import { globSync } from "glob";
 import { FullPathDir, FullPathFile } from "../types";
-import { GodotScene, IGodotScene } from "./godotScene";
-import { GodotPath, gp } from "./godotPath";
-import { availableParallelism } from "os";
+import { GodotScene } from "./godotScene";
+import { GodotPath } from "./godotPath";
 import path from "path";
-import Piscina from "piscina";
-import { CreateSceneWorkerArgs, workerFilename } from "./workerGodot";
 import { getGodotProjectDir } from "../utils";
-
-const createScenesWorker = new Piscina<CreateSceneWorkerArgs, GodotScene[]>({
-  filename: path.resolve(__dirname, "./workerWrapper.js"),
-  workerData: { fullpath: workerFilename },
-});
 
 export class GodotProjectLoader {
   private _godotProjectFile: FullPathFile;
@@ -33,19 +25,19 @@ export class GodotProjectLoader {
     return this._godotProjectFile;
   }
 
-  async reload(nbWorker?: number): Promise<Map<string, GodotScene>> {
+  async reload(): Promise<Map<string, GodotScene>> {
     this.scenes.clear();
     this.dependencies.clear();
-    return this.load(nbWorker);
+    return this.load();
   }
 
-  async load(nbWorker?: number): Promise<Map<string, GodotScene>> {
+  async load(): Promise<Map<string, GodotScene>> {
     let files = globSync("**/*.tscn", {
       absolute: true,
       cwd: this.projectDir,
       nodir: true,
     });
-    return await this.addScenes(files, nbWorker);
+    return this.addScenes(files);
   }
 
   async onChange(
@@ -58,7 +50,7 @@ export class GodotProjectLoader {
 
     // Create Scene
     if (!scene) {
-      await this.addScenes([filename], 1);
+      await this.addScenes([filename]);
       this.lastUpdate = [filepath.base];
     }
 
@@ -66,7 +58,7 @@ export class GodotProjectLoader {
 
     // Delete Scene
     if (remove) {
-      const toRemove = toUpdate.delete(filepath.base);
+      toUpdate.delete(filepath.base);
       this._deleteScene(filepath);
     }
 
@@ -76,26 +68,20 @@ export class GodotProjectLoader {
 
     // Reload only Scenes impacted by change (delete or change)
     this.lastUpdate = [...toUpdate];
-    return await this.addScenes(toUpdateFinale);
+    return this.addScenes(toUpdateFinale);
   }
 
   getScene(gp: GodotPath): GodotScene | undefined {
     return this.scenes.get(gp.base);
   }
 
-  private async addScenes(
-    files: string[],
-    nbWorker?: number
-  ): Promise<Map<string, GodotScene>> {
-    for (const bunch of await this._loadTscns(files, nbWorker)) {
-      for (const ghostScene of bunch) {
-        const scene = new GodotScene(
-          gp(ghostScene.tscnpath.base),
-          ghostScene.gdscene
-        );
-        this._addScene(scene);
-      }
+  private async addScenes(files: string[]): Promise<Map<string, GodotScene>> {
+    for (const scene of await Promise.all(
+      files.map((f) => GodotScene.new(f, this.projectDir))
+    )) {
+      this._addScene(scene);
     }
+
     this._resetDepencies();
     return this.scenes;
   }
@@ -107,22 +93,6 @@ export class GodotProjectLoader {
       this._findDependants(r, res);
     }
     return res;
-  }
-
-  private async _loadTscns(
-    files: string[],
-    nbWorker?: number
-  ): Promise<IGodotScene[][]> {
-    // js worker make loosing getter and other, need to redo the object
-    let chu = chunks(files, nbWorker || getWorkersNb(files.length));
-    return await Promise.all(
-      chu.map((i) => {
-        return createScenesWorker.run(
-          { bunch: i, godotdir: this.projectDir },
-          { name: "createBunchOfGodotScenes" }
-        );
-      })
-    );
   }
 
   private _getDependencies(key: string): Set<string> {
@@ -148,18 +118,5 @@ export class GodotProjectLoader {
 
   private _deleteScene(scene: GodotPath) {
     this.scenes.delete(scene.base);
-  }
-}
-function chunks<T>(arr: T[], n: number): T[][] {
-  const chunkSize = Math.ceil(arr.length / n);
-  return [...Array(n).keys()].map((_) => arr.splice(0, chunkSize));
-}
-
-function getWorkersNb(length: number): number {
-  const cpus = availableParallelism() / 2;
-  if (length < cpus * cpus) {
-    return cpus / 2;
-  } else {
-    return cpus;
   }
 }

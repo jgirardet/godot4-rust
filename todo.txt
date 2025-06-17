@@ -1,6 +1,11 @@
 bug:
 
 Prochain en cours :
+- refactor sync/async respars
+- move out frm godotScene ?
+- fix ui tests
+- test about new context with missing/unknown
+- nodeitem method order
 
 
 

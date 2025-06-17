@@ -160,7 +160,10 @@ export async function matchTrimedLine(
       errMsg
     );
   } else {
+    console.log("CCCCCCCCCCCCCCC");
+    console.log(await editor.getText());
     content = (await editor.getTextAtLine(line)).trim();
+    console.log("DDDDDDDDDDDDDDDDDDDDDDd");
     expect(content).toEqual(toMatch);
   }
 }

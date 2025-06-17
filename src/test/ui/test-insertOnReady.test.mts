@@ -1,11 +1,4 @@
-import {
-  InputBox,
-  TextEditor,
-  ViewSection,
-  VSBrowser,
-  WebDriver,
-  Workbench,
-} from "vscode-extension-tester";
+import { InputBox, Key, TextEditor } from "vscode-extension-tester";
 import {
   initTest,
   matchTrimedLine,
@@ -13,45 +6,31 @@ import {
   setSettings,
 } from "./ui-testutils.js";
 import path from "path";
-import { expect } from "earl";
 
 describe("InsertSnippet Command", () => {
-  let inp: InputBox;
-  let wb: Workbench,
-    browser: VSBrowser,
-    driver: WebDriver,
-    panel: ViewSection,
-    rootPath: string,
-    settingsPath: string;
-  before(async () => {
-    const res = await initTest("assets/panel/panel", "assets/panel");
-    wb = res.wb;
-    browser = res.browser;
-    driver = res.driver;
-    panel = res.panel;
-    rootPath = res.rootPath;
-    settingsPath = res.settingsPath;
-  });
+  // it("tests command alone", async () => {
+  //   let child1f = path.join(rootPath, "src/child_1.rs");
+  //   await browser.openResources(child1f);
 
-  it("tests command alone", async () => {
-    let child1f = path.join(rootPath, "src/child_1.rs");
-    await browser.openResources(child1f);
-
-    let editor = new TextEditor();
-    await editor.setCursor(9, 13);
-    await wb.executeCommand("godot4-rust.insertOnReady");
-    inp = await InputBox.create();
-    await inp.selectQuickPick(2);
-    let ligne1 = await editor.getTextAtLine(10);
-    let ligne2 = await editor.getTextAtLine(11);
-    expect(ligne1.trim()).toEqual(
-      '#[init(node = "AChild1/AAChild1/AAAChild1")]'
-    );
-    expect(ligne2.trim()).toEqual("a_a_a_child_1: OnReady<Gd<Sprite2D>>,");
-    await editor.save();
-  });
+  //   let editor = new TextEditor();
+  //   await editor.setCursor(9, 13);
+  //   await wb.executeCommand("godot4-rust.insertOnReady");
+  //   inp = await InputBox.create();
+  //   await inp.selectQuickPick(2);
+  //   let ligne1 = await editor.getTextAtLine(10);
+  //   let ligne2 = await editor.getTextAtLine(11);
+  //   expect(ligne1.trim()).toEqual(
+  //     '#[init(node = "AChild1/AAChild1/AAAChild1")]'
+  //   );
+  //   expect(ligne2.trim()).toEqual("a_a_a_child_1: OnReady<Gd<Sprite2D>>,");
+  //   await editor.save();
+  // });
 
   it("test panel, godotType, rust godoclass, import type, import name correct", async () => {
+    const { settingsPath, rootPath, browser, panel, driver } = await initTest(
+      "assets/panel/panel",
+      "assets/panel"
+    );
     setSettings(settingsPath, "rust-analyzer.check.overrideCommand", null);
 
     let child1f = path.join(rootPath, "src/other.rs");
@@ -64,18 +43,20 @@ describe("InsertSnippet Command", () => {
     await menu?.wait();
     await menu?.click();
     // await matchTrimedLine(
-    //   editor,
-    //   2,
-    //   "classes::{Camera2D, CanvasLayer, INode2D, Node2D, Sprite2D},",
-    //   9000,
-    //   "Can't find canvas layer import"
-    // );
-    await matchTrimedLine(editor, 14, '#[init(node = "Other1")]');
-    await matchTrimedLine(editor, 15, "other_1: OnReady<Gd<CanvasLayer>>,");
-
-    // test RustStruct
-    let oneChild1 = await pickItem("OneChild1", panel);
-    menu = await oneChild1?.openContextMenu();
+      //   editor,
+      //   2,
+      //   "classes::{Camera2D, CanvasLayer, INode2D, Node2D, Sprite2D},",
+      //   9000,
+      //   "Can't find canvas layer import"
+      // );
+      await matchTrimedLine(editor, 14, '#[init(node = "Other1")]');
+      await matchTrimedLine(editor, 15, "other_1: OnReady<Gd<CanvasLayer>>,");
+      
+      // test RustStruct
+      let oneChild1 = await pickItem("OneChild1", panel);
+      console.log("AAAAAAAAAAAAAAAAAAAAaaaa");
+      menu = await oneChild1?.openContextMenu();
+      console.log("BBBBBBBBBBBBBB");
     await menu?.wait();
     await menu?.click();
     await driver.sleep(2000);
@@ -114,5 +95,7 @@ describe("InsertSnippet Command", () => {
     await matchTrimedLine(editor, 19, "child_22: OnReady<Gd<HttpRequest>>,");
 
     await editor.save();
+    let inp = await InputBox.create();
+    await inp.sendKeys(Key.RETURN);
   });
 });

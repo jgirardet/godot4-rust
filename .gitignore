@@ -8,4 +8,5 @@ node_modules
 scalazard/
 **/.godot/
 **/*.import
+assets/scalazar
 src/godotClasses.ts

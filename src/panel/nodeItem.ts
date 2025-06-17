@@ -1,10 +1,15 @@
 import { GodotPath } from "../godot/godotPath";
-import { Node } from "../godot/types";
+import { Node, RootNode } from "../godot/types";
 import { TreeItem, TreeItemCollapsibleState, Uri, window } from "vscode";
 import { GodotScene } from "../godot/godotScene";
 import { GODOT_STRUCTS } from "../godotClasses";
 import { StoredGodotClass } from "../rust/godoClass";
 import { basename } from "path";
+
+const GHOST_TYPE = "xxxGhostxxx";
+const CTX_ROOT = "root";
+const CTX_CHILD = "child";
+const CTX_RUST = "rust";
 
 export class NodeItem extends TreeItem {
   public children: NodeItem[] = [];
@@ -15,21 +20,16 @@ export class NodeItem extends TreeItem {
   tscn?: GodotPath;
   _rustInstanceStruct?: string;
 
-  private constructor(
-    public readonly node: Node,
+  constructor(
+    public readonly node: Node | RootNode,
     public readonly parent?: NodeItem
   ) {
-    super(node.name.value);
+    super(node.name);
 
     this.label = {
-      label: node.name.value,
+      label: node.name,
       highlights: [],
     };
-    this.parent = parent;
-    this.contextValue = this.isRoot ? "root" : "child";
-  }
-  get basePath(): string {
-    return this.node.parent?.value ?? "";
   }
 
   get flatChildren(): NodeItem[] {
@@ -38,8 +38,13 @@ export class NodeItem extends TreeItem {
     return acc;
   }
 
-  get fullPath(): string {
-    return (this.basePath === "." ? "" : this.basePath + "/") + this.name;
+  get fullParent(): string {
+    if ("parent" in this.node) {
+      return (
+        (this.node.parent === "." ? "" : this.node.parent + "/") + this.name
+      );
+    }
+    return ""; // typechecker
   }
 
   get hasChildren(): boolean {
@@ -51,11 +56,11 @@ export class NodeItem extends TreeItem {
   }
 
   get isInstance(): boolean {
-    return "instance" in this.node;
+    return "resource" in this.node;
   }
 
   get isRoot(): boolean {
-    return this.node.parent === undefined;
+    return !("parent" in this.node);
   }
 
   get isRustStruct(): boolean {
@@ -63,7 +68,7 @@ export class NodeItem extends TreeItem {
   }
 
   get name(): string {
-    return this.node.name.value;
+    return this.node.name;
   }
 
   get rootNode(): NodeItem {
@@ -93,122 +98,145 @@ export class NodeItem extends TreeItem {
   get type(): string {
     return (
       this.instanceType ||
-      this.node.type?.value ||
-      this.node.instance?.value.type.value ||
+      this.node.type ||
+      this.node.resource?.type ||
       "Unknow"
     );
   }
 
-  get packedSceneChildren(): NodeItem[] {
+  get instanceChildren(): NodeItem[] {
     let acc: NodeItem[] = [];
-    getPackedChildren(this.children, acc);
+    getInstanceChildren(this.children, acc);
     return acc;
   }
 
   setup() {
-    this.setLabel();
-    this.setIconPath();
-    this.setTooltip();
-    this.setDescription(); // let last in case of missing tscn, see setDescription
-  }
-
-  setDescription() {
-    if (this.isRoot) {
+    if (this.instanceType === "Missing") {
+      this.setupMissing();
+    } else if (this.isRoot) {
       if (this.isRustStruct) {
-        this.description = `${this.rustModule?.className} \u279C ${this.rustModule?.baseClass}`;
+        this.setupRootRust();
       } else {
-        this.description = `${this.type}`;
+        this.setupRoot();
       }
     } else {
       if (this.isInstance) {
-        // small hack to point out  missing tscn
-        if (this.instanceType === undefined) {
-          this.setMissing("Tscn file is missing");
-          return;
+        if (this.node.resource?.path.endsWith(".tscn")) {
+          this.setupInstanceTscn();
+        } else {
+          this.setupInstanceOther();
         }
-
-        this.description = `[${basename(
-          GodotPath.fromRes(this.node.instance!.value.path.value).base
-        )}]  ${this._rustInstanceStruct || this.instanceType}`;
       } else {
-        this.description = this.type;
+        if (this.type === GHOST_TYPE) {
+          this.setupGhost();
+        } else {
+          this.setupChild();
+        }
       }
     }
   }
 
   setHighlighOn() {
     this.label = {
-      label: this.node.name.value,
-      highlights: [[0, this.node.name.value.length]],
+      label: this.node.name,
+      highlights: [[0, this.node.name.length]],
     };
   }
 
-  setIconPath() {
-    if (this.isRustStruct) {
-      this.iconPath = getGodotRustIconUri();
+  setInstanceType(instanceRootNode: NodeItem | string) {
+    if (typeof instanceRootNode === "string") {
+      this._instanceType = instanceRootNode;
     } else {
-      this.iconPath = getIconUri(this.instanceType || this.type, false);
+      if (instanceRootNode.isRustStruct) {
+        this._instanceType = instanceRootNode.rustModule?.baseClass;
+        this._rustInstanceStruct = instanceRootNode.rustModule?.className;
+      } else {
+        this._instanceType = instanceRootNode.type;
+      }
     }
   }
 
-  setInstanceType(instanceRootNode: NodeItem) {
-    if (instanceRootNode.isRustStruct) {
-      this._instanceType = instanceRootNode.rustModule?.baseClass;
-      this._rustInstanceStruct = instanceRootNode.rustModule?.className;
-    } else {
-      this._instanceType = instanceRootNode.type;
-    }
-  }
-
-  setLabel() {
-    if (this.isRoot) {
-      this.label = {
-        label: `${basename(this.tscn!.base)} (${this.name})`,
-        highlights: [],
-      };
-    } else {
-      this.label = {
-        label: `${this.name}`,
-        highlights: [],
-      };
-    }
-  }
-
-  setMissing(text?: string) {
-    this.setHighlighOn();
-    this.iconPath = getGodotMissingIconUri();
-    this.tooltip = text || "Rust godot class missing";
+  setMissing(text: string) {
+    this.setupMissing();
+    this.tooltip = text;
     this.description = this.tooltip;
   }
 
-  setTooltip() {
-    if (this.isRoot) {
-      this.tooltip = this.tscn?.base;
-    } else {
-      if (this.isInstance) {
-        this.tooltip = `instance: ${
-          GodotPath.fromRes(this.node.instance!.value.path.value).base
-        }  |  type: ${this._rustInstanceStruct || this.instanceType}`;
-      } else {
-        this.tooltip = "";
-      }
-    }
+  setupRoot() {
+    this.description = `${this.type}`;
+    this.iconPath = getIconUri(this.type);
+    this.label = {
+      label: `${basename(this.tscn!.base)} (${this.name})`,
+      highlights: [],
+    };
+    this.tooltip = this.tscn?.base;
+    this.contextValue = CTX_ROOT;
+  }
+
+  setupRootRust() {
+    this.description = `${this.rustModule?.className} \u279C ${this.rustModule?.baseClass}`;
+    this.iconPath = getGodotRustIconUri();
+    this.label = {
+      label: `${basename(this.tscn!.base)} (${this.name})`,
+      highlights: [],
+    };
+    this.tooltip = this.tscn?.base;
+    this.contextValue = [CTX_ROOT, CTX_RUST].join("-");
+  }
+
+  setupInstanceTscn() {
+    this.description = `[${basename(
+      GodotPath.fromRes(this.node.resource?.path || "").base
+    )}]  ${this._rustInstanceStruct || this.instanceType}`;
+
+    this.iconPath = getIconUri(this.instanceType || this.type);
+    this.tooltip = `instance: ${
+      GodotPath.fromRes(this.node.resource?.path || "").base
+    }  |  type: ${this._rustInstanceStruct || this.instanceType}`;
+    this.contextValue = CTX_CHILD;
+  }
+
+  setupInstanceOther() {
+    this.description = `[${basename(
+      GodotPath.fromRes(this.node.resource?.path || "").base
+    )}]  ${this.node.resource!.type}`;
+    this.iconPath = getIconUri(this.node.resource?.type || "PackedScene");
+    this.tooltip = basename(this.node.resource?.path || "unsupported");
+    this.contextValue = "";
+  }
+
+  setupGhost() {
+    this.description = "Ghost node";
+    this.iconPath = getOtherIconUri("ghost.svg");
+    this.tooltip = this.description + " ignore";
+    this.contextValue = "";
+  }
+
+  setupMissing() {
+    this.setHighlighOn();
+    this.iconPath = getOtherIconUri("danger.svg");
+    this.tooltip = "Missing";
+    this.description = this.tooltip;
+    this.contextValue = "";
+  }
+
+  setupMissingRootRust() {
+    this.setMissing("Rust Godot Class missing");
+    this.contextValue = CTX_ROOT;
+  }
+
+  setupChild() {
+    this.description = this.type;
+    this.iconPath = getIconUri(this.type);
+    this.tooltip = this.type;
+    this.contextValue = CTX_CHILD;
   }
 
   private static createChildren(nodes: Node[], root: NodeItem): NodeItem[] {
     let parents = new Map();
     parents.set(".", root);
-    for (const n of nodes.slice(1)) {
-      let parent =
-        n.parent!.value === "." ? root : parents.get(n.parent!.value);
-      let asParentPath =
-        n.parent!.value === "."
-          ? n.name.value
-          : n.parent!.value + "/" + n.name.value;
-      const item = new NodeItem(n, parent);
-      item.setup();
-      parents.set(asParentPath, item);
-      parents.get(n.parent!.value)!.children.push(item);
+    for (const n of nodes) {
+      createNodeChild(n, parents);
     }
     return parents.get(".")!.children;
   }
@@ -217,19 +245,18 @@ export class NodeItem extends TreeItem {
     scene: GodotScene,
     rustStruct?: StoredGodotClass
   ): NodeItem {
-    let root = new NodeItem(scene.rootNode);
+    let root = new NodeItem(scene.gdscene.rootNode);
     root.children = NodeItem.createChildren(scene.gdscene.nodes, root);
     root.collapsibleState = TreeItemCollapsibleState.Collapsed;
     root.tscn = scene.tscnpath;
     if (rustStruct) {
       root.rustModule = rustStruct;
-      root.contextValue = root.contextValue += "-rust";
     }
 
     if (rustStruct || root.type in GODOT_STRUCTS) {
       root.setup();
     } else {
-      root.setMissing();
+      root.setupMissingRootRust();
     }
     return root;
   }
@@ -242,7 +269,7 @@ export function getGodotRustIconUri() {
   );
 }
 
-export function getIconUri(nom: string, isInstance: boolean): Uri | undefined {
+export function getIconUri(nom: string): Uri | undefined {
   const godotIconPath = "../../../resources/godotIcons/godot_icons/";
 
   let theme = window.activeColorTheme.kind;
@@ -255,10 +282,10 @@ export function getIconUri(nom: string, isInstance: boolean): Uri | undefined {
   return uri;
 }
 
-function getGodotMissingIconUri() {
+function getOtherIconUri(name: string) {
   return Uri.joinPath(
     Uri.file(__filename),
-    "../../../resources/godotIcons/others/danger.svg"
+    "../../../resources/godotIcons/others/" + name
   );
 }
 
@@ -269,12 +296,71 @@ const getFlatChildren = (children: NodeItem[], acc: NodeItem[]) => {
   }
 };
 
-const getPackedChildren = (children: NodeItem[], acc: NodeItem[]) => {
+const getInstanceChildren = (children: NodeItem[], acc: NodeItem[]) => {
   for (const c of children) {
     if (c.isInstance) {
       acc.push(c);
     } else {
-      getPackedChildren(c.children, acc);
+      getInstanceChildren(c.children, acc);
     }
   }
 };
+
+function createNodeChild(node: Node, allParents: Map<string, NodeItem>) {
+  let parent = allParents.get(node.parent);
+  if (!parent) {
+    parent = createGhostParent(node.parent, allParents);
+  }
+  const item = new NodeItem(node, parent);
+  item.setup();
+  allParents.set(asParentPath(node.name, node.parent), item);
+  parent.children.push(item);
+}
+
+function createGhostParent(
+  ghostParentPath: string,
+  allParents: Map<string, NodeItem>
+): NodeItem {
+  const ancestors = ghostParentPath.split("/");
+  const nodeToCreateName = ancestors.pop();
+  if (!nodeToCreateName) {
+    throw new Error(
+      `Fantom node should have a name, fantomParent: ${ghostParentPath}`
+    );
+  }
+
+  let parentPath = ancestors.join("/");
+  if (parentPath !== "") {
+    if (!allParents.has(parentPath)) {
+      createGhostParent(parentPath, allParents);
+    }
+  } else {
+    parentPath = ".";
+  }
+  return createGhostNode(nodeToCreateName, parentPath, allParents);
+}
+
+function createGhostNode(
+  name: string,
+  parent: string,
+  allParents: Map<string, NodeItem>
+): NodeItem {
+  const parentNode = allParents.get(parent)!;
+  const item = new NodeItem(
+    {
+      type: GHOST_TYPE,
+      kind: "node",
+      name,
+      parent,
+    },
+    parentNode
+  );
+  item.setup();
+  parentNode.children.push(item);
+  allParents.set(asParentPath(name, parent), item);
+  return item;
+}
+
+function asParentPath(name: string, parentName: string): string {
+  return parentName === "." ? name : parentName + "/" + name;
+}

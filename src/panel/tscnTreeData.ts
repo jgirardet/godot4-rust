@@ -10,7 +10,6 @@ import { FullPathDir, FullPathFile } from "../types";
 import { GodotScene } from "../godot/godotScene";
 import { RustManager } from "../rust/rustmanager";
 import { GodotPath } from "../godot/godotPath";
-import { GODOT_STRUCTS } from "../godotClasses";
 
 export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
   data: Map<FullPathFile, NodeItem> = new Map();
@@ -30,26 +29,31 @@ export class TscnTreeProvider implements TreeDataProvider<NodeItem> {
 
     // initial load
     for (const [k, s] of scenes.entries()) {
-      let searchedStruct = rust.modules.get(s.rootNode.type!.value); //ok
+      let searchedStruct = rust.modules.get(s.gdscene.rootNode.type);
       let root = NodeItem.createRoot(s, searchedStruct);
       this.data.set(k, root);
     }
 
     // process packed scenes, afterwards
-    for (const [k, v] of this.data.entries()) {
-      for (const p of v.packedSceneChildren) {
-        let packedResPath = p.node.instance?.value.path.value;
-        if (packedResPath) {
-          let packedGPath = GodotPath.fromRes(packedResPath);
+    for (const v of this.data.values()) {
+      for (const p of v.instanceChildren) {
+        let resourcePath = p.node.resource?.path;
+        // should be always true
+        if (resourcePath) {
+          // First Check if it is known node
+          let packedGPath = GodotPath.fromRes(resourcePath);
           let rootNodeItem = this.data.get(packedGPath.base);
           if (rootNodeItem) {
             p.setInstanceType(rootNodeItem);
-            if (rust.modules.has(p.instanceType!) || p.type in GODOT_STRUCTS) {
-              p.setup();
+          } else {
+            // not know: even missing tscn or other resource
+            if (resourcePath.endsWith(".tscn")) {
+              p.setInstanceType("Missing");
             } else {
-              p.setMissing();
+              p.setInstanceType(p.node.resource?.type || "unkown");
             }
           }
+          p.setup();
         }
       }
     }

@@ -1,7 +1,7 @@
-import { FullPathDir, FullPathFile, Name } from "../types";
+import { FullPathDir, FullPathFile } from "../types";
 import { GodotPath, IGodotPath } from "./godotPath";
-import { TscnParser } from "./parser";
-import { GDScene, Node, Uid } from "./types";
+import { parseResFile, parseResFileSync } from "./resParser";
+import { GDScene } from "./types";
 
 export class GodotScene implements IGodotScene {
   readonly gdscene: GDScene;
@@ -12,19 +12,11 @@ export class GodotScene implements IGodotScene {
     this.gdscene = gdScene;
   }
 
-  get uid(): Uid {
-    return this.gdscene.uid;
-  }
-
-  get rootNode(): Node {
-    return this.gdscene.nodes.at(0)!; // there always id a root node
-  }
-
   get depedencies(): GodotPath[] {
     let acc = [];
     for (const ressou of this.gdscene.extResources) {
-      if (ressou.type.value === "PackedScene") {
-        acc.push(GodotPath.fromRes(ressou.path.value));
+      if (ressou.type === "PackedScene") {
+        acc.push(GodotPath.fromRes(ressou.path));
       }
     }
     return acc;
@@ -34,7 +26,11 @@ export class GodotScene implements IGodotScene {
     tscnFile: FullPathFile,
     godotDir: FullPathDir
   ): Promise<GodotScene> {
-    let gdScene = (await TscnParser.file(tscnFile)).parse();
+    let gdScene = await parseResFile(tscnFile);
+    return new GodotScene(GodotPath.fromAbs(tscnFile, godotDir), gdScene);
+  }
+  static newSync(tscnFile: FullPathFile, godotDir: FullPathDir): GodotScene {
+    let gdScene = parseResFileSync(tscnFile);
     return new GodotScene(GodotPath.fromAbs(tscnFile, godotDir), gdScene);
   }
 }

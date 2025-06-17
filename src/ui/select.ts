@@ -71,9 +71,6 @@ class NodeQuickPickItem implements QuickPickItem {
   node: NodeItem;
   constructor(node: NodeItem) {
     this.node = node;
-    let nb_sub = node.basePath.split("/").length || 0;
-    this.label = `${"-".repeat(nb_sub * 4)}> ${
-      (node.basePath === "." ? "" : node.parent?.name + "/") + node.name
-    }  (${node.description})`;
+    this.label = node.fullParent;
   }
 }
