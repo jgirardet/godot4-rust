@@ -7,10 +7,9 @@ const ENTRY_REGEX =
 
 export async function parseResFile(path: FullPathFile): Promise<GDScene> {
   let content = await readUtf8(path);
-  let entries = tree(content);
   let scene;
   try {
-    scene = validateAndDispatch(entries);
+    scene = _parseResFile(content);
   } catch (e: any) {
     return Promise.reject(`Error parsing file : ${path}\n${e}`);
   }
@@ -19,15 +18,23 @@ export async function parseResFile(path: FullPathFile): Promise<GDScene> {
 
 export function parseResFileSync(path: FullPathFile): GDScene {
   let content = readUtf8Sync(path);
-  let entries = tree(content);
   let scene;
   try {
-    scene = validateAndDispatch(entries);
+    scene = _parseResFile(content);
   } catch (e: any) {
     throw new Error(`Error parsing file : ${path}\n${e}`);
   }
   return scene;
 }
+
+function _parseResFile(content: string): GDScene {
+  let entries = tree(content);
+  let scene;
+  scene = validateAndDispatch(entries);
+  return scene;
+}
+
+
 function tree(content: string): ResEntry[] {
   let lines = content.matchAll(/^\[(\w+) (.*)\]$/gm);
   let res = [];
